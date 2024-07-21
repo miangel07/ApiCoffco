@@ -41,7 +41,7 @@ export const validarUsuarios = async (req, res) => {
 
         if (resultado.length > 0) {
             const user = resultado[0];
-            const storedPasswordHash = user.contraseña_usuario;
+            const storedPasswordHash = user.password;
 
             // Comparación de la contraseña proporcionada con el hash almacenado en la base de datos
             const passwordMatch = await bcryptjs.compare(password, storedPasswordHash);
