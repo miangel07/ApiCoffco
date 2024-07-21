@@ -42,13 +42,13 @@ export const registrarUsuario = async (req,res)=>{
         console.log(req.body)
 
         
-        let{nombre_usuario,apellido_usuario,correo_electronico,telefono_usuario,password,rol_usuario,tipo_documento,numero_identificacion}=req.body
+        let{nombre,apellidos,correo_electronico,rol_usuario,password,numero_documento,tipo_documento,estado}=req.body
       
         const salt = await bcryptjs.genSalt(10);
         let hashPassword = await bcryptjs.hash(password,salt)
         
-        let sql = `insert into usuarios (nombre_usuario,apellido_usuario,correo_electronico,telefono_usuario,rol_usuario,contraseña_usuario,numero_identificacion,tipo_documento)
-        value('${nombre_usuario}','${apellido_usuario}','${correo_electronico}','${telefono_usuario}','${rol_usuario}','${hashPassword}','${numero_identificacion}','${tipo_documento}')`;
+        let sql = `insert into usuarios (nombre,apellidos,correo_electronico,rol_usuario,password,numero_documento,tipo_documento,estado)
+        value('${nombre}','${apellidos}','${correo_electronico}','${rol_usuario}','${hashPassword}','${numero_documento}','${tipo_documento}','${estado}')`;
         const [respuesta]=await conexion.query(sql)
         if(respuesta.affectedRows>0){
             res.status(200).json({message:'Se registro el usuario con exito'})
@@ -76,38 +76,54 @@ export const eliminarUsuario = async (req,res)=>{
     }
 }
 
-export const actualizarUsuario = async (req,res)=>{
+export const actualizarUsuario = async (req, res) => {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+
         const salt = await bcryptjs.genSalt(10);
 
-        let id=req.params.id
-        let {nombre_usuario,apellido_usuario,correo_electronico,telefono_usuario,rol_usuario,contraseña_usuario,numero_identificacion,tipo_documento}=req.body
+        const { id } = req.params;
+        const { nombre, apellidos, correo_electronico, rol_usuario, password, numero_documento, tipo_documento, estado } = req.body;
 
-        let hashPassword = await bcryptjs.hash(contraseña_usuario,salt)
-        console.log(hashPassword)
-        let sql=`update usuarios set nombre_usuario='${nombre_usuario}', apellido_usuario='${apellido_usuario}',
-        correo_electronico='${correo_electronico}', telefono_usuario='${telefono_usuario}',rol_usuario='${rol_usuario}', 
-        contraseña_usuario='${hashPassword}',numero_identificacion=${numero_identificacion},tipo_documento='${tipo_documento}' where id_usuario='${id}'`
-    
-        const [respuesta]= await conexion.query(sql)
+        const hashPassword = await bcryptjs.hash(password, salt);
 
-        if(respuesta.affectedRows>0){
-            res.status(200).json({'message':'Usuario actualizo'})
-        }else{
-            res.status(404).json({'message':'Usuario no actualizado'})
+        const sql = `
+            UPDATE usuarios 
+            SET 
+                nombre = ?, 
+                apellidos = ?, 
+                correo_electronico = ?, 
+                rol_usuario = ?, 
+                password = ?, 
+                numero_documento = ?, 
+                tipo_documento = ?, 
+                estado = ?
+            WHERE id_usuario = ?
+        `;
+
+        const values = [nombre, apellidos, correo_electronico, rol_usuario, hashPassword, numero_documento, tipo_documento, estado, id];
+
+        const [respuesta] = await conexion.query(sql, values);
+
+        if (respuesta.affectedRows > 0) {
+            res.status(200).json({ 'message': 'Usuario actualizado' });
+        } else {
+            res.status(404).json({ 'message': 'Usuario no actualizado' });
         }
-        
-    } catch (error) {
-        res.status(500).json({'message': 'Error'+error.message})
-    }
 
+    } catch (error) {
+        res.status(500).json({ 'message': 'Error ' + error.message });
+    }
 }
 export const ConsultaUsers = async(req, res) =>{
     try {
         let sql=`SELECT COUNT(rol_usuario) AS rol
         FROM usuarios
-        WHERE rol_usuario = 'administrador'
-        GROUP BY rol_usuario`
+        WHEREpassword = 'administrador'
+        GROUP BYpassword`
         let rol 
         const [respuesta] = await conexion.query(sql)
         console.log(respuesta)
