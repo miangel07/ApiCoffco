@@ -12,6 +12,7 @@ import rutaFinca from "./FincaRoute.js";
 import rutaDatos from "./DatosRouters.js";
 import RutaAuth from "./AutonteficacionRoutes.js";
 import EstadisticaRouter from "./EstadisticaRouters.js";
+import rutaAmbiente from "./AmbienteRouter.js";
 
 const router = express.Router();
 router.use("/estadisticas",EstadisticaRouter)
@@ -27,5 +28,6 @@ router.use('/datos', rutaDatos);
 router.use('/alquiler', rutaAlquiler);
 router.use('/servicios',rutaServicios)
 router.use('/tipoformato',rutaTipoFormato)
+router.use('/ambiente',rutaAmbiente)
 
 export default router;
