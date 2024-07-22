@@ -1,4 +1,5 @@
 
+import { validationResult } from "express-validator";
 import { conexion } from "../database/conexion.js";
 
 export const ListarAmbientes = async (req, res) => {
@@ -31,9 +32,16 @@ export const ListarAmbientesId = async (req, res) => {
 
 export const CrearAmbiente = async (req, res) => {
   try {
-    const { nombre } = req.body;
-    const sql = "INSERT INTO ambiente (nombre_ambiente) VALUES (?)";
-    const [result] = await conexion.query(sql, [nombre]);
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+    const { nombre,  } = req.body;
+    const sql = "INSERT INTO ambiente (nombre_ambiente,estado) VALUES (?)";
+    const value=[
+      nombre
+    ]
+    const [result] = await conexion.query(sql,value);
     if (result.affectedRows > 0) {
       res.status(201).json({ menssage: "Ambiente creado correctamente" });
     } else {
