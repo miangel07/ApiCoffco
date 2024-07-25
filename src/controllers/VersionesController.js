@@ -27,6 +27,7 @@ export const registrarVersiones = async (req, res) => {
     }
     const { version, fk_id_usuarios, fk_documentos, estado, fecha_version } =
       req.body;
+
     const archivo = req.file.originalname;
 
     const sql = `INSERT INTO versiones (version, fk_id_usuarios, fk_documentos, estado, nombre_documento, fecha_version)

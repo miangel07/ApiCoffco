@@ -34,8 +34,4 @@ export const validacionUser = [
   check("tipo_documento", "El tipo de documento es obligatorio")
     .optional()
     .isIn(['cc', 'ti', 'nit', 'pasaporte']),
-
-  check("estado", "El estado es obligatorio")
-    .optional()
-    .isIn(['activo', 'inactivo'])
 ];

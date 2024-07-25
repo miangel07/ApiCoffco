@@ -10,14 +10,17 @@ import rutaUsuario from "./usuarioRoute.js";
 import rutaDetalle from "./detalleRoute.js";
 import rutaFinca from "./FincaRoute.js";
 import rutaDatos from "./DatosRouters.js";
+import rutaPrecio from "./PrecioRoute.js";
 import RutaAuth from "./AutonteficacionRoutes.js";
 import EstadisticaRouter from "./EstadisticaRouters.js";
 import rutaAmbiente from "./AmbienteRouter.js";
 import routerClientes from "./clienteRouter.js";
 
 const router = express.Router();
+
 router.use("/estadisticas", EstadisticaRouter);
 router.use("/auth", RutaAuth);
+router.use("/precio", rutaPrecio);
 router.use("/municipio", rutaMunicipio);
 router.use("/muestra", ruta);
 router.use("/documentos", DocumentosRouter);
