@@ -1,83 +1,83 @@
-import {conexion} from "../database/conexion.js"
-import { validationResult } from "express-validator"
+import { conexion } from "../database/conexion.js";
+import { validationResult } from "express-validator";
 
-export const ListarMunicipio =async(req,res)=>{
+export const listarMunicipio = async (req, res) => {
     try {
-    let sql="select * from municipio"
-    const [responde] = await conexion.query(sql)
-    if(responde.length>0){
-        res.status(200).json(responde)
-    }
-       else{
-        res.status(404).json({"menssage":"no se pudo listar correctamente"})
-       }
+        let sql = "SELECT * FROM municipio";
+        const [responde] = await conexion.query(sql);
+        if (responde.length > 0) {
+            res.status(200).json(responde);
+        } else {
+            res.status(404).json({ "message": "No se pudo listar correctamente" });
+        }
     } catch (error) {
-        res.status(500).json({"menssage":"error en la conexion"+error.menssage})
+        res.status(500).json({ "message": "Error en la conexión: " + error.message });
     }
-}
+};
 
-export const RegistrarMunicipio=async(req,res)=>{
+export const registrarMunicipio = async (req, res) => {
     try {
-        const error = validationResult(req)
-        if(!error.isEmpty()){
-            return res.status(400).json(error)
+        const error = validationResult(req);
+        if (!error.isEmpty()) {
+            return res.status(400).json(error);
         }
-        
-        let {nombre_municipio}=req.body
-        let sql =`insert into municipio (nombre_municipio) values('${nombre_municipio}')`
-        const [respuesta]=await conexion.query(sql)
-        if(respuesta.affectedRows>0){
-            return res.status(200).json({"menssage":"el dato se registro correctamente"})
-        }
-        else{
-            return res.status(404).json({"message":"el dato no se registro"})
+
+        let { nombre_municipio } = req.body;
+        let sql = `INSERT INTO municipio (nombre_municipio) VALUES (?)`;
+        const [respuesta] = await conexion.query(sql, [nombre_municipio]);
+        if (respuesta.affectedRows > 0) {
+            return res.status(200).json({ "message": "El dato se registró correctamente" });
+        } else {
+            return res.status(404).json({ "message": "El dato no se registró" });
         }
     } catch (error) {
-        return res.status(500).json({"message":"error al conectar la base de datos"})
+        return res.status(500).json({ "message": "Error al conectar la base de datos: " + error.message });
     }
-}
-export const ActualizarMunicipio=async(req,res)=>{
-    
-    let {id_municipio,nombre_municipio}=req.body
-    let id=req.params.id
-    let sql=`update muestra set id_municipio='${id_municipio}', nombre_municipio='${nombre_municipio} where id_muestra=${id}`
-    const [responde]=await conexion.query(sql)
-    
-    if(responde.affectedRows>0){
-        return res.status(200).json({"message":"se actualizo con exito el usuario"})
-    }
-    else{
-        return res.status(404).json({"message":"no se actualizo el usuario"})
-    } 
-}
-export const EliminarMunicipio= async(req,res)=>{
+};
+
+export const actualizarMunicipio = async (req, res) => {
     try {
-        let id=req.params.id
-        let sql =`delete from muestra where id_municipio=${id}`
-        const [responde]=await conexion.query(sql)
-        if(responde.affectedRows>0){
-            res.status(200).json({"message":"usuario eliminado correctamente"})
+        let { nombre_municipio } = req.body;
+        let id = req.params.id;
+        let sql = `UPDATE municipio SET nombre_municipio = ? WHERE id_municipio = ?`;
+        const [responde] = await conexion.query(sql, [nombre_municipio, id]);
+
+        if (responde.affectedRows > 0) {
+            return res.status(200).json({ "message": "Se actualizó con éxito el municipio" });
+        } else {
+            return res.status(404).json({ "message": "No se actualizó el municipio" });
         }
-        else{
-            res.status(404).json({"message":"usuario no eliminado correctamente"})
-        }  
     } catch (error) {
-        res.status(500).json({"message":"error en la conexion"+error.menssage})
+        return res.status(500).json({ "message": "Error en el servidor: " + error.message });
     }
-}
-export const ListaridMunicipio=async(req,res)=>{
+};
+
+export const eliminarMunicipio = async (req, res) => {
     try {
-        let id=req.params.id
-        let sql=`select * from muestra where id_municipio=${id}`
-        const [responde]= await conexion.query(sql)
-        if(responde.length == 1){
-            res.status(200).json(responde)
+        let id = req.params.id;
+        let sql = `DELETE FROM municipio WHERE id_municipio = ?`;
+        const [responde] = await conexion.query(sql, [id]);
+        if (responde.affectedRows > 0) {
+            res.status(200).json({ "message": "Municipio eliminado correctamente" });
+        } else {
+            res.status(404).json({ "message": "Municipio no eliminado correctamente" });
         }
-        else{
-            res.status(404).json({"message":"usuario no encontrado"})
-        }
-        
     } catch (error) {
-        res.status(500).json({"menssage":"error en la conexion en la base de datos "+error.menssage})
+        res.status(500).json({ "message": "Error en la conexión: " + error.message });
     }
+};
+
+export const listarIdMunicipio = async (req, res) => {
+    try {
+        let id = req.params.id;
+        let sql = `SELECT * FROM municipio WHERE id_municipio = ?`;
+        const [responde] = await conexion.query(sql, [id]);
+        if (responde.length == 1) {
+            res.status(200).json(responde);
+        } else {
+            res.status(404).json({ "message": "Municipio no encontrado" });
+        }
+    } catch (error) {
+        res.status(500).json({ "message": "Error en la conexión en la base de datos: " + error.message });
     }
+};
