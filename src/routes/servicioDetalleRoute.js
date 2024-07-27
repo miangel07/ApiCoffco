@@ -5,8 +5,8 @@ import { validateServicioDetalle } from "../../validation/servicioDetalleValidat
 
 const rutaServicioDetalle = Router();
 
-rutaServicioDetalle.get('/listar', validarToken, listarServiciosDetalle);
-rutaServicioDetalle.get('/listar/:id', validarToken, listarServicioDetallePorId);
+rutaServicioDetalle.get('/listar',validarToken, listarServiciosDetalle);
+rutaServicioDetalle.get('/listar/:id',validarToken,listarServicioDetallePorId);
 rutaServicioDetalle.post('/registrar', validarToken, validateServicioDetalle, registrarServicioDetalle);
 rutaServicioDetalle.put('/actualizar/:id', validarToken, validateServicioDetalle, actualizarServicioDetalle);
 rutaServicioDetalle.delete('/eliminar/:id', validarToken, eliminarServicioDetalle);

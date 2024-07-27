@@ -78,6 +78,6 @@ export const listarIdTipoDocumento = async (req, res) => {
             res.status(404).json({ "message": "Tipo de documento no encontrado" });
         }
     } catch (error) {
-        res.status 500.json({ "message": "Error en la conexión en la base de datos: " + error.message });
+        res.status(500).json({ "message": "Error en la conexión en la base de datos: " + error.message });
     }
 };

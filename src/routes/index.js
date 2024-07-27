@@ -1,7 +1,7 @@
 import express from "express";
 import rutaAlquiler from "./AlquilerRoute.js";
 import rutaServicios from "./serviciosRoute.js";
-import rutaTipoFormato from "./tipoFormatoRoute.js";
+import rutaTipodocumento from "./tipoDocumentoRoute.js";
 import rutaMunicipio from "./municipioRoute.js";
 import ruta from "./muestraRoutes.js";
 import DocumentosRouter from "./DocumentosRoute.js";
@@ -17,6 +17,7 @@ import routerClientes from "./clienteRouter.js";
 import rutaRecuperarContraseña from "./recuperarContraseñaRoute.js";
 import rutaVariables from "./variablesRouters.js";
 import rutaVersionesTieneVariables from "./versiones_tiene_variablesRoute.js";
+import servicioDetalle from "./servicioDetalleRoute.js"
 
 const router = express.Router();
 
@@ -33,7 +34,8 @@ router.use("/finca", rutaFinca);
 router.use("/variables", rutaVariables);
 router.use("/alquiler", rutaAlquiler);
 router.use("/servicios", rutaServicios);
-router.use("/tipoformato", rutaTipoFormato);
+router.use("/servicioDetalle",servicioDetalle);
+router.use("/tipodocumento", rutaTipodocumento);
 router.use("/ambiente", rutaAmbiente);
 router.use("/cliente", routerClientes);
 router.use("/password", rutaRecuperarContraseña);
