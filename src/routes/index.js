@@ -18,6 +18,7 @@ import rutaRecuperarContraseña from "./recuperarContraseñaRoute.js";
 import rutaVariables from "./variablesRouters.js";
 import rutaVersionesTieneVariables from "./versiones_tiene_variablesRoute.js";
 import servicioDetalle from "./servicioDetalleRoute.js"
+import routerConsultas from "./consultasRouter.js";
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.use("/servicioDetalle",servicioDetalle);
 router.use("/tipodocumento", rutaTipodocumento);
 router.use("/ambiente", rutaAmbiente);
 router.use("/cliente", routerClientes);
+router.use("/consultas", routerConsultas);
 router.use("/password", rutaRecuperarContraseña);
 router.use("/versionestienevariables", rutaVersionesTieneVariables);
 
