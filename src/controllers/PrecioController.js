@@ -14,11 +14,9 @@ export const listarPrecios = async (req, res) => {
         .json({ message: "No se encontraron precios en la base de datos" });
     }
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        message: "Error en el controlador PrecioController.js: " + err.message,
-      });
+    res.status(500).json({
+      message: "Error en el controlador PrecioController.js: " + err.message,
+    });
   }
 };
 

@@ -15,6 +15,7 @@ import RutaAuth from "./AutonteficacionRoutes.js";
 import EstadisticaRouter from "./EstadisticaRouters.js";
 import rutaAmbiente from "./AmbienteRouter.js";
 import routerClientes from "./clienteRouter.js";
+import rutaRecuperarContraseña from "./recuperarContraseñaRoute.js";
 
 const router = express.Router();
 
@@ -34,5 +35,6 @@ router.use("/servicios", rutaServicios);
 router.use("/tipoformato", rutaTipoFormato);
 router.use("/ambiente", rutaAmbiente);
 router.use("/cliente", routerClientes);
+router.use("/password", rutaRecuperarContraseña);
 
 export default router;
