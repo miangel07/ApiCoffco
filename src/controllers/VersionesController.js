@@ -25,26 +25,25 @@ export const registrarVersiones = async (req, res) => {
     if (!error.isEmpty()) {
       return res.status(400).json(error);
     }
-    const { version, fk_id_usuarios, fk_documentos, estado, fecha_version } =
-      req.body;
+    let { version, fk_id_usuarios, fk_documentos, estado, fecha_version }=req.body;
+      console.log(req.body)
     const archivo = req.file.originalname;
 
-    const sql = `INSERT INTO versiones (version, fk_id_usuarios, fk_documentos, estado, nombre_documento, fecha_version)
-                 VALUES ('${version}', '${fk_id_usuarios}', '${fk_documentos}', '${estado}', '${archivo}','${fecha_version}' )`;
+    let sql = `insert into versiones (version, fk_id_usuarios, fk_documentos, estado, nombre_documento, fecha_version)values(?,?,?,?,?,?)`;
 
-    const [rows] = await conexion.query(sql);
-
-    if (rows.affectedRows > 0) {
+    const [respuesta] = await conexion.query(sql,[version,fk_id_usuarios,fk_documentos,estado,archivo,fecha_version]);
+    
+    if (respuesta.affectedRows > 0) {
       return res
         .status(200)
         .json({ message: "Se registró con éxito la versión" });
     } else {
       return res
         .status(404)
-        .json({ message: "No se registró ningún formato." });
+        .json({ message: "No se registró ningúna version" });
     }
-  } catch (e) {
-    return res.status(500).json({ message: "Error: " + e.message });
+  } catch (error) {
+    return res.status(500).json({ message: "Error en el servidor " + error.message });
   }
 };
 
@@ -65,7 +64,8 @@ export const eliminarVersiones = async (req, res) => {
   } catch (e) {
     return res.status(500).json({ message: "error " + e.message });
   }
-};
+}
+
 
 export const actualizarVersiones = async (req, res) => {
   try {
