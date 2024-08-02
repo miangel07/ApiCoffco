@@ -20,6 +20,7 @@ export const listarVersiones = async (req, res) => {
 };
 
 export const registrarVersiones = async (req, res) => {
+  /* idVersion	version	fk_id_usuarios	fk_documentos	estado	nombre_documento	fecha_version	 */
   try {
     const error = validationResult(req);
     if (!error.isEmpty()) {
