@@ -18,7 +18,8 @@ export const listarDocumentos = async (req, res) => {
     res.status(500).json({ message: "Error" + err });
   }
 };
-/* nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision	fk_idServicios	fk_idTipoDocumento */
+/* nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision	fk_idTipoServicio	fk_idTipoDocumento	fk_idLogos	
+ */
 export const registrarDocumentos = async (req, res) => {
   try {
     const error = validationResult(req);
@@ -31,12 +32,13 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      servicios: fk_idServicios,
+      servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
+      logo: fk_idLogos
     } = req.body;
 
-    let sql = `insert into documentos (nombre, fecha_carga,descripcion,codigo_documentos,	fecha_emision	,fk_idServicios,	fk_idTipoDocumento )
-        values ('${nombre}','${fecha_carga}','${descripcion}','${codigo_documentos}','${fecha_emision}','${fk_idServicios}','${fk_idTipoDocumento}')`;
+    let sql = `insert into documentos (nombre, fecha_carga,descripcion,codigo_documentos,	fecha_emision	,fk_idTipoServicio,	fk_idTipoDocumento ,fk_idLogos)
+        values ('${nombre}','${fecha_carga}','${descripcion}','${codigo_documentos}','${fecha_emision}','${fk_idTipoServicio}','${fk_idTipoDocumento}','${fk_idLogos}')`;
     const [rows] = await conexion.query(sql);
     if (rows.affectedRows > 0) {
       return res
@@ -78,11 +80,12 @@ export const actalizardocumentos = async (req, res) => {
       fecha_emision,
       servicios: fk_idServicios,
       tipo_documento: fk_idTipoDocumento,
+      logo: fk_idLogos
     } = req.body;
     let id_documentos = req.params.id_documentos;
     let sql = `update documentos set nombre ='${nombre}', fecha_carga = '${fecha_carga}', 
          descripcion = '${descripcion}',codigo_documento='${codigo_documentos}',
-        fecha_emision='${fecha_emision},servicios=${fk_idServicios},tipo_documento=${fk_idTipoDocumento}
+        fecha_emision='${fecha_emision},servicios=${fk_idServicios},tipo_documento=${fk_idTipoDocumento},logo=${fk_idLogos}
          where id_documentos = ${id_documentos}`;
 
     const [rows] = await conexion.query(sql);
@@ -118,58 +121,3 @@ export const buscarDocumentos = async (req, res) => {
   }
 };
 
-export const ListaridDocumentos = async (req, res) => {
-  try {
-    let id_documentos = req.params.id_documentos;
-    let sql = `select * from documentos where id_documentos=${id_documentos}`;
-    const [responde] = await conexion.query(sql);
-    if (responde.length == 1) {
-      res.status(200).json(responde);
-    } else {
-      res.status(500).json({ message: "dato no encontrado" });
-    }
-  } catch (error) {
-    res.status(500).json({ menssage: "error en la conexion" + error.menssage });
-  }
-};
-
-export const editarEstadoDocumento = async (req, res) => {
-  try {
-    //con esta valirable trae el token de la cabecera
-    let token = req.headers.token;
-    //decodifica el token y lo guarda en la variable decodedToken
-    let decodedToken = jwt.decode(token);
-    // mira como trae la decodificacion y la trae en objeto
-    console.log(decodedToken);
-    // decode accede al array dentro del objeo y con user[0] que es el array accede al poscicion 0 y trae id_documentos y lo alamcena en rol
-    // ya con ese rol se dan los permisos
-    let rol = decodedToken.user[0].rol_usuario;
-
-    const id_documentos = req.params.id_documentos;
-    const { estado } = req.body;
-    if (rol != "administrador") {
-      return res
-        .status(401)
-        .json({ message: "No tienes permisos para realizar esta acción." });
-    } else {
-      if (estado != "activo" && estado != "inactivo") {
-        return res.status(400).json({
-          message: "El estado del documento debe ser activo o inactivo.",
-        });
-      }
-      let sql = `update documentos set estado ='${estado}' where id_documentos = ${id_documentos}`;
-      const [rows] = await conexion.query(sql);
-      if (rows.affectedRows > 0) {
-        return res
-          .status(200)
-          .json({ message: "Se actualizó con éxito el estado del documento." });
-      } else {
-        return res
-          .status(404)
-          .json({ message: "No se actualizó el estado del documento." });
-      }
-    }
-  } catch (err) {
-    res.status(500).json({ message: "Error" + err });
-  }
-};
