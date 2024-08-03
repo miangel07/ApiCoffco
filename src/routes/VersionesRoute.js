@@ -7,12 +7,12 @@ import { subirArchivos } from "../controllers/SubirArchivosControllers.js";
 
 const rutaVersion = Router()
 
-rutaVersion.get('/listar', listarVersiones)
-rutaVersion.get('/listarid/:id_formato', ListaridVersiones)
-rutaVersion.post('/registrar', subirArchivos, validateVersiones, registrarVersiones)
-rutaVersion.put('/actualizarVersion/:id_formato', subirArchivos, validateVersiones, actualizarVersiones)
-rutaVersion.put('/actualizarEstado/:id_formato', desactivarEstado)
-rutaVersion.put('/actualizar/:id_formato', subirArchivos, actualizar)
+rutaVersion.get('/listar', validarToken, listarVersiones)
+rutaVersion.get('/listarid/:id_formato', validarToken, ListaridVersiones)
+rutaVersion.post('/registrar', validarToken, subirArchivos, validateVersiones, registrarVersiones)
+rutaVersion.put('/actualizarVersion/:id_formato', validarToken, subirArchivos, validateVersiones, actualizarVersiones)
+rutaVersion.put('/actualizarEstado/:id_formato', validarToken, desactivarEstado)
+rutaVersion.put('/actualizar/:id_formato', validarToken, subirArchivos, validateVersiones, actualizar)
 rutaVersion.delete('/eliminar/:id_formato', validarToken, eliminarVersiones)
 
 
