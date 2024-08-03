@@ -7,8 +7,8 @@ const DocumentosRouter = Router()
 DocumentosRouter.get('/listar',validarToken,listarDocumentos)
 DocumentosRouter.post('/registrar',validarToken,documentoValidate,registrarDocumentos)
 DocumentosRouter.delete('/eliminar/:id_documentos',validarToken, eliminarDocumentos)
-DocumentosRouter.put('/actualizar/:id_documentos', validarToken,validateCargarDocs,actalizardocumentos)
-DocumentosRouter.get('/buscar/:id', validarToken,validaciondocumentos,buscarDocumentos)
+DocumentosRouter.put('/actualizar/:id_documentos', validarToken,documentoValidate,actalizardocumentos)
+DocumentosRouter.get('/buscar/:id', validarToken,buscarDocumentos)
 
 
 export default DocumentosRouter
