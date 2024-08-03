@@ -20,7 +20,7 @@ export const registrarLogo = async (req, res) => {
     try {
         let { estado, nombre } = req.body;
         const ruta = req.file.originalname;
-        let sql = "INSERT INTO logos (ruta,estado,nombre	) VALUES (?, ?,?)";
+        let sql = "INSERT INTO logos (ruta,estado,nombre) VALUES (?, ?,?)";
         const [response] = await conexion.query(sql, [ruta, estado, nombre]);
         if (response.affectedRows > 0) {
             return res.status(200).json({ message: "Logo registrado correctamente" });

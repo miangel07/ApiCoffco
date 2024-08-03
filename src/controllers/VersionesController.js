@@ -153,8 +153,7 @@ export const actualizar = async (req, res) => {
     let sqlbuscar = `select * from versiones where idVersion=${idVersion}`;
     const [rows] = await conexion.query(sqlbuscar);
     const fecha_version = rows[0].fecha_version
-    const date = new Date(fecha_version).toISOString().split('T')[0];
-    let sql = `update versiones set version='${version}', fk_id_usuarios=${fk_id_usuarios}, fk_documentos=${fk_documentos}, nombre_documento='${archivo}',fecha_version='${date}'
+    let sql = `update versiones set version='${version}', fk_id_usuarios=${fk_id_usuarios}, fk_documentos=${fk_documentos}, nombre_documento='${archivo}',fecha_version='${fecha_version}'
      where idVersion=${idVersion}`;
     const [responde] = await conexion.query(sql);
     if (responde.affectedRows > 0) {
