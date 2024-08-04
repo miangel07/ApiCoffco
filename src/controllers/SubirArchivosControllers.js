@@ -1,35 +1,40 @@
 import multer from "multer";
-import fs from "fs";
-// updaload hace uso de multer y le dice donde se va alamacenar los archivos
-const upload = multer({ dest: "public" });
+import path from "path";
 
-export const subirArchivo = (req, res) => {
-    // upload single  es como se va a llamar el campo del formulario donde va recibir el archivo
-  upload.single("archivo")(req, res, (err) => {
+// Tipos de archivo permitidos
+const fileTypes = /document|docx|xls|xlsx|pdf|pptx|ppt|png|jpg|svg/;
 
-    // console.log(req.file); muestra los datos del archovo con req.file
-    console.log(req.file);
-    //recibe la imagen y va ala funcion del cambio de nombre del archivo 
-    guardarNombre(req.file)
-    // aqui maneja el error 
-    console.log(guardarNombre)
-    if (err) {
-      // Manejar errores de subida de archivos
-      console.error(err);
-      res.status(500).send("Error al subir el archivo");
-    } else {
-      console.log(req.file);
-      res.send("Archivo subido correctamente");
-    }
-  });
-  // guardarnombre del archivo trae lo de file 
-  function guardarNombre(file){
-    // recibe el nombre del archivo original y lo cambia por el nuevo nombre
-    const nuevoNombre =`./uploads/${file.originalname}`
-    // cambia el nombre del archivo original por el nuevo nombre
-    fs.renameSync(file.path, nuevoNombre)
-    return nuevoNombre
+// Configuración de almacenamiento de Multer
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "public/documentos");
+  },
+
+  filename: function (req, file, cb) {
+    const nombre = `${Date.now()}-${file.originalname}`;
+    cb(null, nombre);
+  },
+});
+
+// Filtro de archivos
+const fileFilter = (req, file, cb) => {
+  // Verificar la extensión del archivo
+  const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+  // Verificar el tipo MIME
+  const mimetype = fileTypes.test(file.mimetype);
+  if (mimetype && extname) {
+    cb(null, true);
+  } else {
+    return cb(
+      JSON.stringify({
+        message: "archivo no valido",
+      })
+    );
   }
 };
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+});
 
-
+export const subirArchivos = upload.single("file");
