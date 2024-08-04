@@ -8,9 +8,9 @@ export const registrarServicio = async (req, res) => {
             return res.status(400).json(error);
         }
 
-        let { nombre, estado } = req.body;
+        let { nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado } = req.body;
         let sql = `INSERT INTO servicios (nombre, estado) VALUES (?, ?)`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado]);
+        const [respuesta] = await conexion.query(sql, [nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado]);
         if (respuesta.affectedRows > 0) {
             res.status(200).json({ message: 'Dato registrado con éxito' });
         } else {
@@ -51,11 +51,13 @@ export const listarServiciosId = async (req, res) => {
 };
 
 export const actualizarServicios = async (req, res) => {
+    /* 	id_servicios	nombre	fk_idTipoServicio	fecha	fk_idAmbiente	fk_idMuestra	fk_idPrecio	fk_idUsuarios	estado	 */
     try {
-        let { nombre, estado } = req.body;
+        let { nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado } = req.body;
         let id = req.params.id;
-        let sql = `UPDATE servicios SET nombre = ?, estado = ? WHERE id_servicios = ?`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado, id]);
+        let sql = `UPDATE servicios SET  nombre=?, fk_idTipoServicio=?, fecha=?, fk_idAmbiente=?, fk_idMuestra=?, fk_idPrecio=?, fk_idUsuarios=?, estado=? 
+        WHERE id_servicios=?`;
+        const [respuesta] = await conexion.query(sql, [nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado, id]);
         if (respuesta.affectedRows > 0) {
             res.status(200).json({ message: 'Datos actualizados con éxito' });
         } else {

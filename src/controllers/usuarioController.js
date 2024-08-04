@@ -38,22 +38,33 @@ export const registrarUsuario = async (req, res) => {
       return res.status(400).json(error);
     }
     console.log(req.body);
-
+    /* nombre
+    apellidos
+    correo_electronico
+    rol_usuario
+    password
+    numero_documento
+    tipo_documento
+    estado
+    fk_idRol
+     */
     let {
       nombre,
       apellidos,
       correo_electronico,
-      rol_usuario,
       password,
       numero_documento,
       tipo_documento,
+      estado,
+      rol: fk_idRol
     } = req.body;
 
     const salt = await bcryptjs.genSalt(10);
     let hashPassword = await bcryptjs.hash(password, salt);
 
-    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,rol_usuario,password,numero_documento,tipo_documento)
-        value('${nombre}','${apellidos}','${correo_electronico}','${rol_usuario}','${hashPassword}','${numero_documento}','${tipo_documento}')`;
+    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,password,numero_documento,tipo_documento,estado,
+      fk_idRol)
+        value('${nombre}','${apellidos}','${correo_electronico}','${hashPassword}','${numero_documento}','${tipo_documento}','${estado}','${fk_idRol}')`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows > 0) {
       res.status(200).json({ message: "Se registro el usuario con exito" });
@@ -99,6 +110,7 @@ export const actualizarUsuario = async (req, res) => {
       numero_documento,
       tipo_documento,
       estado,
+      rol: fk_idRol
     } = req.body;
 
     const hashPassword = await bcryptjs.hash(password, salt);
@@ -114,6 +126,7 @@ export const actualizarUsuario = async (req, res) => {
                 numero_documento = ?, 
                 tipo_documento = ?, 
                 estado = ?
+                fk_idRol=?
             WHERE id_usuario = ?
         `;
 
@@ -126,6 +139,7 @@ export const actualizarUsuario = async (req, res) => {
       numero_documento,
       tipo_documento,
       estado,
+      fk_idRol,
       id,
     ];
 
@@ -155,5 +169,5 @@ export const ConsultaUsers = async (req, res) => {
     } else {
       res.status(404).json({ message: "No se encontraron usuarios" });
     }
-  } catch (error) {}
+  } catch (error) { }
 };

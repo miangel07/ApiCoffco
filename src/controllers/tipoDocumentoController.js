@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 export const listarTipoDocumento = async (req, res) => {
     try {
-        let sql = "SELECT * FROM tipo_documento";
+        let sql = "SELECT * FROM tipodocumento";
         const [respuesta] = await conexion.query(sql);
         if (respuesta.length > 0) {
             res.status(200).json(respuesta);
@@ -16,15 +16,16 @@ export const listarTipoDocumento = async (req, res) => {
 };
 
 export const registrarTipoDocumento = async (req, res) => {
+    /* 	idTipoDocumento	TipoDocumento	estado */
     try {
         const error = validationResult(req);
         if (!error.isEmpty()) {
             return res.status(400).json(error);
         }
 
-        let { nombre } = req.body;
-        let sql = `INSERT INTO tipo_documento (nombre) VALUES (?)`;
-        const [respuesta] = await conexion.query(sql, [nombre]);
+        let { TipoDocumento, estado } = req.body;
+        let sql = `INSERT INTO tipodocumento (TipoDocumento,estado ) VALUES (?,?)`;
+        const [respuesta] = await conexion.query(sql, [TipoDocumento, estado]);
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "El dato se registró correctamente" });
         } else {
@@ -36,11 +37,12 @@ export const registrarTipoDocumento = async (req, res) => {
 };
 
 export const actualizarTipoDocumento = async (req, res) => {
+
     try {
-        let { nombre } = req.body;
+        let { TipoDocumento, estado } = req.body;
         let id = req.params.id;
-        let sql = `UPDATE tipo_documento SET nombre = ? WHERE idTipo_documento = ?`;
-        const [respuesta] = await conexion.query(sql, [nombre, id]);
+        let sql = `UPDATE tipodocumento SET TipoDocumento = ? , estado=? WHERE idTipoDocumento = ?`;
+        const [respuesta] = await conexion.query(sql, [TipoDocumento, estado, id]);
 
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "Se actualizó con éxito el tipo de documento" });
@@ -55,7 +57,7 @@ export const actualizarTipoDocumento = async (req, res) => {
 export const eliminarTipoDocumento = async (req, res) => {
     try {
         let id = req.params.id;
-        let sql = `DELETE FROM tipo_documento WHERE idTipo_documento = ?`;
+        let sql = `DELETE FROM tipodocumento WHERE idTipoDocumento = ?`;
         const [respuesta] = await conexion.query(sql, [id]);
         if (respuesta.affectedRows > 0) {
             res.status(200).json({ "message": "Tipo de documento eliminado correctamente" });
@@ -70,7 +72,7 @@ export const eliminarTipoDocumento = async (req, res) => {
 export const listarIdTipoDocumento = async (req, res) => {
     try {
         let id = req.params.id;
-        let sql = `SELECT * FROM tipo_documento WHERE idTipo_documento = ?`;
+        let sql = `SELECT * FROM tipodocumento WHERE idTipoDocumento = ?`;
         const [respuesta] = await conexion.query(sql, [id]);
         if (respuesta.length === 1) {
             res.status(200).json(respuesta);
