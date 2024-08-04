@@ -105,7 +105,6 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
-      rol_usuario,
       password,
       numero_documento,
       tipo_documento,
@@ -121,12 +120,11 @@ export const actualizarUsuario = async (req, res) => {
                 nombre = ?, 
                 apellidos = ?, 
                 correo_electronico = ?, 
-                rol_usuario = ?, 
                 password = ?, 
                 numero_documento = ?, 
                 tipo_documento = ?, 
-                estado = ?
-                fk_idRol=?
+                estado = ?, 
+                fk_idRol = ?
             WHERE id_usuario = ?
         `;
 
@@ -134,7 +132,6 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
-      rol_usuario,
       hashPassword,
       numero_documento,
       tipo_documento,

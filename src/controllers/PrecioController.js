@@ -23,26 +23,30 @@ export const listarPrecios = async (req, res) => {
 // Registrar un nuevo precio
 export const registrarPrecio = async (req, res) => {
   try {
+    // Validar los datos
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json(errors.array());
     }
 
-    let { estado_precio, presentacion, precio, fk_idServicios } = req.body;
+    // Obtener los datos del cuerpo de la solicitud
+    const { estado_precio, presentacion, precio, fk_idTipoServicio } = req.body;
 
-    let sql = `INSERT INTO precio (estado_precio, presentacion, precio, fk_idServicios)
-                   VALUES (?, ?, ?, ?)`;
+    // Consulta SQL para insertar el nuevo precio
+    const sql = `INSERT INTO precio (estado_precio, presentacion, precio, fk_idTipoServicio)
+                 VALUES (?, ?, ?, ?)`;
+
+    // Ejecutar la consulta
     const [result] = await conexion.query(sql, [
       estado_precio,
       presentacion,
       precio,
-      fk_idServicios,
+      fk_idTipoServicio,
     ]);
 
+    // Verificar el resultado de la consulta
     if (result.affectedRows > 0) {
-      return res
-        .status(200)
-        .json({ message: "Se registró con éxito el precio" });
+      return res.status(200).json({ message: "Se registró con éxito el precio" });
     } else {
       return res.status(404).json({ message: "No se registró el precio." });
     }
@@ -75,14 +79,14 @@ export const eliminarPrecio = async (req, res) => {
 export const actualizarPrecio = async (req, res) => {
   try {
     let idPrecio = req.params.idPrecio;
-    let { estado_precio, presentacion, precio, fk_idServicios } = req.body;
+    let { estado_precio, presentacion, precio, fk_idTipoServicio } = req.body;
 
-    let sql = `UPDATE precio SET estado_precio = ?, presentacion = ?, precio = ?, fk_idServicios = ? WHERE idPrecio = ?`;
+    let sql = `UPDATE precio SET estado_precio = ?, presentacion = ?, precio = ?, fk_idTipoServicio = ? WHERE idPrecio = ?`;
     let values = [
       estado_precio,
       presentacion,
       precio,
-      fk_idServicios,
+      fk_idTipoServicio,
       idPrecio,
     ];
 

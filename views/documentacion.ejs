@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentación de la API</title>
+    <title>Documentación del API COFFCO</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1>Documentación de la API</h1>
-    <h2>Tabla Genders</h2>
+    <h1>Documentación del API COFFCO</h1>
+    <h2>Tabla Rol</h2>
     <table>
         <thead>
             <tr>
@@ -21,16 +21,16 @@
         </thead>
         <tbody>
             <tr>
-                <td>http://localhost:3000/genders/registrar</td>
+                <td>http://localhost:3000/api/rol/registrar</td>
                 <td>POST</td>
-                <td>Registrar un nuevo género</td>
+                <td>Registrar un nuevo rol</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                  "name_genders": "Nombre del género" <br>
+                                    "rol": "Administrador"<br>
                                 } <br> 
                             </ul>
                         </li>
@@ -39,14 +39,7 @@
                 <td>
 <pre>
 {
-    "message(200)": {"Género registrado con éxito",
-    
-        "gender": {
-            "name_genders": "Nombre del género",
-            "_id": "666791d698fe968011fbed4e",
-            "__v": 0
-        }
-    }
+    "message(200)": "Rol registrado correctamente"
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -55,9 +48,9 @@
             </tr>
             
             <tr>
-                <td>http://localhost:3000/genders/listar</td>
+                <td>http://localhost:3000/api/rol/listar</td>
                 <td>GET</td>
-                <td>Obtener todos los géneros</td>
+                <td>Obtener todos los roles</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -67,12 +60,13 @@
                 <td>
 <pre>
 {
-    "message(200)":	
-        {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nombre del género",
-            "__v": 0
-        }
+    "message(200)": "Roles listados correctamente",
+	"data": [
+		{
+			"idRol": 40,
+			"rol": "Administrador"
+		}
+	]
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -80,9 +74,9 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/genders/listarId/:id</td>
+                <td>http://localhost:3000/api/rol/listarid/:idRol</td>
                 <td>GET</td>
-                <td>Obtener un género por ID</td>
+                <td>Obtener un rol por ID</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -92,43 +86,11 @@
                 <td>
 <pre>
 {
-    "message(200)": 
-        {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nombre del género",
-            "__v": 0
-        }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/genders/actualizar/:id</td>
-                <td>PUT</td>
-                <td>Actualizar un género</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong>
-                            <ul>
-                                { <br>
-                                    "name_genders": "Nuevo Nombre del Género" <br>
-                                } <br>                              
-                            </ul>
-                        </li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": {
-        "Género actualizado",
-        "updatedGender": {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nuevo Nombre del Género",
-            "__v": 0
+    {
+        "message(200)": "Rol encontrado correctamente",
+        "data": {
+            "idRol": 40,
+            "rol": "Administrador"
         }
     }
     "message(400)": "Token no proporcionado",
@@ -138,9 +100,35 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/genders/eliminar/:id</td>
+                <td>http://localhost:3000/api/rol/actualizar/:idRol</td>
+                <td>PUT</td>
+                <td>Actualizar un rol</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "rol": "Cliente" <br>
+                                } <br>                              
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Rol actualizado correctamente"
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/rol/eliminar/:idRol</td>
                 <td>DELETE</td>
-                <td>Eliminar un género</td>
+                <td>Eliminar un rol</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -150,7 +138,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Género eliminado",
+    "message(200)": "Rol eliminado correctamente",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -164,7 +152,7 @@
 
 
 
-    <h2>Tabla Users</h2>
+    <h2>Tabla Usuarios</h2>
     <table>
         <thead>
             <tr>
@@ -177,19 +165,24 @@
         </thead>
         <tbody>
             <tr>
-                <td>http://localhost:3000/users/registrar</td>
+                <td>http://localhost:3000/api/usuario/registrar</td>
                 <td>POST</td>
                 <td>Registrar un nuevo usuario</td>
                 <td>
                     <ul>
-                        <li><strong>Header:</strong> Null</li>
+                        <li><strong>Header:</strong>Token</li>
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                    "fullname": "Daniel", <br>
-                                    "email": "daniel@gmail.com", <br>
-                                    "password": "123" <br>
-                                } <br>
+                                    "nombre": "Daniel", <br>
+                                    "apellidos": "Yara", <br>
+                                    "correo_electronico": "daniel.yara@gmail.com", <br>
+                                    "password": "daniel2005", <br>
+                                    "numero_documento": 1083869732, <br>
+                                    "tipo_documento": "cc", <br>
+                                    "estado": "activo", <br>
+                                    "rol": 40 <br>
+                                } <br>                                  
                             </ul>
                         </li>
                     </ul>
@@ -197,14 +190,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Usuario registrado con éxito",
-    "user": {
-        "fullname": "Daniel",
-        "email": "daniel@gmail.com",
-        "password": "$2a$10$g1r8138bdRu7swh1MBXgWeam5xHx0fORp8Tw.pXkU9DPwWRunickO",
-        "_id": "66677ade98fe968011fbed46",
-        "__v": 0
-    },
+    "message(200)": "Se registro el usuario con exito",
     "message(400)": "El correo electrónico ya está en uso",
     "message(500)": "Error en el servidor: "
 }
@@ -212,7 +198,7 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/login</td>
+                <td>http://localhost:3000/api/auth/login</td>
                 <td>POST</td>
                 <td>Autenticar usuario</td>
                 <td>
@@ -221,9 +207,9 @@
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                    "email": "daniel@gmail.com", <br>
-                                    "password": "123" <br>
-                                } <br>
+                                    "id": 1083869732, <br>
+                                    "password": "daniel2005" <br>
+                                } <br>                                  
                             </ul>
                         </li>
                     </ul>
@@ -231,11 +217,20 @@
                 <td>
 <pre>
 {
-    "message(200)": "Inicio de sesión exitoso", 
-	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9. 
-    eyJ1c2VySWQiOiI2NjVmMDRhNjUzMGI2NWQzYmM2YTcxY2QiLCJl 
-    bWFpbCI6ImRhbmllbEBnbWFpbC5jb20iLCJpYXQiOjE3MTc1MDMxNT 
-    MsImV4cCI6MTcxNzU4OTU1M30.hoQ6-RRIRBA7vi5LEl8sRojTrlFaWb_VNKC_N0ThBaE" 
+    {
+        "user": {
+            "nombre": "Daniel",
+            "rol_usuario": 40,
+            "estado": "activo"
+        },
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyI
+        jpbeyJub21icmUiOiJEYW5pZWwiLCJlc3RhZG8iOiJhY3Rpdm8iLCJma
+        19pZFJvbCI6NDAsInBhc3N3b3JkIjoiJDJhJDEwJGRROVAxWUFSMGd
+        xZVZwV2k5Wm0uSC5JUGpqUFVRdG5jZ1p6SGZLM21aTXRPakJ5NnlacWF
+        DIn1dLCJpYXQiOjE3MjI3MzUyOTEsImV4cCI6MTcyMjgyMTY5MX0.OsPJ
+        K39Cla57GS-QItnYauF50mhwJWhPagqMCxzyRpc",
+        "message(200)": "Usuario autorizado"
+    } 
     "message(400)": "Correo electrónico o contraseña incorrectos",
     "message(500)": "Error en el servidor: "
 }
@@ -243,7 +238,7 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/users/listar</td>
+                <td>http://localhost:3000/api/usuario/listar</td>
                 <td>GET</td>
                 <td>Obtener todos los usuarios</td>
                 <td>
@@ -255,12 +250,16 @@
                 <td>
 <pre>
 {
-    "message(200)":	{
-		"_id": "66677ade98fe968011fbed46",
-		"fullname": "Daniel",
-		"email": "daniel@gmail.com",
-		"password": "$2a$10$g1r8138bdRu7swh1MBXgWeam5xHx0fORp8Tw.pXkU9DPwWRunickO",
-		"__v": 0
+    "message(200)":		{
+		"id_usuario": 6,
+		"nombre": "Daniel",
+		"apellidos": "Yara",
+		"correo_electronico": "daniel.yara@gmail.com",
+		"password": "$2a$10$dQ9P1YAR0gqeVpWi9Zm.H.IPjjPUQtncgZzHfK3mZMtOjBy6yZqaC",
+		"numero_documento": 1083869732,
+		"tipo_documento": "cc",
+		"estado": "activo",
+		"fk_idRol": 40
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -269,7 +268,7 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/users/listarId/:id</td>
+                <td>http://localhost:3000/api/usuario/listarid/:id_usuario</td>
                 <td>GET</td>
                 <td>Obtener un usuario por ID</td>
                 <td>
@@ -281,13 +280,17 @@
                 <td>
 <pre>
 {
-    "message(200)": {
-        "_id": "66677ade98fe968011fbed46",
-        "fullname": "Daniel",
-        "email": "daniel@gmail.com",
-        "password": "$2a$10$g1r8138bdRu7swh1MBXgWeam5xHx0fORp8Tw.pXkU9DPwWRunickO",
-        "__v": 0
-    }
+    "message(200)": 	{
+		"id_usuario": 6,
+		"nombre": "Daniel",
+		"apellidos": "Yara",
+		"correo_electronico": "daniel.yara@gmail.com",
+		"password": "$2a$10$dQ9P1YAR0gqeVpWi9Zm.H.IPjjPUQtncgZzHfK3mZMtOjBy6yZqaC",
+		"numero_documento": 1083869732,
+		"tipo_documento": "cc",
+		"estado": "activo",
+		"fk_idRol": 40
+	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -295,7 +298,7 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/users/actualizar/:id</td>
+                <td>http://localhost:3000/users/actualizar/:id_usuario</td>
                 <td>PUT</td>
                 <td>Actualizar un usuario</td>
                 <td>
@@ -304,10 +307,15 @@
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                  "fullname": "Daniel Actualizado", <br>
-                                  "email": "daniel_actualizado@gmail.com", <br>
-                                  "password": "123" <br>
-                                } <br>
+                                    "nombre": "Daniel ACTUALIZADO", <br>
+                                    "apellidos": "Yara ACTUALIZADO", <br>
+                                    "correo_electronico": "daniel.yara@gmail.com", <br>
+                                    "password": "daniel2005", <br>
+                                    "numero_documento": 1083869732, <br>
+                                    "tipo_documento": "cc", <br>
+                                    "estado": "activo", <br>
+                                    "rol": 40 <br>
+                                } <br>                                  
                             </ul>
                         </li>
                     </ul>
@@ -315,16 +323,7 @@
                 <td>
 <pre>
 {
-    "message(200)": {
-        "Usuario actualizado",
-        "updatedUser": {
-            "_id": "66677ade98fe968011fbed46",
-            "fullname": "Daniel Actualizado",
-            "email": "daniel_actualizado@gmail.com",
-            "password": "123",
-            "__v": 0
-        }
-    }
+    "message(200)": "Usuario actualizado",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -332,7 +331,7 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/users/eliminar/:id</td>
+                <td>http://localhost:3000/api/usuario/eliminar/:id_usuario</td>
                 <td>DELETE</td>
                 <td>Eliminar un usuario</td>
                 <td>
@@ -344,7 +343,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Usuario eliminado",
+    "message(200)": "El usuario se elimiino con exito",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -363,7 +362,7 @@
 
 
 
-    <h2>Tabla Genders</h2>
+    <h2>Tabla Municipio</h2>
     <table>
         <thead>
             <tr>
@@ -376,16 +375,16 @@
         </thead>
         <tbody>
             <tr>
-                <td>http://localhost:3000/genders/registrar</td>
+                <td>http://localhost:3000/api/municipio/registrar</td>
                 <td>POST</td>
-                <td>Registrar un nuevo género</td>
+                <td>Registrar un nuevo municipio</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                  "name_genders": "Nombre del género" <br>
+                                    "nombre_municipio": "Pitalito"<br>
                                 } <br> 
                             </ul>
                         </li>
@@ -394,14 +393,7 @@
                 <td>
 <pre>
 {
-    "message(200)": {"Género registrado con éxito",
-    
-        "gender": {
-            "name_genders": "Nombre del género",
-            "_id": "666791d698fe968011fbed4e",
-            "__v": 0
-        }
-    }
+    "message(200)": "El dato se registró correctamente",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -410,161 +402,9 @@
             </tr>
             
             <tr>
-                <td>http://localhost:3000/genders/listar</td>
+                <td>http://localhost:3000/api/municipio/listar</td>
                 <td>GET</td>
-                <td>Obtener todos los géneros</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong> Null</li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)":	
-        {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nombre del género",
-            "__v": 0
-        }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/genders/listarId/:id</td>
-                <td>GET</td>
-                <td>Obtener un género por ID</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong> Null</li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": 
-        {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nombre del género",
-            "__v": 0
-        }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/genders/actualizar/:id</td>
-                <td>PUT</td>
-                <td>Actualizar un género</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong>
-                            <ul>
-                                { <br>
-                                    "name_genders": "Nuevo Nombre del Género" <br>
-                                } <br>                              
-                            </ul>
-                        </li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": {
-        "Género actualizado",
-        "updatedGender": {
-            "_id": "666791d698fe968011fbed4e",
-            "name_genders": "Nuevo Nombre del Género",
-            "__v": 0
-        }
-    }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/genders/eliminar/:id</td>
-                <td>DELETE</td>
-                <td>Eliminar un género</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong> Null</li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": "Género eliminado",
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-
-
-    <h2>Tabla Categories</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Endpoint</th>
-                <th>Método</th>
-                <th>Descripción</th>
-                <th>Parámetros</th>
-                <th>Ejemplo de Respuesta</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>http://localhost:3000/categories/registrar</td>
-                <td>POST</td>
-                <td>Registrar una nueva categoria</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong>
-                            <ul>
-                                { <br>
-                                  "name_categories": "Nombre de la categoría" <br>
-                                } <br> 
-                            </ul>
-                        </li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": "Categoría registrada con éxito",
-	"category": {
-		"name_categories": "Nombre de la categoría",
-		"_id": "6667972998fe968011fbed59",
-		"__v": 0
-	}
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            
-            <tr>
-                <td>http://localhost:3000/categories/listar</td>
-                <td>GET</td>
-                <td>Obtener todas las categorias</td>
+                <td>Obtener todos los municipios</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -576,9 +416,8 @@
 {
     "message(200)":	
 	{
-		"_id": "6667972998fe968011fbed59",
-		"name_categories": "Nombre de la categoría",
-		"__v": 0
+		"id_municipio": 3,
+		"nombre_municipio": "Pitalito"
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -587,9 +426,149 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/categories/listarId/:id</td>
+                <td>http://localhost:3000/api/municipio/listarid/:id</td>
                 <td>GET</td>
-                <td>Obtener una categoria por ID</td>
+                <td>Obtener un municipio por ID</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": 
+	{
+		"id_municipio": 3,
+		"nombre_municipio": "Pitalito"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/municipio/actualizar/:id</td>
+                <td>PUT</td>
+                <td>Actualizar un municipio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombre_municipio": "Isnos" <br>
+                                } <br>                              
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se actualizó con éxito el municipio",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/municipio/eliminar/:id</td>
+                <td>DELETE</td>
+                <td>Eliminar un municipio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Municipio eliminado correctamente",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+    <h2>Tabla Finca</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Método</th>
+                <th>Descripción</th>
+                <th>Parámetros</th>
+                <th>Ejemplo de Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>http://localhost:3000/api/finca/registrar</td>
+                <td>POST</td>
+                <td>Registrar una nueva finca</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombre_finca": "Finca El Paraíso", <br>
+                                    "fk_id_municipio": 4 <br>
+                                } <br> 
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se registró con éxito la finca",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>http://localhost:3000/api/finca/listar</td>
+                <td>GET</td>
+                <td>Obtener todas las fincas</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)":	
+    {
+		"id_finca": 3,
+		"nombre_finca": "Finca El Paraíso",
+		"fk_id_municipio": 4
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/finca/listarid/:id_finca</td>
+                <td>GET</td>
+                <td>Obtener una finca por ID</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -601,40 +580,9 @@
 {
     "message(200)": 
     {
-        "_id": "6667972998fe968011fbed59",
-        "name_categories": "Nombre de la categoría",
-        "__v": 0
-    }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/categories/actualizar/:id</td>
-                <td>PUT</td>
-                <td>Actualizar una categoria</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong>
-                            <ul>
-                                { <br>
-                                    "name_categories": "Nuevo Nombre de la Categoría" <br>
-                                } <br>                              
-                            </ul>
-                        </li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": "Categoría actualizada",
-	"updatedCategory": {
-		"_id": "6667972998fe968011fbed59",
-		"name_categories": "Nuevo Nombre de la Categoría",
-		"__v": 0
+		"id_finca": 3,
+		"nombre_finca": "Finca El Paraíso",
+		"fk_id_municipio": 4
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -643,9 +591,36 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/categories/eliminar/:id</td>
+                <td>http://localhost:3000/api/finca/actualizar/:id_finca</td>
+                <td>PUT</td>
+                <td>Actualizar una finca</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombre_finca": "Finca El Paraíso ACTUALIZADO", <br>
+                                    "fk_id_municipio": 4 <br>
+                                } <br>                                                               
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se actualizó con éxito la finca",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/finca/eliminar/:id_finca</td>
                 <td>DELETE</td>
-                <td>Eliminar un categoria</td>
+                <td>Eliminar un finca</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -655,7 +630,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Categoría eliminada",
+    "message(200)": "Se eliminó con éxito la finca",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -669,7 +644,7 @@
 
 
 
-    <h2>Tabla Races</h2>
+    <h2>Tabla Muestra</h2>
     <table>
         <thead>
             <tr>
@@ -682,17 +657,21 @@
         </thead>
         <tbody>
             <tr>
-                <td>http://localhost:3000/races/registrar</td>
+                <td>http://localhost:3000/api/muestra/registrar</td>
                 <td>POST</td>
-                <td>Registrar una nueva raza</td>
+                <td>Registrar una nueva muestra</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                  "name_races": "Nombre de la raza" <br>
-                                } <br> 
+                                    "cantidadEntrada": 150.5, <br>
+                                    "fk_id_finca": 4, <br>
+                                    "fecha_muestra": "2024-08-01", <br>
+                                    "codigo_muestra": "M12345", <br>
+                                    "fk_id_usuarios": 7 <br>
+                                } <br>                               
                             </ul>
                         </li>
                     </ul>
@@ -700,12 +679,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Raza registrada con éxito",
-	"race": {
-		"name_races": "Nombre de la raza",
-		"_id": "66679a7198fe968011fbed6a",
-		"__v": 0
-	}
+    "message(200)": "se registro correctamente ",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -714,9 +688,9 @@
             </tr>
             
             <tr>
-                <td>http://localhost:3000/races/listar</td>
+                <td>http://localhost:3000/api/muestra/listar</td>
                 <td>GET</td>
-                <td>Obtener todas las razas</td>
+                <td>Obtener todas las muestras</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -727,10 +701,13 @@
 <pre>
 {
     "message(200)":	
-	{
-		"_id": "66679a7198fe968011fbed6a",
-		"name_races": "Nombre de la raza",
-		"__v": 0
+    {
+		"id_muestra": 2,
+		"cantidadEntrada": 150.5,
+		"fk_id_finca": 4,
+		"fecha_muestra": "2024-08-01T05:00:00.000Z",
+		"codigo_muestra": "M12345",
+		"fk_id_usuarios": 7
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -739,9 +716,9 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/races/listarId/:id</td>
+                <td>http://localhost:3000/api/muestra/listarid/:id</td>
                 <td>GET</td>
-                <td>Obtener una raza por ID</td>
+                <td>Obtener una muestra por ID</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -752,41 +729,13 @@
 <pre>
 {
     "message(200)": 
-    {
-        "_id": "66679a7198fe968011fbed6a",
-        "name_races": "Nombre de la raza",
-        "__v": 0
-    }
-    "message(400)": "Token no proporcionado",
-    "message(500)": "Error en el servidor: "
-}
-</pre>
-                </td>
-            </tr>
-            <tr>
-                <td>http://localhost:3000/races/actualizar/:id</td>
-                <td>PUT</td>
-                <td>Actualizar una raza</td>
-                <td>
-                    <ul>
-                        <li><strong>Header:</strong> Token</li>
-                        <li><strong>Body:</strong>
-                            <ul>
-                                { <br>
-                                    "name_races": "Nuevo Nombre de la Raza" <br>
-                                } <br>                              
-                            </ul>
-                        </li>
-                    </ul>
-                </td>
-                <td>
-<pre>
-{
-    "message(200)": "Raza actualizada",
-	"updatedRace": {
-		"_id": "66679a7198fe968011fbed6a",
-		"name_races": "Nuevo Nombre de la Raza",
-		"__v": 0
+	{
+		"id_muestra": 2,
+		"cantidadEntrada": 150.5,
+		"fk_id_finca": 4,
+		"fecha_muestra": "2024-08-01T05:00:00.000Z",
+		"codigo_muestra": "M12345",
+		"fk_id_usuarios": 7
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -795,9 +744,39 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/races/eliminar/:id</td>
+                <td>http://localhost:3000/api/muestra/actualizar/:id</td>
+                <td>PUT</td>
+                <td>Actualizar una muestra</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "cantidadEntrada": 150.5, <br>
+                                    "fk_id_finca": 4, <br>
+                                    "fecha_muestra": "2024-08-01", <br>
+                                    "codigo_muestra": "M12345ACTUALIZADO", <br>
+                                    "fk_id_usuarios": 7 <br>
+                                } <br>                                                               
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "se actualizo con exito ",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/muestra/eliminar/:id</td>
                 <td>DELETE</td>
-                <td>Eliminar un categoria</td>
+                <td>Eliminar un muestra</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -807,7 +786,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Raza eliminada",
+    "message(200)": "dato eliminado correctamente",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -822,7 +801,7 @@
 
 
 
-    <h2>Tabla Pets</h2>
+    <h2>Tabla Tipo_Servicio</h2>
     <table>
         <thead>
             <tr>
@@ -835,20 +814,16 @@
         </thead>
         <tbody>
             <tr>
-                <td>http://localhost:3000/pets/registrar</td>
+                <td>http://localhost:3000/api/tipoServicio/registrar</td>
                 <td>POST</td>
-                <td>Registrar una nueva mascota</td>
+                <td>Registrar un nuevo tipo de servicio</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
                         <li><strong>Body:</strong>
                             <ul>
                                 { <br>
-                                  "name": "Nombre de la mascota" <br>
-                                  "race_id": "id raza" <br>
-                                  "category_id": "id categoria" <br>
-                                  "photo": foto de la mascota" <br>
-                                  "gender_id": "genero de la mascota" <br>
+                                    "nombreServicio": "trilla" <br>
                                 } <br> 
                             </ul>
                         </li>
@@ -857,7 +832,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Mascota registrada con éxito",
+    "message(200)": "Registrado con éxito",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -866,9 +841,9 @@
             </tr>
             
             <tr>
-                <td>http://localhost:3000/pets/listar</td>
+                <td>http://localhost:3000/api/tipoServicio/listar</td>
                 <td>GET</td>
-                <td>Obtener todas las mascotas</td>
+                <td>Obtener todos los tipos de servicio</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -880,13 +855,8 @@
 {
     "message(200)":	
 	{
-		"_id": "6668418e8b408f1fe0516f8c",
-		"name": "Luiz Rio",
-		"race_id": null,
-		"category_id": null,
-		"photo": "Luiz_Rio.jpg",
-		"gender_id": null,
-		"__v": 0
+		"idTipoServicio": 5,
+		"nombreServicio": "trilla"
 	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
@@ -895,9 +865,9 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/pets/listarId/:id</td>
+                <td>http://localhost:3000/api/tipoServicio/listar/:id</td>
                 <td>GET</td>
-                <td>Obtener una mascota por ID</td>
+                <td>Obtener un tipo de servicio por ID</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -908,15 +878,10 @@
 <pre>
 {
     "message(200)": 
-    {
-        "_id": "6668418e8b408f1fe0516f8c",
-        "name": "Luiz Rio",
-        "race_id": null,
-        "category_id": null,
-        "photo": "Luiz_Rio.jpg",
-        "gender_id": null,
-        "__v": 0
-    }
+	{
+		"idTipoServicio": 5,
+		"nombreServicio": "trilla"
+	}
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -924,9 +889,9 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/pets/actualizar/:id</td>
+                <td>http://localhost:3000/api/tipoServicio/actualizar/:id</td>
                 <td>PUT</td>
-                <td>Actualizar una mascota</td>
+                <td>Actualizar un tipo de servicio</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -934,11 +899,7 @@
                             <ul>
                                 <ul>
                                     { <br>
-                                      "name": "Nuevo nombre de la mascota" <br>
-                                      "race_id": "id raza" <br>
-                                      "category_id": "id categoria" <br>
-                                      "photo": foto de la nueva mascota" <br>
-                                      "gender_id": "genero de la mascota" <br>
+                                      "nombreServicio": "trilla ACTUALIZADO" <br>
                                     } <br> 
                                 </ul>                            
                             </ul>
@@ -948,16 +909,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Mascota actualizada con éxito",
-	"data": {
-		"_id": "6668418e8b408f1fe0516f8c",
-		"name": "Bolt",
-		"race_id": "665e5324786ee3bfa086bece",
-		"category_id": "665e530a786ee3bfa086becb",
-		"photo": "bolt.jpg",
-		"gender_id": "665e533e786ee3bfa086bed1",
-		"__v": 0
-	}
+    "message(200)": "Datos actualizados con éxito",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -965,9 +917,9 @@
                 </td>
             </tr>
             <tr>
-                <td>http://localhost:3000/pets/eliminar/:id</td>
+                <td>http://localhost:3000/api/tipoServicio/eliminar/:id</td>
                 <td>DELETE</td>
-                <td>Eliminar un mascota</td>
+                <td>Eliminar un tipo de servicio</td>
                 <td>
                     <ul>
                         <li><strong>Header:</strong> Token</li>
@@ -977,7 +929,7 @@
                 <td>
 <pre>
 {
-    "message(200)": "Mascota eliminada",
+    "message(200)": "Datos eliminados con éxito",
     "message(400)": "Token no proporcionado",
     "message(500)": "Error en el servidor: "
 }
@@ -986,5 +938,655 @@
             </tr>
         </tbody>
     </table>
+
+
+
+
+
+
+
+
+
+
+
+    
+    <h2>Tabla Precio</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Método</th>
+                <th>Descripción</th>
+                <th>Parámetros</th>
+                <th>Ejemplo de Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>http://localhost:3000/api/precio/registrar</td>
+                <td>POST</td>
+                <td>Registrar un nuevo precio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "estado_precio": "activo", <br>
+                                    "presentacion": "pergamino", <br>
+                                    "precio": 120.75, <br>
+                                    "fk_idTipoServicio": 7 <br>
+                                } <br>
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se registró con éxito el precio",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>http://localhost:3000/api/precio/listar</td>
+                <td>GET</td>
+                <td>Obtener todos los precios</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)":	
+	{
+		"idPrecio": 6,
+		"estado_precio": "activo",
+		"presentacion": "pergamino",
+		"precio": 120.75,
+		"fk_idTipoServicio": 7
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/precio/listarid/:idPrecio</td>
+                <td>GET</td>
+                <td>Obtener un precio por ID</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": 
+	{
+		"idPrecio": 6,
+		"estado_precio": "activo",
+		"presentacion": "pergamino",
+		"precio": 120.75,
+		"fk_idTipoServicio": 7
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/precio/actualizar/:idPrecio</td>
+                <td>PUT</td>
+                <td>Actualizar un precio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                <ul>
+                                    { <br>
+                                        "estado_precio": "activo", <br>
+                                        "presentacion": "pergamino ACTUALZADO", <br>
+                                        "precio": 120.75, <br>
+                                        "fk_idTipoServicio": 7 <br>
+                                    } <br>
+                                </ul>                            
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se actualizó con éxito el precio",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/precio/eliminar/:idPrecio</td>
+                <td>DELETE</td>
+                <td>Eliminar un tipo de servicio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se eliminó con éxito el precio",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Tabla Ambiente</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Método</th>
+                <th>Descripción</th>
+                <th>Parámetros</th>
+                <th>Ejemplo de Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>http://localhost:3000/api/ambiente/registrar</td>
+                <td>POST</td>
+                <td>Registrar un nuevo ambiente</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombre": "Taller trilla", <br>
+                                    "estado": "activo" <br>
+                                } <br>                                  
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Ambiente creado correctamente",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>http://localhost:3000/api/ambiente/listar</td>
+                <td>GET</td>
+                <td>Obtener todos los ambientes</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)":	
+	{
+		"idAmbiente": 5,
+		"nombre_ambiente": "Taller trilla",
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/ambiente/listarid/:id</td>
+                <td>GET</td>
+                <td>Obtener un ambiente por ID</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": 
+	{
+		"idAmbiente": 5,
+		"nombre_ambiente": "Taller trilla",
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/ambiente/actualizar/:id</td>
+                <td>PUT</td>
+                <td>Actualizar un ambiente</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                <ul>
+                                    { <br>
+                                        "nombre": "Taller trilla ACTUALIZADO", <br>
+                                        "estado": "activo" <br>
+                                    } <br>                                     
+                                </ul>                            
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se actualizó con éxito el precio",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/ambiente/eliminar/:id</td>
+                <td>DELETE</td>
+                <td>Eliminar un ambiente</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Ambiente eliminado correctamente",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+    <h2>Tabla Servicio</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Método</th>
+                <th>Descripción</th>
+                <th>Parámetros</th>
+                <th>Ejemplo de Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>http://localhost:3000/api/servicios/registrar</td>
+                <td>POST</td>
+                <td>Registrar un nuevo servicio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombre": "Servicio de Trilla", <br>
+                                    "fk_idTipoServicio": 7, <br>
+                                    "fecha": "2024-08-03", <br>
+                                    "fk_idAmbiente": 6, <br>
+                                    "fk_idMuestra": 3, <br>
+                                    "fk_idPrecio": 7, <br>
+                                    "fk_idUsuarios": 7, <br>
+                                    "estado": "activo" <br>
+                                } <br>                                                                   
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Dato registrado con éxito",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>http://localhost:3000/api/servicios/listar</td>
+                <td>GET</td>
+                <td>Obtener todos los ambientes</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)":	
+	{
+		"id_servicios": 3,
+		"nombre": "Servicio de Trilla",
+		"fk_idTipoServicio": 7,
+		"fecha": "2024-08-03T05:00:00.000Z",
+		"fk_idAmbiente": 6,
+		"fk_idMuestra": 3,
+		"fk_idPrecio": 7,
+		"fk_idUsuarios": 7,
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/servicios/listar/:id</td>
+                <td>GET</td>
+                <td>Obtener un servicio por ID</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": 
+	{
+		"id_servicios": 3,
+		"nombre": "Servicio de Trilla",
+		"fk_idTipoServicio": 7,
+		"fecha": "2024-08-03T05:00:00.000Z",
+		"fk_idAmbiente": 6,
+		"fk_idMuestra": 3,
+		"fk_idPrecio": 7,
+		"fk_idUsuarios": 7,
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/servicios/actualizar/:id</td>
+                <td>PUT</td>
+                <td>Actualizar un servicio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                <ul>
+                                    { <br>
+                                        "nombre": "Servicio de Trilla ACTUALIZADO", <br>
+                                        "fk_idTipoServicio": 7, <br>
+                                        "fecha": "2024-08-03", <br>
+                                        "fk_idAmbiente": 6, <br>
+                                        "fk_idMuestra": 3, <br>
+                                        "fk_idPrecio": 7, <br>
+                                        "fk_idUsuarios": 7, <br>
+                                        "estado": "activo" <br>
+                                    } <br>                                
+                                </ul>                            
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Datos actualizados con éxito",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/servicios/eliminar/:id</td>
+                <td>DELETE</td>
+                <td>Eliminar un servicio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Datos eliminados con éxito",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+    <h2>Tabla Tipo_Documento</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Endpoint</th>
+                <th>Método</th>
+                <th>Descripción</th>
+                <th>Parámetros</th>
+                <th>Ejemplo de Respuesta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>hhttp://localhost:3000/api/tipodocumento/registrar</td>
+                <td>POST</td>
+                <td>Registrar un nuevo tipo de documento</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                { <br>
+                                    "nombreDocumento": "Procesos Misionales", <br>
+                                    "estado": "activo" <br>
+                                }    <br>                                                            
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Dato registrado con éxito",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>http://localhost:3000/api/tipodocumento/listar</td>
+                <td>GET</td>
+                <td>Obtener todos los tipos de documento</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)":	
+	{
+		"idTipoDocumento": 7,
+		"nombreDocumento": "Procesos Misionales",
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/tipodocumento/listar/:id</td>
+                <td>GET</td>
+                <td>Obtener un tipo de documento por ID</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": 
+	{
+		"idTipoDocumento": 7,
+		"nombreDocumento": "Procesos Misionales",
+		"estado": "activo"
+	}
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/tipodocumento/actualizar/:id</td>
+                <td>PUT</td>
+                <td>Actualizar un tipo de documento</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong>
+                            <ul>
+                                <ul>
+                                    { <br>
+                                        "nombreDocumento": "Procesos Misionales ACTUALIZADO", <br>
+                                        "estado": "activo" <br>
+                                    } <br>                                                                   
+                                </ul>                            
+                            </ul>
+                        </li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Se actualizó con éxito el tipo de documento",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>http://localhost:3000/api/tipodocumento/eliminar/:id</td>
+                <td>DELETE</td>
+                <td>Eliminar un servicio</td>
+                <td>
+                    <ul>
+                        <li><strong>Header:</strong> Token</li>
+                        <li><strong>Body:</strong> Null</li>
+                    </ul>
+                </td>
+                <td>
+<pre>
+{
+    "message(200)": "Tipo de documento eliminado correctamente",
+    "message(400)": "Token no proporcionado",
+    "message(500)": "Error en el servidor: "
+}
+</pre>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
