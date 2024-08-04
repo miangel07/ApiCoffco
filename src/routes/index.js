@@ -17,7 +17,7 @@ import rutaVariables from "./variablesRouters.js";
 import servicioDetalle from "./tipoServicioRoute.js"
 import routerConsultas from "./consultasRouter.js";
 import logoRouter from "./logoRoutes.js";
-import rol from "./rolRouter.js";
+import rolRouter from "./rolRouter.js";
 
 const router = express.Router();
 
@@ -37,9 +37,9 @@ router.use("/tipoServicio", servicioDetalle);
 router.use("/tipodocumento", rutaTipodocumento);
 router.use("/ambiente", rutaAmbiente);
 router.use("/logo", logoRouter);
-router.use("/rol", rol);
 router.use("/consultas", routerConsultas);
 router.use("/password", rutaRecuperarContraseña);
+router.use("/rol", rolRouter)
 
 
 export default router;

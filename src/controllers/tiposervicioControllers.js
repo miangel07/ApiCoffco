@@ -4,25 +4,31 @@ import { validationResult } from "express-validator"
 // Registrar Servicio Detalle
 export const registrartiposervicio = async (req, res) => {
     try {
-        /* nombreServicio */
+        // Validar los datos
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
+        // Obtener el nombre del servicio del cuerpo de la solicitud
         const { nombreServicio } = req.body;
-        const sql = `INSERT INTO tiposervicio (nombreServicio)`;
+
+        // Definir la consulta SQL para insertar el nuevo servicio
+        const sql = `INSERT INTO tiposervicio (nombreServicio) VALUES (?)`;
+
+        // Ejecutar la consulta
         const [result] = await conexion.query(sql, [nombreServicio]);
 
+        // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
-            res.status(200).json({ message: 'registrado con éxito' });
+            res.status(200).json({ message: 'Registrado con éxito' });
         } else {
-            res.status(404).json({ message: 'no se regitro' });
+            res.status(404).json({ message: 'No se registró' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-}
+};
 
 // Listar Todos los Servicios Detalle
 export const listartiposervicio = async (req, res) => {
@@ -44,7 +50,7 @@ export const listartiposervicio = async (req, res) => {
 export const listartiposervicioId = async (req, res) => {
     try {
         const id = req.params.id;
-        const sql = `SELECT * FROM tiposervicio WHERE idServicios = ?`;
+        const sql = `SELECT * FROM tiposervicio WHERE idTipoServicio = ?`;
         const [result] = await conexion.query(sql, [id]);
 
         if (result.length === 1) {
@@ -62,24 +68,30 @@ export const actualizartiposervicio = async (req, res) => {
     try {
         const { nombreServicio } = req.body;
         const id = req.params.id;
-        const sql = `UPDATE tiposervicio SET nombreServicio=?  WHERE idServicios = ?`;
-        const [result] = await conexion.query(sql, [nombreServicio,id]);
 
+        console.log(`Actualizando tipo de servicio con ID: ${id} y nombre: ${nombreServicio}`);
+
+        // Consulta SQL para actualizar el tipo de servicio
+        const sql = `UPDATE tiposervicio SET nombreServicio = ? WHERE idTipoServicio = ?`;
+
+        // Ejecutar la consulta
+        const [result] = await conexion.query(sql, [nombreServicio, id]);
+
+        // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
             res.status(200).json({ message: 'Datos actualizados con éxito' });
         } else {
-            res.status(404).json({ message: 'Datos no actualizados' });
+            res.status(404).json({ message: 'Datos no actualizados. Verifica si el ID existe.' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-}
-
+};
 // Eliminar Servicio Detalle
 export const eliminartiposervicio = async (req, res) => {
     try {
         const id = req.params.id;
-        const sql = `DELETE FROM tiposervicio WHERE idServicios = ?`;
+        const sql = `DELETE FROM tiposervicio WHERE idTipoServicio = ?`;
         const [result] = await conexion.query(sql, [id]);
 
         if (result.affectedRows === 1) {

@@ -16,16 +16,16 @@ export const listarTipoDocumento = async (req, res) => {
 };
 
 export const registrarTipoDocumento = async (req, res) => {
-    /* 	idTipoDocumento	TipoDocumento	estado */
+    /* 	nombreDocumento	TipoDocumento	estado */
     try {
         const error = validationResult(req);
         if (!error.isEmpty()) {
             return res.status(400).json(error);
         }
 
-        let { TipoDocumento, estado } = req.body;
-        let sql = `INSERT INTO tipodocumento (TipoDocumento,estado ) VALUES (?,?)`;
-        const [respuesta] = await conexion.query(sql, [TipoDocumento, estado]);
+        let { nombreDocumento, estado } = req.body;
+        let sql = `INSERT INTO tipodocumento (nombreDocumento,estado ) VALUES (?,?)`;
+        const [respuesta] = await conexion.query(sql, [nombreDocumento, estado]);
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "El dato se registró correctamente" });
         } else {
@@ -39,10 +39,10 @@ export const registrarTipoDocumento = async (req, res) => {
 export const actualizarTipoDocumento = async (req, res) => {
 
     try {
-        let { TipoDocumento, estado } = req.body;
+        let { nombreDocumento, estado } = req.body;
         let id = req.params.id;
-        let sql = `UPDATE tipodocumento SET TipoDocumento = ? , estado=? WHERE idTipoDocumento = ?`;
-        const [respuesta] = await conexion.query(sql, [TipoDocumento, estado, id]);
+        let sql = `UPDATE tipodocumento SET nombreDocumento = ? , estado=? WHERE idTipoDocumento = ?`;
+        const [respuesta] = await conexion.query(sql, [nombreDocumento, estado, id]);
 
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "Se actualizó con éxito el tipo de documento" });
