@@ -33,10 +33,12 @@ export const validarUsuarios = async (req, res) => {
         }
 
         let { id: numero_documento,password: password } = req.body
+        console.log(req.body)
         
         // Consulta para obtener el hash de la contraseña del usuario desde la base de datos
-        let sql =`SELECT numero_documento,  password FROM usuarios WHERE numero_documento='${numero_documento}'`
+        let sql =`SELECT nombre,estado ,fk_idRol,password  FROM usuarios WHERE numero_documento='${numero_documento}'`
         const [resultado] = await conexion.query(sql);
+        console.log(resultado)
       
 
         if (resultado.length > 0) {
@@ -49,7 +51,7 @@ export const validarUsuarios = async (req, res) => {
             if (passwordMatch) {
                 // Contraseña válida: se genera un token de autenticación
                 let token = jwt.sign({user:resultado},process.env.SECRET,{expiresIn:process.env.TIME})
-                return res.status(200).json({ user: { nombre: user.nombre, rol_usuario: user.rol_usuario }, token, message: 'Usuario autorizado' });
+                return res.status(200).json({ user: { nombre: user.nombre, rol_usuario: user.fk_idRol,estado:user.estado }, token, message: 'Usuario autorizado' });
             } else {
                 // Contraseña no válida
                 return res.status(401).json({ message: 'Contraseña incorrecta' });
