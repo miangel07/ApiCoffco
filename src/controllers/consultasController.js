@@ -50,7 +50,7 @@ JOIN
     tiposervicio ts ON d.fk_idTipoServicio = ts.idTipoServicio 
 WHERE 
     d.nombre = '${formulario}'  -- Filtro por el documento específico
-    AND m.fecha_muestra BETWEEN '${fecha_incio}' AND '${fecha_fin}'  -- Rango de fechas
+    AND m.fecha_muestra BETWEEN '${fecha_incio}' AND '${fecha_fin}' 
 GROUP BY     
     d.nombre, d.descripcion, ver.version, m.codigo_muestra, m.fecha_muestra, m.cantidadEntrada, u_receptor.nombre, u_productor.nombre, u_productor.tipo_documento, u_productor.numero_documento, u_productor.telefono, mun.nombre_municipio 
 ORDER BY     
