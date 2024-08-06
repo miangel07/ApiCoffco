@@ -22,7 +22,6 @@ export const listarDocumentos = async (req, res) => {
  */
 export const registrarDocumentos = async (req, res) => {
   try {
-    console.log("resgister", body)
     const error = validationResult(req);
     if (!error.isEmpty()) {
       return res.status(400).json(error);
@@ -64,7 +63,7 @@ export const registrarDocumentos = async (req, res) => {
     if (response.affectedRows > 0) {
       return res.status(200).json({ message: "Se registró con éxito el documento y sus logos." });
     } else {
-      return res.status(404).json({ message: "No se pudieron registrar los logos para el documento." });
+      return res.status(404).json({ message: "No se registro el documento." });
     }
   } catch (e) {
     return res.status(500).json({ message: "Error: " + e.message });
@@ -91,6 +90,10 @@ export const eliminarDocumentos = async (req, res) => {
 
 export const actalizardocumentosVersion = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
     let {
       nombre,
       descripcion,
@@ -134,7 +137,7 @@ export const actalizardocumentosVersion = async (req, res) => {
 
     const [response] = await conexion.query(sqlLogos, [values]);
     if (response.affectedRows > 0) {
-      return res.status(200).json({ message: "Se actualizo con éxito el documento y sus logos." });
+      return res.status(200).json({ message: "Se actualizo con éxito el documento" });
     }
   } catch (e) {
     return res.status(500).json({ message: "error " + e.message });
@@ -161,6 +164,10 @@ export const buscarDocumentos = async (req, res) => {
 
 export const Actualizar = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
     let {
       nombre,
       descripcion,

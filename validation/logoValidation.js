@@ -1,12 +1,7 @@
 import { check } from "express-validator";
 
 export const logoValidate = [
-  check("estado", "El estado es obligatorio")
-    .not()
-    .isEmpty()
-    .withMessage("El estado no debe estar vacío")
-    .isIn(['activo', 'inactivo'])
-    .withMessage("El estado debe ser 'activo' o 'inactivo'"),
+
 
   check("nombre", "El nombre es obligatorio")
     .not()
