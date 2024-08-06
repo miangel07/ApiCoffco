@@ -1913,5 +1913,874 @@
         </tr>
       </tbody>
     </table>
+<<<<<<< HEAD
+=======
+    <!--  -->
+    <h2>Tabla logo</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Parámetros</th>
+          <th>Ejemplo de Respuesta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>http://localhost:3000/api/logo/registrar</td>
+          <td>POST</td>
+          <td>Registrar un nuevo Logo</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  {<br />
+                    "nombre":"Logo Documento",<br />
+                    "file":"logo.jpg"<br />
+                    }
+                    <br />
+                  </ul>
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Logo registrado correctamente" ,
+    "message(400)": "No se registrado correctamente"  ,
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td>http://localhost:3000/api/logo/listar</td>
+          <td>GET</td>
+          <td>Obtener todos los logos</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+              [
+              {
+                "idLogos": 5,
+                "ruta": "documento.png",
+                "estado": "inactivo",
+                "nombre": "logo sena empresa"
+              },
+              {
+                "idLogos": 6,
+                "ruta": "documento.png",
+                "estado": "activo",
+                "nombre": "logo sena empresa"
+              },
+              {
+                "idLogos": 7,
+                "ruta": "documento.png",
+                "estado": "activo",
+                "nombre": "logo sena "
+              },
+              {
+                "idLogos": 8,
+                "ruta": "contrato.png",
+                "estado": "activo",
+                "nombre": "sena verde"
+              }
+            ]
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/listarid/5</td>
+          <td>GET</td>
+          <td>Obtener un logo por ID</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+  {
+    "message": "Logo encontrado correctamente",
+    "data": [
+      {
+        "idLogos": 5,
+        "ruta": "documento.png",
+        "estado": "inactivo",
+        "nombre": "logo sena empresa"
+      }
+    ]
+  }
+    "message(400)":  "lo siento logo no encontrado",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/actualizar/8</td>
+          <td>PUT</td>
+          <td>Actualizar un valor del logo  sin cambiar la version</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  <ul>
+                   {
+                    "nombre": "logo senova",
+                    "estado": "inactivo"
+                   }
+                    <br />
+                  </ul>
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Logo actualizado correctamente",
+    "message(400)": "No se ha podido actualizar el documento.",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/actualizarversion/28</td>
+          <td>PUT</td>
+          <td>
+            ACtualizar un logo sin cambiar los valores del que ya existen
+          </td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong></li>
+            </ul>
+            <ul>
+              <ul>
+                {<br />
+                  "nombre":"Logo Documento",<br />
+                  "file":"logo.jpg"<br />
+                  }
+                <br />
+              </ul>
+            </ul>
+          </td>
+          <td>
+            <pre>
+  {
+      "message(200)":"Logo actualizado correctamente",
+      "message(400)": "no se actualizado correctamente" ,
+      "message(500)": "Error en el servidor: "
+  }
+  </pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/eliminar/8</td>
+          <td>DELETE</td>
+          <td>Eliminar un logo</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong>Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)":"Logo eliminado correctamente" ,
+    "message(400)": "No se eliminado correctamente"  ,
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+     <h2>Consultas de ingreso segun el los formularios</h2>
+     <table>
+       <thead>
+         <tr>
+           <th>Endpoint</th>
+           <th>Método</th>
+           <th>Descripción</th>
+           <th>Parámetros</th>
+           <th>Ejemplo de Respuesta</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr>
+           <td>http://localhost:3000/api/logo/registrar</td>
+           <td>POST</td>
+           <td>Trae reportes segun un rango de fechas de los formularios </td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li>
+                 <strong>Body:</strong>
+                 <ul>
+                  {<br>
+                    "formulario":"formulario de ingreso trilla",<br>
+                    "fecha_inicio":"2024-08-05",<br>
+                    "fecha_fin":"2024-08-05"<br>
+                  }<br>
+                     <br />
+                   </ul>
+                 </ul>
+               </li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": [
+     {
+       "nombre_documento": "formulario de ingreso trilla",
+       "descripcion_documento": "formulario de registro para el ingreso de trilla ",
+       "logos": null,
+       "version": "V-01",
+       "codigo_muestra": "m-02",
+       "fecha_muestra": "2024-08-05T05:00:00.000Z",
+       "cantidadEntrada": 50,
+       "quien_recibe": "Pedro",
+       "productor_nombre": "Samuel",
+       "tipo_documento": "cc",
+       "numero_documento": 909090909,
+       "telefono": "2334345343",
+       "nombre_municipio": "Acevedo",
+       "variables_y_valores": "altura(msnm): 2000, observaciones: para empacar, variedad: caturro rosado"
+     },
+     {
+       "nombre_documento": "formulario de ingreso trilla",
+       "descripcion_documento": "formulario de registro para el ingreso de trilla ",
+       "logos": null,
+       "version": "V-01",
+       "codigo_muestra": "m-01",
+       "fecha_muestra": "2024-08-01T05:00:00.000Z",
+       "cantidadEntrada": 25,
+       "quien_recibe": "Jorge",
+       "productor_nombre": "Rodrigo",
+       "tipo_documento": "cc",
+       "numero_documento": 222222,
+       "telefono": "322675489",
+       "nombre_municipio": "Pitalito",
+       "variables_y_valores": "altura(msnm): 2500, observaciones: no aplica, variedad: borbon"
+     }
+   ] ,
+     "message(400)": "No se registrado correctamente"  ,
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+ 
+         
+       </tbody>
+     </table>
+
+     <h2>Tabla Versiones</h2>
+     <table>
+       <thead>
+         <tr>
+           <th>Endpoint</th>
+           <th>Método</th>
+           <th>Descripción</th>
+           <th>Parámetros</th>
+           <th>Ejemplo de Respuesta</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr>
+           <td>http://localhost:3000/api/versiones/registrar</td>
+           <td>POST</td>
+           <td>Registrar una nueva version</td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li>
+                 <strong>Body:</strong>
+                 <ul>
+                  { <br>
+                    "version": "v2.7", <br>
+                    "fk_id_usuarios": 1, <br>
+                    "fk_documentos": 28, <br>
+                    "estado": "activo", <br>
+                    "nombre_documento": "Anexo 6 - Plantilla Tarea 2.pdf", <br>
+                    "fecha_version": "2024-08-03" <br>
+                  } <br>
+                 </ul>
+               </li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": "Se registró con éxito la versión",
+     "message(400)": "No se registró ningúna version" ,
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+ 
+         <tr>
+           <td>http://localhost:3000/api/versiones/listar	</td>
+           <td>GET</td>
+           <td>Obtener todas las versiones</td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li><strong>Body:</strong> Null</li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)":	
+     {
+      "idVersion": 30,
+      "version": "1.0",
+      "fk_id_usuarios": 1,
+      "fk_documentos": 28,
+      "estado": "inactivo",
+      "nombre_documento": "Hoja de vida Miguel Angel Osorio Rojas (2).pdf",
+      "fecha_version": "2024-08-03T19:00:09.000Z"
+    },
+    {
+      "idVersion": 32,
+      "version": "v2.1",
+      "fk_id_usuarios": 1,
+      "fk_documentos": 28,
+      "estado": "inactivo",
+      "nombre_documento": "instalaciones de untu virtual box dependencias.docx",
+      "fecha_version": "2024-08-03T19:03:08.000Z"
+    },
+    {
+      "idVersion": 33,
+      "version": "v2.3",
+      "fk_id_usuarios": 1,
+      "fk_documentos": 28,
+      "estado": "activo",
+      "nombre_documento": "Anexo 6 - Plantilla Tarea 2.pdf",
+      "fecha_version": "2024-08-03T05:00:00.000Z"
+    }
+     "message(400)": "No se encontraron docuementos  en la base de datos",
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+         <tr>
+           <td>http://localhost:3000/api/versiones/listarid/:id</td>
+           <td>GET</td>
+           <td>Obtener una version por ID</td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li><strong>Body:</strong> Null</li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": 
+     {
+      "idVersion": 30,
+      "version": "1.0",
+      "fk_id_usuarios": 1,
+      "fk_documentos": 28,
+      "estado": "inactivo",
+      "nombre_documento": "Hoja de vida Miguel Angel Osorio Rojas (2).pdf",
+      "fecha_version": "2024-08-03T19:00:09.000Z"
+    }
+     "message(400)": "No se ha encontrado el documento solicitado.",
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+         <tr>
+           <td>http://localhost:3000/api/versiones/actualizarVersion/:id</td>
+           <td>PUT</td>
+           <td>Actualizar un valor del documento sin cambiar la version</td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li>
+                 <strong>Body:</strong>
+                 <ul>
+                   <ul>
+                    { <br>
+                      "version": "1.1", <br>
+                      "fk_id_usuarios": 1, <br>
+                      "fk_documentos": 28, <br>
+                      "estado": "inactivo", <br>
+                      "nombre_documento": "Hoja de vida Miguel Angel Osorio Rojas (2).pdf", <br>
+                      "fecha_version": "2024-08-03T19:00:09.000Z" <br>
+                    } <br>
+                     <br />
+                   </ul>
+                 </ul>
+               </li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": "Se actualizó con éxito la version.",
+     "message(400)": "No se actualizó version",
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+         <tr>
+           <td>http://localhost:3000/api/versiones/actualizarversion/28</td>
+           <td>PUT</td>
+           <td>
+             Actualizar la version de una version
+           </td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li><strong>Body:</strong></li>
+             </ul>
+             <ul>
+               <ul>
+                 {<br />
+                 "nombre":"FORMATO ENTREGA DE PRODUCTOs - SERVICO DE tostion",<br />
+                 "descripcion":"formato de tostion",<br />
+                 "codigo": "ft08",<br />
+                 "fecha_emision":"2022-07-01",<br />
+                 "servicios":1,<br />
+                 "tipo_documento": 1,<br />
+                 "logos":[6,5,7]<br />
+                 }
+                 <br />
+               </ul>
+             </ul>
+           </td>
+           <td>
+             <pre>
+   {
+       "message(200)": "Se actualizo con éxito el documento" ,
+       "message(400)": "No se actualizó el documentos." ,
+       "message(500)": "Error en el servidor: "
+   }
+   </pre
+             >
+           </td>
+         </tr>
+         <tr>
+           <td>http://localhost:3000/api/versiones/actualizarEstado/:id_formato</td>
+           <td>PUT</td>
+           <td>Actualizar el estado de una version</td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li><strong>Body:</strong>	{"estado": "activo"}</li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": Se cambio  con éxito el estado a ${estado} ,
+     "message(400)": "dato no encontrado" ,
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/versiones/eliminar/:id</td>
+          <td>DELETE</td>
+          <td>Eliminar una version</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong>Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Se eliminó con éxito la version." ,
+    "message(400)": "No se eliminó la version." ,
+    "message(500)": "Error en el servidor: "
+}
+</pre
+             >
+             
+           </td>
+         </tr>
+       </tbody>
+     </table>
+
+
+
+
+
+
+     <h2>Tabla Variables</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Parámetros</th>
+          <th>Ejemplo de Respuesta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>http://localhost:3000/api/variables/registrar	</td>
+          <td>POST</td>
+          <td>Registrar una nueva variable</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  { <br>
+                    "nombre": "cantidad", <br>
+                    "estado": "activo", <br>
+                    "fk_idVersiones": 0 <br>
+                  } <br>
+                  <br />
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Variable registrada exitosamente"
+    "message(400)": "Variable no registrada",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td>http://localhost:3000/api/variables/listar</td>
+          <td>GET</td>
+          <td>Obtener todas los variables</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": 
+    {
+      "idVariable": 1,
+      "nombre": "temperatura",
+      "estado": "activo",
+      "fk_idVersiones": 0
+    },
+    {
+      "idVariable": 3,
+      "nombre": "cantidad",
+      "estado": "activo",
+      "fk_idVersiones": 0
+    }
+    "message(400)": 'No hay variables registradas',
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/variables/listarid/:id</td>
+          <td>GET</td>
+          <td>Obtener una variable por ID</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    
+        "message(200)": 
+        {
+          "idVariable": 2,
+          "nombre": "temperatura",
+          "estado": "activo",
+          "fk_idVersiones": 0
+        }
+    "message(400)": "Variable no encontrada",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/variables/actualizar/:id</td>
+          <td>PUT</td>
+          <td>Actualizar una variable</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  { <br>
+                    "nombre": "temperatura ACTUALIZADO", <br>
+                    "estado": "activo", <br>
+                    "fk_idVersiones": 0 <br>
+                  } <br>
+                  <br />
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "se actualizo con exito la variable"
+    "message(400)": "no se actualizo la variable",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/variables/eliminar/:id</td>
+          <td>DELETE</td>
+          <td>Eliminar una variable</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Variable eliminada correctamente",
+    "message(400)": "Variable no eliminada correctamente",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+    <h2>Tabla Valor</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Parámetros</th>
+          <th>Ejemplo de Respuesta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>http://localhost:3000/api/valor/registrar</td>
+          <td>POST</td>
+          <td>Registrar un nuevo valor</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  { <br>
+                    "valor": "150.25", <br>
+                    "servicio": 4, <br>
+                    "variable": 1 <br>
+                  } <br>
+                  <br />
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Dato ingresado con exito"
+    "message(400)": "Datos no registrados",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td>http://localhost:3000/api/valor/listar</td>
+          <td>GET</td>
+          <td>Obtener todos los valores</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)":
+    {
+      "idValor": 1,
+      "valor": "150.25",
+      "fk_idServicios": 4,
+      "fk_idVariable": 1
+    }
+    "message(400)": "No hay datos registrados",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/valor/listar/:id</td>
+          <td>GET</td>
+          <td>Obtener un valor por ID</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    
+        "message(200)": 
+        {
+          "idValor": 1,
+          "valor": "150.25",
+          "fk_idServicios": 4,
+          "fk_idVariable": 1
+        }
+    "message(400)": "El dato no existe",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/valor/actualizar/:id</td>
+          <td>PUT</td>
+          <td>Actualizar un valor</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  { <br>
+                    "idValor": 1, <br>
+                    "valor": "550.27", <br>
+                    "fk_idServicios": 4, <br>
+                    "fk_idVariable": 1 <br>
+                  } <br>
+                  <br />
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Datos actualizados con exito"
+    "message(400)": "Datos no actualizados",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/valor/eliminar/:id</td>
+          <td>DELETE</td>
+          <td>Eliminar un valor</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Datos eliminados con exito",
+    "message(400)": "Error al eliminar datos",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+>>>>>>> 212dc07 (documentacion terminada)
   </body>
 </html>
