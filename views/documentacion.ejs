@@ -190,6 +190,8 @@
                   <br />
                   "correo_electronico": "daniel.yara@gmail.com",
                   <br />
+                  "telefono": "3204994085",
+                  <br />
                   "password": "daniel2005",
                   <br />
                   "numero_documento": 1083869732,
@@ -1855,7 +1857,7 @@
         </tr>
         <tr>
           <td>http://localhost:3000/api/documentos/actualizarversion/28</td>
-          <td>DELETE</td>
+          <td>PUT</td>
           <td>
             ACtualizar un documento sin cambiar los valores del que ya existe
           </td>
@@ -1905,6 +1907,211 @@
 {
     "message(200)": "Se eliminó con éxito el documentos." ,
     "message(400)": "No se eliminó el documentos." ,
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!--  -->
+    <h2>Tabla logo</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Endpoint</th>
+          <th>Método</th>
+          <th>Descripción</th>
+          <th>Parámetros</th>
+          <th>Ejemplo de Respuesta</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>http://localhost:3000/api/logo/registrar</td>
+          <td>POST</td>
+          <td>Registrar un nuevo Logo</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  {<br />
+                    "nombre":"Logo Documento",<br />
+                    "file":"logo.jpg"<br />
+                    }
+                    <br />
+                  </ul>
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Logo registrado correctamente" ,
+    "message(400)": "No se registrado correctamente"  ,
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+
+        <tr>
+          <td>http://localhost:3000/api/logo/listar</td>
+          <td>GET</td>
+          <td>Obtener todos los logos</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+              [
+              {
+                "idLogos": 5,
+                "ruta": "documento.png",
+                "estado": "inactivo",
+                "nombre": "logo sena empresa"
+              },
+              {
+                "idLogos": 6,
+                "ruta": "documento.png",
+                "estado": "activo",
+                "nombre": "logo sena empresa"
+              },
+              {
+                "idLogos": 7,
+                "ruta": "documento.png",
+                "estado": "activo",
+                "nombre": "logo sena "
+              },
+              {
+                "idLogos": 8,
+                "ruta": "contrato.png",
+                "estado": "activo",
+                "nombre": "sena verde"
+              }
+            ]
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/listarid/5</td>
+          <td>GET</td>
+          <td>Obtener un logo por ID</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong> Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+  {
+    "message": "Logo encontrado correctamente",
+    "data": [
+      {
+        "idLogos": 5,
+        "ruta": "documento.png",
+        "estado": "inactivo",
+        "nombre": "logo sena empresa"
+      }
+    ]
+  }
+    "message(400)":  "lo siento logo no encontrado",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/actualizar/8</td>
+          <td>PUT</td>
+          <td>Actualizar un valor del logo  sin cambiar la version</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li>
+                <strong>Body:</strong>
+                <ul>
+                  <ul>
+                   {
+                    "nombre": "logo senova",
+                    "estado": "inactivo"
+                   }
+                    <br />
+                  </ul>
+                </ul>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)": "Logo actualizado correctamente",
+    "message(400)": "No se ha podido actualizar el documento.",
+    "message(500)": "Error en el servidor: "
+}
+</pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/actualizarversion/28</td>
+          <td>PUT</td>
+          <td>
+            ACtualizar un logo sin cambiar los valores del que ya existen
+          </td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong></li>
+            </ul>
+            <ul>
+              <ul>
+                {<br />
+                  "nombre":"Logo Documento",<br />
+                  "file":"logo.jpg"<br />
+                  }
+                <br />
+              </ul>
+            </ul>
+          </td>
+          <td>
+            <pre>
+  {
+      "message(200)":"Logo actualizado correctamente",
+      "message(400)": "no se actualizado correctamente" ,
+      "message(500)": "Error en el servidor: "
+  }
+  </pre
+            >
+          </td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000/api/logo/eliminar/8</td>
+          <td>DELETE</td>
+          <td>Eliminar un logo</td>
+          <td>
+            <ul>
+              <li><strong>Header:</strong> Token</li>
+              <li><strong>Body:</strong>Null</li>
+            </ul>
+          </td>
+          <td>
+            <pre>
+{
+    "message(200)":"Logo eliminado correctamente" ,
+    "message(400)": "No se eliminado correctamente"  ,
     "message(500)": "Error en el servidor: "
 }
 </pre

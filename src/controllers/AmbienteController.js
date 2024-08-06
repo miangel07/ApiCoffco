@@ -2,6 +2,7 @@
 import { validationResult } from "express-validator";
 import { conexion } from "../database/conexion.js";
 
+
 export const ListarAmbientes = async (req, res) => {
   try {
     const sql = "select * from ambiente";
@@ -32,29 +33,37 @@ export const ListarAmbientesId = async (req, res) => {
 
 export const CrearAmbiente = async (req, res) => {
   try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-          return res.status(400).json({ errors: errors.array() });
-      }
+    const error = validationResult(req)
+    if (!error.isEmpty()) {
+      return res.status(400).json(error)
+    }
 
-      const { nombre, estado } = req.body;
 
-      const sql = "INSERT INTO ambiente (nombre_ambiente, estado) VALUES (?, ?)";
-      const values = [nombre, estado];
 
-      const [result] = await conexion.query(sql, values);
+    const { nombre, estado } = req.body;
 
-      if (result.affectedRows > 0) {
-          res.status(201).json({ menssage: "Ambiente creado correctamente" });
-      } else {
-          res.status(400).json({ menssage: "Error al crear ambiente" });
-      }
+    const sql = "INSERT INTO ambiente (nombre_ambiente, estado) VALUES (?, ?)";
+    const values = [nombre, estado];
+
+    const [result] = await conexion.query(sql, values);
+
+    if (result.affectedRows > 0) {
+      res.status(201).json({ menssage: "Ambiente creado correctamente" });
+    } else {
+      res.status(400).json({ menssage: "Error al crear ambiente" });
+    }
   } catch (error) {
-      res.status(500).json({ menssage: "Error en la conexion: " + error.message });
+    res.status(500).json({ menssage: "Error en la conexion: " + error.message });
   }
 };
 export const ActualizarAmbiente = async (req, res) => {
   try {
+    const error = validationResult(req)
+    if (!error.isEmpty()) {
+        return res.status(400).json(error)
+    }
+
+
     const { nombre, estado } = req.body;
     const id = req.params.id;
     const sql =
