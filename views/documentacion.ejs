@@ -2120,5 +2120,88 @@
         </tr>
       </tbody>
     </table>
+    
+     <h2>Consultas de ingreso segun el los formularios</h2>
+     <table>
+       <thead>
+         <tr>
+           <th>Endpoint</th>
+           <th>Método</th>
+           <th>Descripción</th>
+           <th>Parámetros</th>
+           <th>Ejemplo de Respuesta</th>
+         </tr>
+       </thead>
+       <tbody>
+         <tr>
+           <td>http://localhost:3000/api/logo/registrar</td>
+           <td>POST</td>
+           <td>Trae reportes segun un rango de fechas de los formularios </td>
+           <td>
+             <ul>
+               <li><strong>Header:</strong> Token</li>
+               <li>
+                 <strong>Body:</strong>
+                 <ul>
+                  {<br>
+                    "formulario":"formulario de ingreso trilla",<br>
+                    "fecha_inicio":"2024-08-05",<br>
+                    "fecha_fin":"2024-08-05"<br>
+                  }<br>
+                     <br />
+                   </ul>
+                 </ul>
+               </li>
+             </ul>
+           </td>
+           <td>
+             <pre>
+ {
+     "message(200)": [
+     {
+       "nombre_documento": "formulario de ingreso trilla",
+       "descripcion_documento": "formulario de registro para el ingreso de trilla ",
+       "logos": null,
+       "version": "V-01",
+       "codigo_muestra": "m-02",
+       "fecha_muestra": "2024-08-05T05:00:00.000Z",
+       "cantidadEntrada": 50,
+       "quien_recibe": "Pedro",
+       "productor_nombre": "Samuel",
+       "tipo_documento": "cc",
+       "numero_documento": 909090909,
+       "telefono": "2334345343",
+       "nombre_municipio": "Acevedo",
+       "variables_y_valores": "altura(msnm): 2000, observaciones: para empacar, variedad: caturro rosado"
+     },
+     {
+       "nombre_documento": "formulario de ingreso trilla",
+       "descripcion_documento": "formulario de registro para el ingreso de trilla ",
+       "logos": null,
+       "version": "V-01",
+       "codigo_muestra": "m-01",
+       "fecha_muestra": "2024-08-01T05:00:00.000Z",
+       "cantidadEntrada": 25,
+       "quien_recibe": "Jorge",
+       "productor_nombre": "Rodrigo",
+       "tipo_documento": "cc",
+       "numero_documento": 222222,
+       "telefono": "322675489",
+       "nombre_municipio": "Pitalito",
+       "variables_y_valores": "altura(msnm): 2500, observaciones: no aplica, variedad: borbon"
+     }
+   ] ,
+     "message(400)": "No se registrado correctamente"  ,
+     "message(500)": "Error en el servidor: "
+ }
+ </pre
+             >
+           </td>
+         </tr>
+ 
+         
+       </tbody>
+     </table>
+
   </body>
 </html>
