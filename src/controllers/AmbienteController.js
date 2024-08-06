@@ -32,26 +32,27 @@ export const ListarAmbientesId = async (req, res) => {
 
 export const CrearAmbiente = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
-    }
-    const { nombre,  } = req.body;
-    const sql = "INSERT INTO ambiente (nombre_ambiente,estado) VALUES (?)";
-    const value=[
-      nombre
-    ]
-    const [result] = await conexion.query(sql,value);
-    if (result.affectedRows > 0) {
-      res.status(201).json({ menssage: "Ambiente creado correctamente" });
-    } else {
-      res.status(400).json({ menssage: "Error al crear ambiente" });
-    }
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { nombre, estado } = req.body;
+
+      const sql = "INSERT INTO ambiente (nombre_ambiente, estado) VALUES (?, ?)";
+      const values = [nombre, estado];
+
+      const [result] = await conexion.query(sql, values);
+
+      if (result.affectedRows > 0) {
+          res.status(201).json({ menssage: "Ambiente creado correctamente" });
+      } else {
+          res.status(400).json({ menssage: "Error al crear ambiente" });
+      }
   } catch (error) {
-    res.status(500).json({ menssage: "Error en la conexion" + error.message });
+      res.status(500).json({ menssage: "Error en la conexion: " + error.message });
   }
 };
-
 export const ActualizarAmbiente = async (req, res) => {
   try {
     const { nombre, estado } = req.body;

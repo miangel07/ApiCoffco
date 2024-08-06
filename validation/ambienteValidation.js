@@ -1,8 +1,13 @@
 import { check } from "express-validator";
 
+/* nombre_ambiente, estado */
+
 export const ambienteValidate = [
-  check("nombre","El nombre es obligatorio").not().isEmpty().isInt().isLength({max:50}),
-  check("estado", "El estado es obligatorio")
-    .optional()
-    .isIn(['activo', 'inactivo'])
+  check('nombre', 'El nombre del ambiente es obligatorio')
+        .not().isEmpty()
+        .isLength({ max: 45 }).withMessage('El nombre del ambiente no puede exceder los 45 caracteres'),
+
+    check('estado', 'El estado del ambiente es obligatorio')
+        .not().isEmpty()
+        .isLength({ max: 45 }).withMessage('El estado del ambiente no puede exceder los 45 caracteres'),
 ];
