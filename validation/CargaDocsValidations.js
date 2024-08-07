@@ -15,7 +15,7 @@ export const documentoValidate = [
     .isLength({ max: 200 })
     .withMessage("La descripción no debe exceder 200 caracteres"),
 
-  check("codigo", "El código de documentos es obligatorio")
+  check("codigo_documentos", "El código de documentos es obligatorio")
     .not()
     .isEmpty()
     .withMessage("El código de documentos no debe estar vacío")
@@ -29,17 +29,24 @@ export const documentoValidate = [
     .isISO8601()
     .withMessage("La fecha de emisión debe estar en formato ISO 8601"),
 
-  check("servicios", "El tipo de servicio es obligatorio")
+  check("fk_idTipoServicio", "El tipo de servicio es obligatorio")
     .not()
     .isEmpty()
     .withMessage("El tipo de servicio no debe estar vacío")
     .isInt()
     .withMessage("El tipo de servicio debe ser un número entero"),
 
-  check("tipo_documento", "El tipo de documento es obligatorio")
+  check("fk_idTipoDocumento", "El tipo de documento es obligatorio")
     .not()
     .isEmpty()
     .withMessage("El tipo de documento no debe estar vacío")
     .isInt()
     .withMessage("El tipo de documento debe ser un número entero"),
+
+  check("fk_idLogos", "El logo es obligatorio")
+    .not()
+    .isEmpty()
+    .withMessage("El logo no debe estar vacío")
+    .isInt()
+    .withMessage("El logo debe ser un número entero")
 ];

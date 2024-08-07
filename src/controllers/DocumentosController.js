@@ -90,10 +90,6 @@ export const eliminarDocumentos = async (req, res) => {
 
 export const actalizardocumentosVersion = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
-    }
     let {
       nombre,
       descripcion,
@@ -164,10 +160,6 @@ export const buscarDocumentos = async (req, res) => {
 
 export const Actualizar = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
-    }
     let {
       nombre,
       descripcion,

@@ -10,6 +10,7 @@ export const consultaRegistroIngresoTostion = async (req, res) => {
     d.nombre AS nombre_documento,
     d.descripcion AS descripcion_documento,
     GROUP_CONCAT(DISTINCT l.nombre ORDER BY l.nombre SEPARATOR ', ') AS logos,
+    d.codigo_documentos,
     ver.version AS version, 
     m.codigo_muestra,
     m.fecha_muestra,     
@@ -52,20 +53,87 @@ WHERE
     d.nombre = '${formulario}'  -- Filtro por el documento específico
     AND m.fecha_muestra BETWEEN '${fecha_incio}' AND '${fecha_fin}' 
 GROUP BY     
-    d.nombre, d.descripcion, ver.version, m.codigo_muestra, m.fecha_muestra, m.cantidadEntrada, u_receptor.nombre, u_productor.nombre, u_productor.tipo_documento, u_productor.numero_documento, u_productor.telefono, mun.nombre_municipio 
+    d.nombre, d.descripcion, d.codigo_documentos, ver.version, m.codigo_muestra, m.fecha_muestra, 
+    m.cantidadEntrada, u_receptor.nombre, u_productor.nombre, u_productor.tipo_documento, 
+    u_productor.numero_documento, u_productor.telefono, mun.nombre_municipio 
 ORDER BY     
-    m.fecha_muestra DESC;  `
+    m.fecha_muestra DESC`;
 
     const [result] = await conexion.query(sql);
-    console.log(result);
-
-    console.log(result.length);
     if (result.length > 0) {
       res.status(200).json(result);
     } else {
       res
         .status(404)
         .json({ message: "No se encontro reporte de este registro" });
+    }
+  } catch (err) {
+    res.status(500).json({
+      message: "Error en el controlador VersionesController.js " + err,
+    });
+  }
+};
+
+
+export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
+  const { formulario, fecha_incio, fecha_fin } = req.body;
+  try {
+    let sql = `
+    SELECT 
+        d.nombre AS nombre_documento,
+        d.descripcion AS descripcion_documento,
+        GROUP_CONCAT(DISTINCT l.nombre ORDER BY l.nombre SEPARATOR ', ') AS logos,
+        d.codigo_documentos,
+        ver.version AS version, 
+        m.codigo_muestra,
+        GROUP_CONCAT(DISTINCT CONCAT(v.nombre, ': ', val.valor) ORDER BY v.nombre SEPARATOR ', ') AS variables_y_valores,
+        FORMAT(m.cantidadEntrada * p.precio, 3) AS total_precio
+    FROM     
+        muestra m 
+    JOIN     
+        servicios s ON m.id_muestra = s.fk_idMuestra 
+    JOIN     
+        valor val ON s.id_servicios = val.fk_idServicios 
+    JOIN     
+        variables v ON val.fk_idVariable = v.idVariable 
+    JOIN     
+        versiones ver ON v.fk_idVersiones = ver.idVersion 
+    JOIN     
+        documentos d ON ver.fk_documentos = d.id_documentos 
+    LEFT JOIN 
+        logo_documento ld ON d.id_documentos = ld.documentos_iddocumentos
+    LEFT JOIN 
+        logos l ON ld.logo_idlogos = l.idLogos
+    JOIN     
+        precio p ON s.fk_idTipoServicio = p.fk_idTipoServicio
+    WHERE 
+        d.nombre = '${formulario}'
+        AND m.fecha_muestra BETWEEN '${fecha_incio}' AND '${fecha_fin}'
+    GROUP BY     
+        d.nombre, d.descripcion, d.codigo_documentos, ver.version, m.cantidadEntrada, m.codigo_muestra, p.precio
+    ORDER BY     
+        m.codigo_muestra DESC
+    `;
+
+    const [result] = await conexion.query(sql);
+
+    if (result.length > 0) {
+      res.status(200).json(
+        result.map((row) => ({
+          nombre_documento: row.nombre_documento,
+          descripcion_documento: row.descripcion_documento,
+          logos: row.logos,
+          codigo_documentos: row.codigo_documentos,
+          version: row.version,
+          codigo_muestra: row.codigo_muestra,
+          total_precio: row.total_precio,
+          variables_y_valores: row.variables_y_valores,
+        }))
+      );
+    } else {
+      res
+        .status(404)
+        .json({ message: "No se encontró reporte de este registro" });
     }
   } catch (err) {
     res.status(500).json({

@@ -1,10 +1,11 @@
 import express from "express";
 import { validarUsuarios } from "../controllers/AutentificacionLogin.js";
-import { consultaRegistroIngresoTostion } from "../controllers/consultasController.js";
+import { consultaRegistroIngresoTostion, consultaSalidaserviciosTostionyTrilla } from "../controllers/consultasController.js";
 
 const routerConsultas = express.Router();
 
-routerConsultas.post('/reporteingresotrilla',consultaRegistroIngresoTostion)
+routerConsultas.post('/reporteingreso',consultaRegistroIngresoTostion)
+routerConsultas.post('/reportesalida',consultaSalidaserviciosTostionyTrilla)
 
 
 export default routerConsultas;
