@@ -4,7 +4,7 @@ import { conexion } from "../database/conexion.js";
 
 
 export const consultaRegistroIngresoTostion = async (req, res) => {
-    const {formulario,fecha_incio, fecha_fin}= req.body
+  const { formulario, fecha_incio, fecha_fin } = req.body;
   try {
     let sql = `SELECT 
     d.nombre AS nombre_documento,
@@ -60,12 +60,41 @@ ORDER BY
     m.fecha_muestra DESC`;
 
     const [result] = await conexion.query(sql);
+
     if (result.length > 0) {
-      res.status(200).json(result);
+      res.status(200).json(
+        result.map((row) => {
+          const variablesYValores = row.variables_y_valores
+            .split(", ")
+            .reduce((acc, current) => {
+              const [variable, valor] = current.split(": ");
+              acc[variable.trim()] = valor.trim();
+              return acc;
+            }, {});
+
+          return {
+            nombre_documento: row.nombre_documento,
+            descripcion_documento: row.descripcion_documento,
+            logos: row.logos,
+            codigo_documentos: row.codigo_documentos,
+            version: row.version,
+            codigo_muestra: row.codigo_muestra,
+            fecha_muestra: row.fecha_muestra,
+            cantidadEntrada: row.cantidadEntrada,
+            quien_recibe: row.quien_recibe,
+            productor_nombre: row.productor_nombre,
+            tipo_documento: row.tipo_documento,
+            numero_documento: row.numero_documento,
+            telefono: row.telefono,
+            nombre_municipio: row.nombre_municipio,
+            variables_y_valores: variablesYValores,
+          };
+        })
+      );
     } else {
       res
         .status(404)
-        .json({ message: "No se encontro reporte de este registro" });
+        .json({ message: "No se encontró reporte de este registro" });
     }
   } catch (err) {
     res.status(500).json({
@@ -73,6 +102,7 @@ ORDER BY
     });
   }
 };
+
 
 
 export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
@@ -86,8 +116,7 @@ export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
         d.codigo_documentos,
         ver.version AS version, 
         m.codigo_muestra,
-        GROUP_CONCAT(DISTINCT CONCAT(v.nombre, ': ', val.valor) ORDER BY v.nombre SEPARATOR ', ') AS variables_y_valores,
-        FORMAT(m.cantidadEntrada * p.precio, 3) AS total_precio
+        GROUP_CONCAT(DISTINCT CONCAT(v.nombre, ': ', val.valor) ORDER BY v.nombre SEPARATOR ', ') AS variables_y_valores
     FROM     
         muestra m 
     JOIN     
@@ -110,7 +139,7 @@ export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
         d.nombre = '${formulario}'
         AND m.fecha_muestra BETWEEN '${fecha_incio}' AND '${fecha_fin}'
     GROUP BY     
-        d.nombre, d.descripcion, d.codigo_documentos, ver.version, m.cantidadEntrada, m.codigo_muestra, p.precio
+        d.nombre, d.descripcion, d.codigo_documentos, ver.version, m.codigo_muestra
     ORDER BY     
         m.codigo_muestra DESC
     `;
@@ -119,16 +148,25 @@ export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
 
     if (result.length > 0) {
       res.status(200).json(
-        result.map((row) => ({
-          nombre_documento: row.nombre_documento,
-          descripcion_documento: row.descripcion_documento,
-          logos: row.logos,
-          codigo_documentos: row.codigo_documentos,
-          version: row.version,
-          codigo_muestra: row.codigo_muestra,
-          total_precio: row.total_precio,
-          variables_y_valores: row.variables_y_valores,
-        }))
+        result.map((row) => {
+          const variablesYValores = row.variables_y_valores
+            .split(", ")
+            .reduce((acc, current) => {
+              const [variable, valor] = current.split(": ");
+              acc[variable.trim()] = valor.trim();
+              return acc;
+            }, {});
+
+          return {
+            nombre_documento: row.nombre_documento,
+            descripcion_documento: row.descripcion_documento,
+            logos: row.logos,
+            codigo_documentos: row.codigo_documentos,
+            version: row.version,
+            codigo_muestra: row.codigo_muestra,
+            variables_y_valores: variablesYValores,
+          };
+        })
       );
     } else {
       res
@@ -141,3 +179,4 @@ export const consultaSalidaserviciosTostionyTrilla = async (req, res) => {
     });
   }
 };
+
