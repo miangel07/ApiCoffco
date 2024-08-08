@@ -1,9 +1,9 @@
 import { check } from 'express-validator';
 
 export const validatePrecio = [
-    check('estado_precio', 'El estado del precio es obligatorio')
+    check('precio', 'El precio del servicio es obligatorio')
         .not().isEmpty()
-        .isLength({ max: 45 }).withMessage('El estado del precio no puede exceder los 45 caracteres'),
+        .isFloat().withMessage('El precio del servicio es obligatorio'),
 
     check('presentacion', 'La presentación es obligatoria')
         .not().isEmpty()
