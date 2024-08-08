@@ -23,9 +23,9 @@ export const registrarTipoDocumento = async (req, res) => {
             return res.status(400).json(error);
         }
 
-        let { nombreDocumento, estado } = req.body;
-        let sql = `INSERT INTO tipodocumento (nombreDocumento,estado ) VALUES (?,?)`;
-        const [respuesta] = await conexion.query(sql, [nombreDocumento, estado]);
+        let { nombreDocumento } = req.body;
+        let sql = `INSERT INTO tipodocumento (nombreDocumento) VALUES (?)`;
+        const [respuesta] = await conexion.query(sql, [nombreDocumento]);
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "El dato se registró correctamente" });
         } else {

@@ -1,5 +1,4 @@
 import express from "express";
-import { validarUsuarios } from "../controllers/AutentificacionLogin.js";
 import { consultaRegistroIngresoTostion, consultaSalidaserviciosTostionyTrilla } from "../controllers/consultasController.js";
 
 const routerConsultas = express.Router();

@@ -37,10 +37,10 @@ export const CrearAmbiente = async (req, res) => {
           return res.status(400).json({ errors: errors.array() });
       }
 
-      const { nombre, estado } = req.body;
+      const { nombre } = req.body;
 
-      const sql = "INSERT INTO ambiente (nombre_ambiente, estado) VALUES (?, ?)";
-      const values = [nombre, estado];
+      const sql = "INSERT INTO ambiente (nombre_ambiente) VALUES (?)";
+      const values = [nombre];
 
       const [result] = await conexion.query(sql, values);
 
