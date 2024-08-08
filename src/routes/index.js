@@ -19,7 +19,6 @@ import routerConsultas from "./consultasRouter.js";
 import logoRouter from "./logoRoutes.js";
 import rolRouter from "./rolRouter.js";
 
-
 const router = express.Router();
 
 router.use("/estadisticas", EstadisticaRouter);

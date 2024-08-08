@@ -7,7 +7,4 @@ export const ambienteValidate = [
         .not().isEmpty()
         .isLength({ max: 45 }).withMessage('El nombre del ambiente no puede exceder los 45 caracteres'),
 
-    check('estado', 'El estado del ambiente es obligatorio')
-        .not().isEmpty()
-        .isLength({ max: 45 }).withMessage('El estado del ambiente no puede exceder los 45 caracteres'),
 ];

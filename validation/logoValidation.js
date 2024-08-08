@@ -1,8 +1,6 @@
 import { check } from "express-validator";
 
 export const logoValidate = [
-
-
   check("nombre", "El nombre es obligatorio")
     .not()
     .isEmpty()

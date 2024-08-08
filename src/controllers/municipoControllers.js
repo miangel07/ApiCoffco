@@ -37,12 +37,6 @@ export const registrarMunicipio = async (req, res) => {
 
 export const actualizarMunicipio = async (req, res) => {
     try {
-        const error = validationResult(req)
-        if (!error.isEmpty()) {
-            return res.status(400).json(error)
-        }
-
-
         let { nombre_municipio } = req.body;
         let id = req.params.id;
         let sql = `UPDATE municipio SET nombre_municipio = ? WHERE id_municipio = ?`;

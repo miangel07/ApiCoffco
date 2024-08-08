@@ -41,7 +41,6 @@ export const registrarUsuario = async (req, res) => {
     /* nombre
     apellidos
     correo_electronico
-    telefono,
     rol_usuario
     password
     numero_documento
@@ -53,20 +52,19 @@ export const registrarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
-      telefono,
       password,
       numero_documento,
       tipo_documento,
-      estado,
+      
       rol: fk_idRol
     } = req.body;
 
     const salt = await bcryptjs.genSalt(10);
     let hashPassword = await bcryptjs.hash(password, salt);
 
-    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,estado,
+    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,password,numero_documento,tipo_documento,
       fk_idRol)
-        value('${nombre}','${apellidos}','${correo_electronico}','${telefono}','${hashPassword}','${numero_documento}','${tipo_documento}','${estado}','${fk_idRol}')`;
+        value('${nombre}','${apellidos}','${correo_electronico}','${hashPassword}','${numero_documento}','${tipo_documento}','${fk_idRol}')`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows > 0) {
       res.status(200).json({ message: "Se registro el usuario con exito" });
@@ -107,7 +105,6 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
-      telefono,
       password,
       numero_documento,
       tipo_documento,
@@ -122,8 +119,7 @@ export const actualizarUsuario = async (req, res) => {
             SET 
                 nombre = ?, 
                 apellidos = ?, 
-                correo_electronico = ?,
-                telefono=?, 
+                correo_electronico = ?, 
                 password = ?, 
                 numero_documento = ?, 
                 tipo_documento = ?, 
@@ -136,7 +132,6 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
-      telefono,
       hashPassword,
       numero_documento,
       tipo_documento,
