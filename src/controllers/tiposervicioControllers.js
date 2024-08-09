@@ -2,31 +2,38 @@ import { conexion } from "../database/conexion.js"
 import { validationResult } from "express-validator"
 
 // Registrar Servicio Detalle
-export const registrarServicioDetalle = async (req, res) => {
+export const registrartiposervicio = async (req, res) => {
     try {
+        // Validar los datos
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { fk_idAmbiente, fk_idCliente, fk_idMuestra, fk_idServicios } = req.body;
-        const sql = `INSERT INTO servicio_detalle (fk_idAmbiente, fk_idCliente, fk_idMuestra, fk_idServicios)`;
-        const [result] = await conexion.query(sql, [fk_idAmbiente, fk_idCliente, fk_idMuestra, fk_idServicios]);
+        // Obtener el nombre del servicio del cuerpo de la solicitud
+        const { nombreServicio } = req.body;
 
+        // Definir la consulta SQL para insertar el nuevo servicio
+        const sql = `INSERT INTO tiposervicio (nombreServicio) VALUES (?)`;
+
+        // Ejecutar la consulta
+        const [result] = await conexion.query(sql, [nombreServicio]);
+
+        // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
-            res.status(200).json({ message: 'registrado con éxito' });
+            res.status(200).json({ message: 'Registrado con éxito' });
         } else {
-            res.status(404).json({ message: 'po se regitro' });
+            res.status(404).json({ message: 'No se registró' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-}
+};
 
 // Listar Todos los Servicios Detalle
-export const listarServiciosDetalle = async (req, res) => {
+export const listartiposervicio = async (req, res) => {
     try {
-        const sql = `SELECT * FROM servicio_detalle`;
+        const sql = `SELECT * FROM tiposervicio`;
         const [result] = await conexion.query(sql);
 
         if (result.length > 0) {
@@ -40,10 +47,10 @@ export const listarServiciosDetalle = async (req, res) => {
 }
 
 // Listar Servicio Detalle por ID
-export const listarServicioDetallePorId = async (req, res) => {
+export const listartiposervicioId = async (req, res) => {
     try {
         const id = req.params.id;
-        const sql = `SELECT * FROM servicio_detalle WHERE idServicios = ?`;
+        const sql = `SELECT * FROM tiposervicio WHERE idTipoServicio = ?`;
         const [result] = await conexion.query(sql, [id]);
 
         if (result.length === 1) {
@@ -57,28 +64,34 @@ export const listarServicioDetallePorId = async (req, res) => {
 }
 
 // Actualizar Servicio Detalle
-export const actualizarServicioDetalle = async (req, res) => {
+export const actualizartiposervicio = async (req, res) => {
     try {
-        const { fk_idAmbiente, fk_idCliente, fk_idMuestra, fk_idServicios } = req.body;
+        const { nombreServicio } = req.body;
         const id = req.params.id;
-        const sql = `UPDATE servicio_detalle SET fk_idAmbiente = ?, fk_idCliente = ?, fk_idMuestra = ?, fk_idServicios = ? WHERE idServicios = ?`;
-        const [result] = await conexion.query(sql, [fk_idAmbiente, fk_idCliente, fk_idMuestra, fk_idServicios, id]);
 
+        console.log(`Actualizando tipo de servicio con ID: ${id} y nombre: ${nombreServicio}`);
+
+        // Consulta SQL para actualizar el tipo de servicio
+        const sql = `UPDATE tiposervicio SET nombreServicio = ? WHERE idTipoServicio = ?`;
+
+        // Ejecutar la consulta
+        const [result] = await conexion.query(sql, [nombreServicio, id]);
+
+        // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
             res.status(200).json({ message: 'Datos actualizados con éxito' });
         } else {
-            res.status(404).json({ message: 'Datos no actualizados' });
+            res.status(404).json({ message: 'Datos no actualizados. Verifica si el ID existe.' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-}
-
+};
 // Eliminar Servicio Detalle
-export const eliminarServicioDetalle = async (req, res) => {
+export const eliminartiposervicio = async (req, res) => {
     try {
         const id = req.params.id;
-        const sql = `DELETE FROM servicio_detalle WHERE idServicios = ?`;
+        const sql = `DELETE FROM tiposervicio WHERE idTipoServicio = ?`;
         const [result] = await conexion.query(sql, [id]);
 
         if (result.affectedRows === 1) {

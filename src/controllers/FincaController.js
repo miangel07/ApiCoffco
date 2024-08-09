@@ -21,10 +21,10 @@ export const registrarFincas = async (req, res) => {
             return res.status(400).json(error)
         }
 
-        let {nombre_finca, fk_id_municipio, fk_id_usuario} = req.body
+        let {nombre_finca, fk_id_municipio} = req.body
 
-        let sql = `insert into finca (nombre_finca, fk_id_municipio, fk_id_usuario)
-        values ('${nombre_finca}','${fk_id_municipio}','${fk_id_usuario}')`
+        let sql = `insert into finca (nombre_finca, fk_id_municipio)
+        values ('${nombre_finca}','${fk_id_municipio}')`
         const [rows] = await conexion.query(sql)
         if(rows.affectedRows > 0){
             return res.status(200).json({"message":"Se registró con éxito la finca"})
@@ -60,10 +60,10 @@ export const eliminarfincas = async (req, res) => {
 export const actualizarFincas = async (req, res) => {
     try {
         let id_finca = req.params.id_finca;
-        let { nombre_finca, fk_id_municipio, fk_id_usuario } = req.body;
+        let { nombre_finca, fk_id_municipio} = req.body;
 
-        let sql = `UPDATE finca SET nombre_finca = ?, fk_id_municipio = ?, fk_id_usuario = ? WHERE id_finca = ?`;
-        let values = [nombre_finca, fk_id_municipio, fk_id_usuario, id_finca];
+        let sql = `UPDATE finca SET nombre_finca = ?, fk_id_municipio = ? WHERE id_finca = ?`;
+        let values = [nombre_finca, fk_id_municipio, id_finca];
 
         const [rows] = await conexion.query(sql, values);
 

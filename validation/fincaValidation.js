@@ -16,10 +16,4 @@ export const validateFinca = [
     .isInt()
     .withMessage("El municipio debe ser un número entero"),
 
-  check("fk_id_usuario", "El usuario es obligatorio")
-    .not()
-    .isEmpty()
-    .withMessage("El usuario no debe estar vacío")
-    .isInt()
-    .withMessage("El usuario debe ser un número entero")
 ]

@@ -11,5 +11,5 @@ export const validateValor = [
 
     check('variable', 'El ID de la variable es obligatorio y debe ser un número entero positivo')
         .not().isEmpty().withMessage('El ID de la variable no debe estar vacío')
-        .isInt({ gt: 0 }).withMessage('El ID de la variable debe ser un número entero positivo')
+        .isInt({ gt: 0 }).withMessage('El ID de la variable debe ser un número positivo')
 ];

@@ -22,9 +22,9 @@ export const RegistrarMuestra=async(req,res)=>{
             return res.status(400).json(error)
         }
 
-        let {cantidad,fk_id_finca,fecha_muestra}=req.body
-        let sql =`insert into muestra(cantidad,fk_id_finca,fecha_muestra)
-        values('${cantidad}','${fk_id_finca}','${fecha_muestra}')`
+        let {cantidadEntrada,fk_id_finca,fecha_muestra,codigo_muestra,fk_id_usuarios}=req.body
+        let sql =`insert into muestra(cantidadEntrada,fk_id_finca,fecha_muestra,codigo_muestra,fk_id_usuarios)
+        values('${cantidadEntrada}','${fk_id_finca}','${fecha_muestra}','${codigo_muestra}','${fk_id_usuarios}')`
         const [respuesta]=await conexion.query(sql)
         if(respuesta.affectedRows>0){
             return res.status(200).json({"menssage":"se registro correctamente "})
@@ -40,9 +40,11 @@ export const RegistrarMuestra=async(req,res)=>{
 }
 export const ActualizarMuestra=async(req,res)=>{
     try {
-        let {id_muestra,cantidad,fk_id_finca,fecha_muestra}=req.body
+        let {cantidadEntrada,fk_id_finca,fecha_muestra,codigo_muestra,fk_id_usuarios}=req.body
         let id=req.params.id
-        let sql=`update muestra set id_muestra='${id_muestra}', cantidad='${cantidad}',fk_id_finca='${fk_id_finca}',fecha_muestra='${fecha_muestra}' where id_muestra=${id}`
+        let sql=`update muestra set cantidadEntrada='${cantidadEntrada}',
+        fk_id_finca='${fk_id_finca}',fecha_muestra='${fecha_muestra}',codigo_muestra='${codigo_muestra}',
+        fk_id_usuarios='${fk_id_usuarios}' where id_muestra=${id}`
         const [responde]=await conexion.query(sql)
         if(responde.affectedRows>0){
             return res.status(200).json({"message":"se actualizo con exito "})

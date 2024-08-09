@@ -3,6 +3,7 @@ import { actualizartiposervicio, eliminartiposervicio, listartiposervicio, lista
 import { validarToken } from "../controllers/AutentificacionLogin.js";
 import { validateTipoServicio } from "../../validation/tipoServicioValidation.js";
 
+
 const rutaidTipoServicio = Router();
 
 rutaidTipoServicio.get('/listar', validarToken, listartiposervicio);
