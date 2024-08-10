@@ -8,13 +8,6 @@ export const documentoValidate = [
     .isLength({ max: 50 })
     .withMessage("El nombre no debe exceder 50 caracteres"),
 
-  check("fecha_carga", "La fecha de carga es obligatoria")
-    .not()
-    .isEmpty()
-    .withMessage("La fecha de carga no debe estar vacía")
-    .isISO8601()
-    .withMessage("La fecha de carga debe estar en formato ISO 8601"),
-
   check("descripcion", "La descripción es obligatoria")
     .not()
     .isEmpty()

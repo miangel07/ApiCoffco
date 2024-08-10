@@ -5,12 +5,13 @@ import { subirArchivos } from "../controllers/SubirArchivosControllers.js";
 import { logoValidate } from "../../validation/logoValidation.js";
 
 
+
 const logoRouter = Router()
 
 logoRouter.get('/listar', validarToken, listarLogos)
-logoRouter.post('/registrar', validarToken,logoValidate, subirArchivos, registrarLogo)
+logoRouter.post('/registrar', validarToken, subirArchivos, logoValidate, registrarLogo)
 logoRouter.delete('/eliminar/:id', validarToken, eliminarLogo)
-logoRouter.put('/actualizar/:id', validarToken,logoValidate, subirArchivos, actualizarLogo)
+logoRouter.put('/actualizar/:id', validarToken, subirArchivos, logoValidate, actualizarLogo)
 logoRouter.get('/listarid/:id', validarToken, buscarLogo)
 
 export default logoRouter
