@@ -3,7 +3,7 @@ import { check } from 'express-validator';
 export const validateMuestra = [
     check('cantidadEntrada', 'La cantidad es obligatoria y debe ser un número válido')
         .not().isEmpty()
-        .isFloat({ min: 0 }).withMessage('La cantidad debe ser un número'),
+        .isFloat().withMessage('La cantidad debe ser un número'),
 
     check('fk_id_finca', 'La finca es obligatoria y debe ser un número entero válido')
         .not().isEmpty()

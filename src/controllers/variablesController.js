@@ -27,10 +27,10 @@ fk_idVersiones 	 */
         if (!error.isEmpty()) {
             return res.status(400).json(error)
         }
-        let { nombre, estado, fk_idVersiones } = req.body;
+        let { nombre,  fk_idVersiones } = req.body;
         console.log(nombre, estado)
-        let sql = `insert into variables (nombre,estado,fk_idVersiones) values (?,?,?)`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado, fk_idVersiones])
+        let sql = `insert into variables (nombre,fk_idVersiones) values (?,?)`;
+        const [respuesta] = await conexion.query(sql, [nombre,  fk_idVersiones])
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ menssage: "Variable registrada exitosamente" })
         }

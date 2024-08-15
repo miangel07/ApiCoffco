@@ -1,5 +1,4 @@
 import { conexion } from "../database/conexion.js";
-import { validationResult } from "express-validator"
 
 export const listarRol = async (req, res) => {  // Cambiado res, req a req, res
     try {
@@ -17,12 +16,6 @@ export const listarRol = async (req, res) => {  // Cambiado res, req a req, res
 
 export const registrarRol = async (req, res) => {
     try {
-        const error = validationResult(req)
-        if (!error.isEmpty()) {
-            return res.status(400).json(error)
-        }
-
-
         const { rol } = req.body;
         let sql = `INSERT INTO rol (rol) VALUES (?)`;
         const [result] = await conexion.query(sql, [rol]);

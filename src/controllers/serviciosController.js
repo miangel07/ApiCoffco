@@ -16,12 +16,11 @@ export const registrarServicio = async (req, res) => {
             fk_idMuestra,
             fk_idPrecio,
             fk_idUsuarios,
-            estado
         } = req.body;
 
         // Asegúrate de que estos campos existen en tu tabla y coinciden con los nombres de columnas
-        const sql = `INSERT INTO servicios (nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios, estado];
+        const sql = `INSERT INTO servicios (nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const values = [nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios];
 
         const [respuesta] = await conexion.query(sql, values);
 
