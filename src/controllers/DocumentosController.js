@@ -1,51 +1,38 @@
-
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-
 export const listarDocumentos = async (req, res) => {
   try {
-
-    const sql = "SELECT * FROM documentos";
+    const sql = `SELECT 
+    d.id_documentos,
+    d.nombre AS nombre_documento,
+    d.fecha_carga,
+    d.descripcion,
+    d.codigo_documentos,
+    d.fecha_emision,
+    v.version,
+    v.estado AS estado_version,
+    v.nombre_documento AS nombre_version,
+    v.fecha_version,
+    t.nombreDocumento AS tipo_documento,
+    t.estado AS estado_tipo_documento
+FROM 
+    documentos d
+JOIN 
+    versiones v ON d.id_documentos = v.fk_documentos
+JOIN 
+    tipodocumento t ON d.fk_idTipoDocumento = t.idTipoDocumento
+WHERE 
+    v.estado = 'activo'`;
     const [result] = await conexion.query(sql);
-
 
     if (result.length === 0) {
       return res.status(404).json({
         message: "No se encontraron documentos en la base de datos",
       });
     }
-
-
-
-    const documentosVersiones = await Promise.all(result.map(async (resul) => {
-
-      const sqlVersion = "SELECT version,estado,fecha_version FROM versiones WHERE fk_documentos = ? AND estado= 'activo'";
-      const sqlTipoDocumento = "SELECT nombreDocumento FROM tipodocumento WHERE idTipoDocumento = ? AND estado = 'activo'";
-      const [versiones] = await conexion.query(sqlVersion, [resul.id_documentos]);
-      const [documento] = await conexion.query(sqlTipoDocumento, [resul.fk_idTipoDocumento]);
-      console.log(documento)
-
-      return {
-        id_documentos: resul.id_documentos,
-        nombre: resul.nombre,
-        descripcion: resul.descripcion,
-        codigo_documentos: resul.codigo_documentos,
-        fecha_emision: resul.fecha_emision,
-        fk_idTipoServicio: resul.fk_idTipoServicio,
-        fk_idTipoDocumento: documento[0].nombreDocumento,
-        versiones: versiones.map(version => ({
-          version: version.version,
-          estado: version.estado,
-          fechaVersion: version.fecha_version
-        }))
-      };
-    }));
-
-
-    res.status(200).json(documentosVersiones);
+    res.status(200).json(result);
   } catch (err) {
-
     res.status(500).json({ message: "Error: " + err.message });
   }
 };
@@ -63,9 +50,9 @@ export const registrarDocumentos = async (req, res) => {
       fecha_emision,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
-      logos
+      logos,
     } = req.body;
-    console.log(req.body)
+    console.log(req.body);
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
@@ -75,23 +62,28 @@ export const registrarDocumentos = async (req, res) => {
       codigo_documentos,
       fecha_emision,
       fk_idTipoServicio,
-      fk_idTipoDocumento
+      fk_idTipoDocumento,
     ]);
 
     // verifica el id del documento que se registro
     const id_documentos = rows.insertId;
 
     if (!logos || logos.length === 0) {
-      return res.status(400).json({ message: "No se proporcionaron logos para el documento." });
+      return res
+        .status(400)
+        .json({ message: "No se proporcionaron logos para el documento." });
     }
 
-    let sqlLogos = 'INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?';
-    const values = logos.map(id_logo => [id_documentos, id_logo]);
-    console.log(values)
+    let sqlLogos =
+      "INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?";
+    const values = logos.map((id_logo) => [id_documentos, id_logo]);
+    console.log(values);
     const [response] = await conexion.query(sqlLogos, [values]);
 
     if (response.affectedRows > 0) {
-      return res.status(200).json({ message: "Se registró con éxito el documento y sus logos." });
+      return res
+        .status(200)
+        .json({ message: "Se registró con éxito el documento y sus logos." });
     } else {
       return res.status(404).json({ message: "No se registro el documento." });
     }
@@ -127,7 +119,7 @@ export const actalizardocumentosVersion = async (req, res) => {
       fecha_emision,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
-      logos
+      logos,
     } = req.body;
 
     const id = req.params.id_documentos;
@@ -138,9 +130,9 @@ export const actalizardocumentosVersion = async (req, res) => {
         .status(404)
         .json({ message: "No se encontró el documento solicitado." });
     }
-    const fecha_carga = documentoRows[0].fecha_carga
-    const date = new Date(fecha_carga).toISOString().split('T')[0];
-    console.log(date)
+    const fecha_carga = documentoRows[0].fecha_carga;
+    const date = new Date(fecha_carga).toISOString().split("T")[0];
+    console.log(date);
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, '${date}', ?, ?, ?, ?, ?)`;
@@ -150,7 +142,7 @@ export const actalizardocumentosVersion = async (req, res) => {
       codigo_documentos,
       fecha_emision,
       fk_idTipoServicio,
-      fk_idTipoDocumento
+      fk_idTipoDocumento,
     ]);
 
     if (!rows2.affectedRows > 0) {
@@ -158,12 +150,15 @@ export const actalizardocumentosVersion = async (req, res) => {
         .status(404)
         .json({ message: "No se actualizó el documentos." });
     }
-    let sqlLogos = 'INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?';
-    const values = logos.map(id_logo => [id, id_logo]);
+    let sqlLogos =
+      "INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?";
+    const values = logos.map((id_logo) => [id, id_logo]);
 
     const [response] = await conexion.query(sqlLogos, [values]);
     if (response.affectedRows > 0) {
-      return res.status(200).json({ message: "Se actualizo con éxito el documento" });
+      return res
+        .status(200)
+        .json({ message: "Se actualizo con éxito el documento" });
     }
   } catch (e) {
     return res.status(500).json({ message: "error " + e.message });
@@ -202,8 +197,8 @@ export const Actualizar = async (req, res) => {
     let sqlbuscar = "SELECT * FROM documentos WHERE id_documentos = ?";
     const [documentoRows] = await conexion.query(sqlbuscar, id);
 
-    const fecha_carga = documentoRows[0].fecha_carga
-    const date = new Date(fecha_carga).toISOString().split('T')[0];
+    const fecha_carga = documentoRows[0].fecha_carga;
+    const date = new Date(fecha_carga).toISOString().split("T")[0];
     let sql = `UPDATE documentos SET nombre ='${nombre}', fecha_carga = '${date}', 
            descripcion = '${descripcion}',codigo_documento='${codigo_documentos}',
           fecha_emision='${fecha_emision}',servicios=${fk_idTipoServicio},tipo_documento=${fk_idTipoDocumento}
@@ -211,14 +206,15 @@ export const Actualizar = async (req, res) => {
 
     const [rows] = await conexion.query(sql);
     if (rows.affectedRows > 0) {
-      return res.status(200).json({ message: "Se actualizó con éxito el documento." });
+      return res
+        .status(200)
+        .json({ message: "Se actualizó con éxito el documento." });
     } else {
-      return res.status(404).json({ message: "No se ha podido actualizar el documento." });
+      return res
+        .status(404)
+        .json({ message: "No se ha podido actualizar el documento." });
     }
-
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
-
-
-}
+};
