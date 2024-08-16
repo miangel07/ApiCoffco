@@ -1,25 +1,55 @@
-import { json } from "express";
+
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
-import jwt from "jsonwebtoken";
+
 
 export const listarDocumentos = async (req, res) => {
   try {
-    let sql = "select * from documentos";
+
+    const sql = "SELECT * FROM documentos";
     const [result] = await conexion.query(sql);
-    console.log(result.length);
-    if (result.length > 0) {
-      res.status(200).json(result);
-    } else
-      res.status(404).json({
-        message: "No se encontraron docuementos  en la base de datos",
+
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        message: "No se encontraron documentos en la base de datos",
       });
+    }
+
+
+
+    const documentosVersiones = await Promise.all(result.map(async (resul) => {
+
+      const sqlVersion = "SELECT version,estado,fecha_version FROM versiones WHERE fk_documentos = ? AND estado= 'activo'";
+      const sqlTipoDocumento = "SELECT nombreDocumento FROM tipodocumento WHERE idTipoDocumento = ? AND estado = 'activo'";
+      const [versiones] = await conexion.query(sqlVersion, [resul.id_documentos]);
+      const [documento] = await conexion.query(sqlTipoDocumento, [resul.fk_idTipoDocumento]);
+      console.log(documento)
+
+      return {
+        id_documentos: resul.id_documentos,
+        nombre: resul.nombre,
+        descripcion: resul.descripcion,
+        codigo_documentos: resul.codigo_documentos,
+        fecha_emision: resul.fecha_emision,
+        fk_idTipoServicio: resul.fk_idTipoServicio,
+        fk_idTipoDocumento: documento[0].nombreDocumento,
+        versiones: versiones.map(version => ({
+          version: version.version,
+          estado: version.estado,
+          fechaVersion: version.fecha_version
+        }))
+      };
+    }));
+
+
+    res.status(200).json(documentosVersiones);
   } catch (err) {
-    res.status(500).json({ message: "Error" + err });
+
+    res.status(500).json({ message: "Error: " + err.message });
   }
 };
-/* nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision	fk_idTipoServicio	fk_idTipoDocumento	fk_idLogos	
- */
+
 export const registrarDocumentos = async (req, res) => {
   try {
     const error = validationResult(req);

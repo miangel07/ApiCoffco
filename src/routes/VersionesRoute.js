@@ -16,4 +16,5 @@ rutaVersion.put('/actualizar/:id_formato', validarToken, subirArchivos, validate
 rutaVersion.delete('/eliminar/:id_formato', validarToken, eliminarVersiones)
 
 
+
 export default rutaVersion

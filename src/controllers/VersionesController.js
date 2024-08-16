@@ -5,6 +5,8 @@ export const listarVersiones = async (req, res) => {
   try {
     let sql = "select * from versiones";
     const [result] = await conexion.query(sql);
+    console.log(result);
+    
     console.log(result.length);
     if (result.length > 0) {
       res.status(200).json(result);
