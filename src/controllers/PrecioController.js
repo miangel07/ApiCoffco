@@ -30,11 +30,11 @@ export const registrarPrecio = async (req, res) => {
     }
 
     // Obtener los datos del cuerpo de la solicitud
-    const { estado_precio, presentacion, precio, fk_idTipoServicio } = req.body;
+    const {  presentacion, precio, fk_idTipoServicio } = req.body;
 
     // Consulta SQL para insertar el nuevo precio
-    const sql = `INSERT INTO precio (estado_precio, presentacion, precio, fk_idTipoServicio)
-                 VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO precio ( presentacion, precio, fk_idTipoServicio)
+                 VALUES (?, ?, ?)`;
 
     // Ejecutar la consulta
     const [result] = await conexion.query(sql, [

@@ -21,16 +21,17 @@ export const RegistrarVariables = async (req, res) => {
     /* idVariable	
 nombre,	
 estado	,
-fk_idVersiones 	 */
+tipo_dato*/
     try {
         const error = validationResult(req)
         if (!error.isEmpty()) {
             return res.status(400).json(error)
         }
-        let { nombre, estado, fk_idVersiones } = req.body;
-        console.log(nombre, estado)
-        let sql = `insert into variables (nombre,estado,fk_idVersiones) values (?,?,?)`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado, fk_idVersiones])
+        let { nombre, tipo_dato } = req.body;
+        console.log(nombre, tipo_dato)
+
+        let sql = `insert into variables (nombre, tipo_dato) values (?,?)`;
+        const [respuesta] = await conexion.query(sql, [nombre,  tipo_dato])
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ menssage: "Variable registrada exitosamente" })
         }
@@ -70,13 +71,13 @@ export const ActualizarVariables = async (req, res) => {
         /* idVariable	
     nombre,	
     estado	,
-    fk_idVersiones 	 */
-        let { nombre, estado, fk_idVersiones } = req.body;
+    tipo_dato 	 */
+        let { nombre, estado, tipo_dato } = req.body;
 
         let id = req.params.id;
 
-        let sql = `update variables set nombre=?, estado=?,fk_idVersiones=? where idVariable=?`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado, fk_idVersiones, id]);
+        let sql = `update variables set nombre=?, estado=?,tipo_dato=? where idVariable=?`;
+        const [respuesta] = await conexion.query(sql, [nombre, estado, tipo_dato, id]);
         if (respuesta.affectedRows > 0) {
             return res
                 .status(200)
@@ -95,6 +96,9 @@ export const ELiminarVariables = async (req, res) => {
     try {
         let id = req.params.id
 
+
+        
+
         let sql = `delete from variables where idVariable=?`
         const [respuesta] = await conexion.query(sql, [id])
 
@@ -105,6 +109,6 @@ export const ELiminarVariables = async (req, res) => {
             res.status(404).json({ message: "Variable no eliminada correctamente" })
         }
     } catch (error) {
-        res.status(500).json({ message: "error en el servidor " + error.mensage })
+        res.status(500).json({ message: "error en el servidor " + error.message })
     }
 }
