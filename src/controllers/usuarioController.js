@@ -52,6 +52,7 @@ export const registrarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
+      telefono,
       password,
       numero_documento,
       tipo_documento,
@@ -62,9 +63,9 @@ export const registrarUsuario = async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     let hashPassword = await bcryptjs.hash(password, salt);
 
-    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,password,numero_documento,tipo_documento,
+    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,
       fk_idRol)
-        value('${nombre}','${apellidos}','${correo_electronico}','${hashPassword}','${numero_documento}','${tipo_documento}','${fk_idRol}')`;
+        value('${nombre}','${apellidos}','${correo_electronico}','${telefono}','${hashPassword}','${numero_documento}','${tipo_documento}','${fk_idRol}')`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows > 0) {
       res.status(200).json({ message: "Se registro el usuario con exito" });
@@ -105,6 +106,7 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
+      telefono,
       password,
       numero_documento,
       tipo_documento,
@@ -119,7 +121,8 @@ export const actualizarUsuario = async (req, res) => {
             SET 
                 nombre = ?, 
                 apellidos = ?, 
-                correo_electronico = ?, 
+                correo_electronico = ?,
+                telefono = ?,
                 password = ?, 
                 numero_documento = ?, 
                 tipo_documento = ?, 
@@ -132,6 +135,7 @@ export const actualizarUsuario = async (req, res) => {
       nombre,
       apellidos,
       correo_electronico,
+      telefono,
       hashPassword,
       numero_documento,
       tipo_documento,
@@ -151,6 +155,8 @@ export const actualizarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error " + error.message });
   }
 };
+
+
 export const ConsultaUsers = async (req, res) => {
   try {
     let sql = `SELECT COUNT(rol_usuario) AS rol
