@@ -50,9 +50,12 @@ export const registrarDocumentos = async (req, res) => {
       fecha_emision,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
+      version,
       logos,
     } = req.body;
-    console.log(req.body);
+ 
+
+    const archivo = req.file.originalname;
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
@@ -67,6 +70,12 @@ export const registrarDocumentos = async (req, res) => {
 
     // verifica el id del documento que se registro
     const id_documentos = rows.insertId;
+    let sql = `insert into versiones (version, fk_documentos, nombre_documento, fecha_version)values(?,?,?,NOW())`;
+
+    const [respondeVersion] = await conexion.query(sql, [version, id_documentos, archivo]);
+    if (!respondeVersion) {
+      return res.status(500).json({ message: "No se pudo registrar la versión." });
+    }
 
     if (!logos || logos.length === 0) {
       return res
@@ -76,7 +85,7 @@ export const registrarDocumentos = async (req, res) => {
 
     let sqlLogos =
       "INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?";
-    const values = logos.map((id_logo) => [id_documentos, id_logo]);
+    const values = JSON.parse(logos).map((id_logo) => [id_documentos, id_logo]);
     console.log(values);
     const [response] = await conexion.query(sqlLogos, [values]);
 

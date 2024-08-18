@@ -5,7 +5,7 @@ import { validateTipoDocumento } from "../../validation/tipoDocumentoValidation.
 
 const rutaTipoDoc = Router();
 
-rutaTipoDoc.get("/listar", validarToken, listarTipoDocumento);
+rutaTipoDoc.get("/listar",  listarTipoDocumento);
 rutaTipoDoc.post("/registrar", validarToken, validateTipoDocumento, registrarTipoDocumento);
 rutaTipoDoc.put("/actualizar/:id", validarToken, validateTipoDocumento, actualizarTipoDocumento);
 rutaTipoDoc.delete("/eliminar/:id", validarToken, eliminarTipoDocumento);
