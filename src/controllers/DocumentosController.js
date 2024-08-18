@@ -43,6 +43,7 @@ export const registrarDocumentos = async (req, res) => {
     if (!error.isEmpty()) {
       return res.status(400).json(error);
     }
+    //optiene todos los datos que se van a insertar en el documento
     let {
       nombre,
       descripcion,
@@ -51,12 +52,14 @@ export const registrarDocumentos = async (req, res) => {
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       version,
+      variables,
       logos,
     } = req.body;
- 
+    // el tipo del servicio puede ir null en casi de no ser un documentos que no este relacionado a un servicio
+    fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
 
     const archivo = req.file.originalname;
-
+    // primero  crea el documento
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
     const [rows] = await conexion.query(sqlDocumento, [
@@ -67,35 +70,51 @@ export const registrarDocumentos = async (req, res) => {
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
-
-    // verifica el id del documento que se registro
+    //obtiene el id del documento que se acabo de crear con este creamos la version 
     const id_documentos = rows.insertId;
-    let sql = `insert into versiones (version, fk_documentos, nombre_documento, fecha_version)values(?,?,?,NOW())`;
-
+    let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
+    // registramos la version el bd
     const [respondeVersion] = await conexion.query(sql, [version, id_documentos, archivo]);
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
-
+    //obtenemos el id del la version que en estos momentos ya esta relacionado a un documento
+    const idVersion = respondeVersion.insertId;
+    // validamos que hallan logos 
     if (!logos || logos.length === 0) {
       return res
         .status(400)
         .json({ message: "No se proporcionaron logos para el documento." });
     }
+    // si hay un un id de servicios osea si el docuemento tiene algo que ver con servicios entra al if
+    if (fk_idTipoServicio) {
+      let sqlValorVariables = `INSERT INTO valor (fk_idServicios, fk_idVariable ,fk_id_Version) VALUES (?,?,?)`;
+      // mapea las variables por que viene en un array 
+      const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
+        const valuesVariable = [fk_idTipoServicio, idVariables, idVersion];
+        //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
+        const [response] = await conexion.query(sqlValorVariables, valuesVariable);
+        return response
+      });
+      if (VariablesDocumento) {
+        return res
+          .status(200)
+          .json({ message: "Se registró con éxito el documento y sus logos. y sus variables" });
+      }
+    }
 
-    let sqlLogos =
-      "INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?";
+
+    let sqlLogos = "INSERT INTO logo_documento (documentos_iddocumentos, logo_idlogos) VALUES ?";
     const values = JSON.parse(logos).map((id_logo) => [id_documentos, id_logo]);
-    console.log(values);
     const [response] = await conexion.query(sqlLogos, [values]);
 
     if (response.affectedRows > 0) {
       return res
         .status(200)
         .json({ message: "Se registró con éxito el documento y sus logos." });
-    } else {
-      return res.status(404).json({ message: "No se registro el documento." });
     }
+    return res.status(404).json({ message: "No se registró el documento." });
+
   } catch (e) {
     return res.status(500).json({ message: "Error: " + e.message });
   }
