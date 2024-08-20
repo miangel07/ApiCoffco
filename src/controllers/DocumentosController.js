@@ -57,7 +57,7 @@ export const registrarDocumentos = async (req, res) => {
     } = req.body;
     // el tipo del servicio puede ir null en casi de no ser un documentos que no este relacionado a un servicio
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-
+    console.log(req.body)
     const archivo = req.file.originalname;
     // primero  crea el documento
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
@@ -96,7 +96,10 @@ export const registrarDocumentos = async (req, res) => {
         const [response] = await conexion.query(sqlValorVariables, valuesVariable);
         return response
       });
-      if (VariablesDocumento) {
+      let sqlLogos = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+      const values = JSON.parse(logos).map((id_logo) => [id_logo, id_documentos]);
+      const [response] = await conexion.query(sqlLogos, [values]);
+      if (VariablesDocumento && response.affectedRows > 0) {
         return res
           .status(200)
           .json({ message: "Se registró con éxito el documento y sus logos. y sus variables" });
@@ -104,8 +107,8 @@ export const registrarDocumentos = async (req, res) => {
     }
 
 
-    let sqlLogos = "INSERT INTO logo_documento (documentos_iddocumentos, logo_idlogos) VALUES ?";
-    const values = JSON.parse(logos).map((id_logo) => [id_documentos, id_logo]);
+    let sqlLogos = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+    const values = JSON.parse(logos).map((id_logo) => [id_logo, id_documentos]);
     const [response] = await conexion.query(sqlLogos, [values]);
 
     if (response.affectedRows > 0) {
