@@ -13,9 +13,10 @@ export const listarDocumentos = async (req, res) => {
     v.version,
     v.estado AS estado_version,
     v.nombre_documento AS nombre_version,
-    v.fecha_version,
+    v.fecha_version,  -- Campo añadido
     t.nombreDocumento AS tipo_documento,
-    t.estado AS estado_tipo_documento
+    t.estado AS estado_tipo_documento,
+    v.nombre_documento AS nombre_documento_version 
 FROM 
     documentos d
 JOIN 
@@ -23,7 +24,9 @@ JOIN
 JOIN 
     tipodocumento t ON d.fk_idTipoDocumento = t.idTipoDocumento
 WHERE 
-    v.estado = 'activo'`;
+    v.estado = 'activo';
+
+`;
     const [result] = await conexion.query(sql);
 
     if (result.length === 0) {
@@ -91,7 +94,7 @@ export const registrarDocumentos = async (req, res) => {
       let sqlValorVariables = `INSERT INTO valor (fk_idServicios, fk_idVariable ,fk_id_Version) VALUES (?,?,?)`;
       // mapea las variables por que viene en un array 
       const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
-        const valuesVariable = [fk_idTipoServicio, idVariables, idVersion];
+        const valuesVariable = [null, idVariables, idVersion];
         //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
         const [response] = await conexion.query(sqlValorVariables, valuesVariable);
         return response
