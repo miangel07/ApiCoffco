@@ -131,7 +131,8 @@ export const ListaridVersiones = async (req, res) => {
 export const desactivarEstado = async (req, res) => {
   try {
     let { estado } = req.body
-    console.log(estado);
+
+ 
     let idVersion = req.params.id_formato;
     console.log(req.body, idVersion)
     let sql = `update versiones set estado='${estado}' where fk_documentos=${idVersion}`;

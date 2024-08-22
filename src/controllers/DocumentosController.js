@@ -28,12 +28,6 @@ WHERE
 
 `;
     const [result] = await conexion.query(sql);
-
-    if (result.length === 0) {
-      return res.status(404).json({
-        message: "No se encontraron documentos en la base de datos",
-      });
-    }
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: "Error: " + err.message });
@@ -91,10 +85,12 @@ export const registrarDocumentos = async (req, res) => {
     }
     // si hay un un id de servicios osea si el docuemento tiene algo que ver con servicios entra al if
     if (fk_idTipoServicio) {
-      let sqlValorVariables = `INSERT INTO valor (fk_idServicios, fk_idVariable ,fk_id_Version) VALUES (?,?,?)`;
+      /* fk_idVariable	fk_id_version	
+ */
+      let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
       // mapea las variables por que viene en un array 
       const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
-        const valuesVariable = [null, idVariables, idVersion];
+        const valuesVariable = [idVariables, idVersion];
         //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
         const [response] = await conexion.query(sqlValorVariables, valuesVariable);
         return response
