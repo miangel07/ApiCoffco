@@ -9,7 +9,7 @@ import { logoValidate } from "../../validation/logoValidation.js";
 const logoRouter = Router()
 
 logoRouter.get('/listar',  listarLogos)
-logoRouter.post('/registrar', validarToken, subirArchivos, logoValidate, registrarLogo)
+logoRouter.post('/registrar',  subirArchivos, logoValidate, registrarLogo)
 logoRouter.delete('/eliminar/:id', validarToken, eliminarLogo)
 logoRouter.put('/actualizar/:id', validarToken, subirArchivos, logoValidate, actualizarLogo)
 logoRouter.get('/listarid/:id', validarToken, buscarLogo)

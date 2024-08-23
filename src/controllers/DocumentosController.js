@@ -13,9 +13,10 @@ export const listarDocumentos = async (req, res) => {
     v.version,
     v.estado AS estado_version,
     v.nombre_documento AS nombre_version,
-    v.fecha_version,
+    v.fecha_version,  -- Campo añadido
     t.nombreDocumento AS tipo_documento,
-    t.estado AS estado_tipo_documento
+    t.estado AS estado_tipo_documento,
+    v.nombre_documento AS nombre_documento_version 
 FROM 
     documentos d
 JOIN 
@@ -23,14 +24,10 @@ JOIN
 JOIN 
     tipodocumento t ON d.fk_idTipoDocumento = t.idTipoDocumento
 WHERE 
-    v.estado = 'activo'`;
-    const [result] = await conexion.query(sql);
+    v.estado = 'activo';
 
-    if (result.length === 0) {
-      return res.status(404).json({
-        message: "No se encontraron documentos en la base de datos",
-      });
-    }
+`;
+    const [result] = await conexion.query(sql);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: "Error: " + err.message });
@@ -88,10 +85,12 @@ export const registrarDocumentos = async (req, res) => {
     }
     // si hay un un id de servicios osea si el docuemento tiene algo que ver con servicios entra al if
     if (fk_idTipoServicio) {
-      let sqlValorVariables = `INSERT INTO valor (fk_idServicios, fk_idVariable ,fk_id_Version) VALUES (?,?,?)`;
+      /* fk_idVariable	fk_id_version	
+ */
+      let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
       // mapea las variables por que viene en un array 
       const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
-        const valuesVariable = [fk_idTipoServicio, idVariables, idVersion];
+        const valuesVariable = [idVariables, idVersion];
         //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
         const [response] = await conexion.query(sqlValorVariables, valuesVariable);
         return response
