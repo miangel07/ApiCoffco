@@ -1,6 +1,7 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
+
 export const listarVersiones = async (req, res) => {
   try {
     let sql = "select * from versiones";
