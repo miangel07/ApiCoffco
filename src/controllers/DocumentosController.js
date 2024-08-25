@@ -155,16 +155,8 @@ export const actalizardocumentosVersion = async (req, res) => {
       version,
       variables
     } = req.body;
+    fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
     const archivo = req.file.originalname;
-    /* 
-estado_version
-idversion
-nombre_version
-version
-variables
-logos
- */
-
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
@@ -201,14 +193,22 @@ logos
       return res.status(404).json({ message: "No se actualizó la versión." });
     }
     let sqlcambio = `update versiones set estado='inactivo' where idVersion = ${idversion}`;
-    const responseEstado = await conexion.query(sqlcambio);
-    if (responseEstado.affectedRows > 0) {
-      return res.status(404).json({ message: "hola" });
+    const [responseEstado] = await conexion.query(sqlcambio);
+    if (!responseEstado.affectedRows > 0) {
+      return res.status(404).json({ message: "No se actualizó el estado de la versión." });
     }
-    let optenervariables = `SELECT fk_idVariable FROM detalle WHERE fk_id_version = ${idversion}`
-    const responseVaraibles = await conexion.query(optenervariables)
-    console.log(responseVaraibles)
-    /* 
+      
+      
+        if(!fk_idTipoServicio){
+          let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+        const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
+        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+        if (response) {
+          return res
+            .status(200)
+            .json({ message: "Se Actualizo con éxito el documento y sus logos." });
+        }
+        };
         let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
         // mapea las variables por que viene en un array 
         const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
@@ -217,27 +217,18 @@ logos
           const [response] = await conexion.query(sqlValorVariables, valuesVariable);
           return response
         });
-        let sqlLogos = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
-        const values = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
-        const [response] = await conexion.query(sqlLogos, [values]);
-        if (VariablesDocumento && response.affectedRows > 0) {
-          return res
-            .status(200)
-            .json({ message: "Se registró con éxito el documento y sus logos. y sus variables" });
-        }
         let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
         const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
-        const [responseversiones] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
-    
-        if (responseversiones.affectedRows > 0) {
+        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+         if (VariablesDocumento && response.affectedRows > 0) {
           return res
             .status(200)
-            .json({ message: "Se registró con éxito el documento y sus logos." });
-        } */
+            .json({ message: "Se Actualizo con éxito el documento  sus logos. y sus variables" });
+        }
     return res.status(404).json({ message: "No se registró el documento." });
 
   } catch (e) {
-    return res.status(500).json({ message: "error " + e.message });
+    return res.status(500).json({ message: "error   " + e.message });
   }
 };
 
