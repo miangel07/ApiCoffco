@@ -95,3 +95,110 @@ export const eliminarServicios = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor ' + error.message });
     }
 };
+
+export const obtenerServicioAlquiler = async (req, res) => {
+    try {
+        const query = `
+        SELECT
+            s.id_servicios,
+            s.nombre AS servicio_nombre,
+            p.precio,
+            CONCAT(u.nombre, ' ', u.apellidos) AS usuario_nombre_completo,
+            v.nombre AS variable_nombre,
+            v.tipo_dato AS variable_tipo_dato,
+            vl.valor AS variable_valor
+        FROM
+            servicios s
+            INNER JOIN precio p ON s.fk_idPrecio = p.idPrecio
+            INNER JOIN usuarios u ON s.fk_idUsuarios = u.id_usuario
+            INNER JOIN valor vl ON s.id_servicios = vl.fk_id_servicio
+            INNER JOIN detalle d ON vl.fk_id_detalle = d.id_detalle
+            INNER JOIN variables v ON d.fk_idVariable = v.idVariable
+        WHERE
+            s.estado = 'activo'
+            AND p.estado_precio = 'activo';
+        `;
+
+        const [rows] = await conexion.query(query);
+
+        // Mapa para organizar los servicios
+        const servicios = {};
+
+        rows.forEach(row => {
+            const {
+                id_servicios,
+                servicio_nombre,
+                precio,
+                usuario_nombre_completo,
+                variable_nombre,
+                variable_tipo_dato,
+                variable_valor
+            } = row;
+
+            // Si el servicio no existe en el mapa, inicializarlo
+            if (!servicios[id_servicios]) {
+                servicios[id_servicios] = {
+                    id_servicios,
+                    servicio_nombre,
+                    precio,
+                    usuario_nombre_completo,
+                    variables: []
+                };
+            }
+
+            // Agregar la variable al array de variables del servicio correspondiente
+            servicios[id_servicios].variables.push({
+                nombre: variable_nombre,
+                tipo_dato: variable_tipo_dato,
+                valor: variable_valor
+            });
+        });
+
+        // Convertir el mapa a un array de servicios
+        const result = Object.values(servicios);
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Error al obtener los servicios:", error);
+        res.status(500).json({ message: "Error al obtener los servicios" });
+    }
+};
+
+
+
+
+export const obtenerVariablesPorVersion = async (req, res) => {
+    const {idTipoFormulario} = req.body
+    try {
+
+        const query = `
+        SELECT
+            v.idVariable,
+            v.nombre AS variable_nombre,
+            v.tipo_dato AS variable_tipo_dato
+        FROM
+            versiones ver
+            INNER JOIN detalle d ON ver.idVersion = d.fk_id_version
+            INNER JOIN variables v ON d.fk_idVariable = v.idVariable
+        WHERE
+            ver.estado = 'activo'
+            AND ver.idVersion = ?
+            AND v.estado = 'activo';
+        `;
+
+        const [rows] = await conexion.query(query, [idTipoFormulario]);
+    
+
+        const variables = rows.map(row => ({
+            id: row.idVariable,
+            nombre: row.variable_nombre,
+            tipo_dato: row.variable_tipo_dato
+        }));
+
+        res.status(200).json(variables);
+    } catch (error) {
+        console.error("Error al obtener las variables por versión:", error);
+        res.status(500).json({ message: "Error al obtener las variables por versión" });
+    }
+};
+
