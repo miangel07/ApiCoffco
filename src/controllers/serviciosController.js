@@ -142,16 +142,21 @@ export const obtenerServicioAlquiler = async (req, res) => {
                     servicio_nombre,
                     precio,
                     usuario_nombre_completo,
-                    variables: []
+                    start: null,
+                    end: null,
+                    title: null,
+                    client: usuario_nombre_completo // Suponiendo que client es el usuario
                 };
             }
 
-            // Agregar la variable al array de variables del servicio correspondiente
-            servicios[id_servicios].variables.push({
-                nombre: variable_nombre,
-                tipo_dato: variable_tipo_dato,
-                valor: variable_valor
-            });
+            // Asignar las variables a las propiedades correspondientes
+            if (variable_nombre === 'fecha_inicio_alquiler') {
+                servicios[id_servicios].start = new Date(variable_valor);
+            } else if (variable_nombre === 'fecha_fin_alquiler') {
+                servicios[id_servicios].end = new Date(variable_valor);
+            } else if (variable_nombre === 'observaciones_laboratorio') {
+                servicios[id_servicios].title = variable_valor;
+            }
         });
 
         // Convertir el mapa a un array de servicios
