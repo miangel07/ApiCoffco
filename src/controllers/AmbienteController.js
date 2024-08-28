@@ -56,10 +56,9 @@ export const CrearAmbiente = async (req, res) => {
 };
 export const ActualizarAmbiente = async (req, res) => {
   try {
-    const { nombre_ambiente, estado } = req.body;
-    const id = req.params.id;
-    const sql =
-      "UPDATE ambiente SET nombre_ambiente =? ,estado=? WHERE idAmbiente =?";
+    let { nombre_ambiente, estado } = req.body;
+    let id = req.params.id;
+    let sql ="UPDATE ambiente SET nombre_ambiente =? ,estado=? WHERE idAmbiente =?";
     const [result] = await conexion.query(sql, [nombre_ambiente, estado, id]);
     if (result.affectedRows > 0) {
       res.status(200).json({ menssage: "Ambiente actualizado correctamente" });
