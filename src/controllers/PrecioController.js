@@ -4,24 +4,23 @@ import { validationResult } from "express-validator";
 // Listar todos los precios
 export const listarPrecios = async (req, res) => {
   try {
-    let sql = `select
-    p.idPrecio,
-    p.estado_precio,
-    p.presentacion,
-    p.precio,
-    t.nombreServicio
-from
-    precio p
-join
-    tiposervicio t ON p.fk_idTipoServicio = t.idTipoServicio;
-`;
+    let sql = `SELECT
+      p.idPrecio,
+      p.estado_precio,
+      p.presentacion,
+      p.precio,
+      t.nombreServicio
+    FROM
+      precio p
+    JOIN
+      tiposervicio t ON p.fk_idTipoServicio = t.idTipoServicio;`;
+
     const [result] = await conexion.query(sql);
+
     if (result.length > 0) {
       res.status(200).json(result);
     } else {
-      res
-        .status(404)
-        .json({ message: "No se encontraron precios en la base de datos" });
+      res.status(404).json({ message: "No se encontraron precios en la base de datos" });
     }
   } catch (err) {
     res.status(500).json({
@@ -29,6 +28,7 @@ join
     });
   }
 };
+
 
 // Registrar un nuevo precio
 export const registrarPrecio = async (req, res) => {
@@ -111,6 +111,22 @@ export const actualizarPrecio = async (req, res) => {
     return res.status(500).json({ message: "Error: " + e.message });
   }
 };
+
+export const actualizarEstado = async(req,res)=>{
+  try {
+    let {estado_precio}=req.body
+    let idPrecio = req.params.idPrecio;
+    let sql=`update precio set estado_precio=? where idPrecio=?`
+    const [respuesta] = await conexion.query(sql,[estado_precio,idPrecio])
+    if(respuesta.affectedRows>0){
+      res.status(200).json({message:'Estado Actualizado correctamente'})
+    }else{
+      res.status(404).json({message:'Estado no actualizado'})
+    }
+  } catch (error) {
+    res.status(500).json({message: 'Error en la conexion'+error.message})
+  }
+}
 
 // Listar precio por ID
 export const ListaridPrecio = async (req, res) => {
