@@ -2,17 +2,22 @@ import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 import bcryptjs from "bcryptjs";
 
+
 export const listarUsuario = async (req, res) => {
   try {
-    let sql = "select * from usuarios";
-    const [resultado] = await conexion.query(sql);
+    const [resultado] = await conexion.query(`
+      SELECT usuarios.*, 
+      rol.rol
+      FROM usuarios
+      JOIN rol ON rol.idRol = usuarios.fk_idRol
+    `);
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
       res.status(404).json({ message: "No se encontraron usuarios" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor" + error.message });
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
 
@@ -38,16 +43,6 @@ export const registrarUsuario = async (req, res) => {
       return res.status(400).json(error);
     }
     console.log(req.body);
-    /* nombre
-    apellidos
-    correo_electronico
-    rol_usuario
-    password
-    numero_documento
-    tipo_documento
-    estado
-    fk_idRol
-     */
     let {
       nombre,
       apellidos,
@@ -56,16 +51,16 @@ export const registrarUsuario = async (req, res) => {
       password,
       numero_documento,
       tipo_documento,
-      
+      estado,
       rol: fk_idRol
     } = req.body;
 
     const salt = await bcryptjs.genSalt(10);
     let hashPassword = await bcryptjs.hash(password, salt);
 
-    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,
+    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,estado,
       fk_idRol)
-        value('${nombre}','${apellidos}','${correo_electronico}','${telefono}','${hashPassword}','${numero_documento}','${tipo_documento}','${fk_idRol}')`;
+        value('${nombre}','${apellidos}','${correo_electronico}','${telefono}','${hashPassword}','${numero_documento}','${tipo_documento}','${estado}','${fk_idRol}')`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows > 0) {
       res.status(200).json({ message: "Se registro el usuario con exito" });
