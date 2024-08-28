@@ -2,8 +2,8 @@ import { check } from 'express-validator';
 
 export const validateValor = [
     check('valor', 'El valor es obligatorio y debe ser un número positivo')
-        .not().isEmpty().withMessage('El valor no debe estar vacío')
-        .isFloat({ min: 0 }).withMessage('El valor debe ser un número positivo'),
+        .not().isEmpty().withMessage('El valor no debe estar vacío'),
+
 
     check('servicio', 'El ID del servicio es obligatorio y debe ser un número entero positivo')
         .not().isEmpty().withMessage('El ID del servicio no debe estar vacío')

@@ -30,6 +30,7 @@ export const listarvalorId = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" + error.message });
   }
 };
+
 /*idValor valor,	fk_idServicios	,fk_idVariable */
 export const registrarvalor = async (req, res) => {
   try {
@@ -38,9 +39,9 @@ export const registrarvalor = async (req, res) => {
       return res.status(400).json(error);
     }
 
-    let { valor, servicio: fk_idServicios, variable: fk_idVariable } = req.body;
-    let sql = `insert into valor (valor,	fk_idServicios	,fk_idVariable)
-        values('${valor}','${fk_idServicios}','${fk_idVariable}')`;
+    let { valor, servicio: fk_idServicios, variable: fk_idVariable, versiones:fk_id_version } = req.body;
+    let sql = `insert into valor (valor,	fk_idServicios	,fk_idVariable,fk_id_version)
+        values('${valor}','${fk_idServicios}','${fk_idVariable}','${fk_id_version}')`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows == 1) {
       res.status(200).json({ message: "Dato ingresado con exito" });
@@ -54,10 +55,9 @@ export const registrarvalor = async (req, res) => {
 
 export const actualizarvalor = async (req, res) => {
   try {
-    let { valor, fk_idVariable } = req.body;
+    let { valor,  } = req.body;
     let id = req.params.id;
-    let sql = `update valor set valor='${valor}', fk_idVariable='${fk_idVariable}'
-        where idValor=${id}`;
+    let sql = `update valor set valor='${valor}' where idValor=${id}`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.affectedRows > 0) {
       res.status(200).json({ message: "Datos actualizados con exito" });

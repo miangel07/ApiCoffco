@@ -22,4 +22,5 @@ servidor.use("/api",router)
 
 servidor.listen(3000, () => {
     console.log("servidor escuchando desde el puerto  3000");
+
 });
