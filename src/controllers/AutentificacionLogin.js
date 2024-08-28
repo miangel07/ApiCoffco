@@ -38,7 +38,7 @@ export const validarUsuarios = async (req, res) => {
         // Consulta para obtener el hash de la contraseña del usuario desde la base de datos
         let sql =`SELECT nombre,estado ,fk_idRol,password  FROM usuarios WHERE numero_documento='${numero_documento}'`
         const [resultado] = await conexion.query(sql);
-        console.log(resultado)
+        // console.log(resultado)
       
 
         if (resultado.length > 0) {

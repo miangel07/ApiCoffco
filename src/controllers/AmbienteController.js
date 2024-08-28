@@ -8,7 +8,8 @@ export const ListarAmbientes = async (req, res) => {
     const [result] = await conexion.query(sql);
     if (result.length > 0) {
       res.status(200).json(result);
-    } else {
+    } 
+    else {
       res.status(404).json({ menssage: "No hay ambientes registrados" });
     }
   } catch (error) {
@@ -37,10 +38,10 @@ export const CrearAmbiente = async (req, res) => {
           return res.status(400).json({ errors: errors.array() });
       }
 
-      const { nombre } = req.body;
+      const { nombre_ambiente } = req.body;
 
       const sql = "INSERT INTO ambiente (nombre_ambiente) VALUES (?)";
-      const values = [nombre];
+      const values = [nombre_ambiente];
 
       const [result] = await conexion.query(sql, values);
 
@@ -55,11 +56,11 @@ export const CrearAmbiente = async (req, res) => {
 };
 export const ActualizarAmbiente = async (req, res) => {
   try {
-    const { nombre, estado } = req.body;
+    const { nombre_ambiente, estado } = req.body;
     const id = req.params.id;
     const sql =
       "UPDATE ambiente SET nombre_ambiente =? ,estado=? WHERE idAmbiente =?";
-    const [result] = await conexion.query(sql, [nombre, estado, id]);
+    const [result] = await conexion.query(sql, [nombre_ambiente, estado, id]);
     if (result.affectedRows > 0) {
       res.status(200).json({ menssage: "Ambiente actualizado correctamente" });
     } else {

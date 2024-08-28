@@ -4,7 +4,17 @@ import { validationResult } from "express-validator";
 // Listar todos los precios
 export const listarPrecios = async (req, res) => {
   try {
-    let sql = "SELECT * FROM precio";
+    let sql = `select
+    p.idPrecio,
+    p.estado_precio,
+    p.presentacion,
+    p.precio,
+    t.nombreServicio
+from
+    precio p
+join
+    tiposervicio t ON p.fk_idTipoServicio = t.idTipoServicio;
+`;
     const [result] = await conexion.query(sql);
     if (result.length > 0) {
       res.status(200).json(result);
@@ -38,7 +48,6 @@ export const registrarPrecio = async (req, res) => {
 
     // Ejecutar la consulta
     const [result] = await conexion.query(sql, [
-      estado_precio,
       presentacion,
       precio,
       fk_idTipoServicio,
@@ -79,11 +88,10 @@ export const eliminarPrecio = async (req, res) => {
 export const actualizarPrecio = async (req, res) => {
   try {
     let idPrecio = req.params.idPrecio;
-    let { estado_precio, presentacion, precio, fk_idTipoServicio } = req.body;
+    let {presentacion, precio, fk_idTipoServicio } = req.body;
 
-    let sql = `UPDATE precio SET estado_precio = ?, presentacion = ?, precio = ?, fk_idTipoServicio = ? WHERE idPrecio = ?`;
+    let sql = `UPDATE precio SET presentacion = ?, precio = ?, fk_idTipoServicio = ? WHERE idPrecio = ?`;
     let values = [
-      estado_precio,
       presentacion,
       precio,
       fk_idTipoServicio,
