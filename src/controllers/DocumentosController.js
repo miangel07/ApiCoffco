@@ -168,11 +168,12 @@ export const actalizardocumentosVersion = async (req, res) => {
       fecha_emision,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
-      idversion,
+      idVersion,
       logos,
       version,
       variables
     } = req.body;
+    console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
     const archivo = req.file.originalname;
 
@@ -210,12 +211,15 @@ export const actalizardocumentosVersion = async (req, res) => {
     if (!respondeVersion.affectedRows > 0) {
       return res.status(404).json({ message: "No se actualizó la versión." });
     }
-    let sqlcambio = `update versiones set estado='inactivo' where idVersion = ${idversion}`;
+    let sqlcambio = `update versiones set estado='inactivo' where idVersion = ${idVersion}`;
     const [responseEstado] = await conexion.query(sqlcambio);
     if (!responseEstado.affectedRows > 0) {
       return res.status(404).json({ message: "No se actualizó el estado de la versión." });
     }
-      
+      /* 
+
+idVersion	
+ */
       
         if(!fk_idTipoServicio){
           let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
