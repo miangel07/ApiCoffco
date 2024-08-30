@@ -7,7 +7,7 @@ import { precioValidationEstado } from "../../validation/precioValidationEstado.
 
 const rutaPrecio = Router()
 
-rutaPrecio.get('/listar',validarToken,listarPrecios)
+rutaPrecio.get('/listar',listarPrecios)
 rutaPrecio.post('/registrar', validarToken,validatePrecio, registrarPrecio)
 rutaPrecio.delete('/eliminar/:idPrecio',validarToken, eliminarPrecio)
 rutaPrecio.put('/actualizar/:idPrecio',validarToken,validatePrecio, actualizarPrecio)
