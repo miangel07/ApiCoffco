@@ -5,7 +5,7 @@ export const listarRol = async (req, res) => {  // Cambiado res, req a req, res
         let sql = "SELECT * FROM rol";
         const [result] = await conexion.query(sql);
         if (result.length > 0) {  // Cambiado affectedRows a length
-            return res.status(200).json({ message: "Roles listados correctamente", data: result });  // Cambiado res a result
+            return res.status(200).json( result );  // Cambiado res a result
         }
         return res.status(401).json({ message: "No se listaron roles correctamente" });
 
