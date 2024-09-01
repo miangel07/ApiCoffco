@@ -1,5 +1,7 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
+import fs from 'fs';
+import path from 'path';
 
 export const listarDocumentos = async (req, res) => {
   try {
@@ -55,11 +57,13 @@ GROUP BY
 
 export const registrarDocumentos = async (req, res) => {
   try {
+    // Validar los datos del cuerpo de la solicitud
     const error = validationResult(req);
     if (!error.isEmpty()) {
       return res.status(400).json(error);
     }
-    //optiene todos los datos que se van a insertar en el documento
+
+    // Extraer datos del cuerpo de la solicitud
     let {
       nombre,
       descripcion,
@@ -71,13 +75,15 @@ export const registrarDocumentos = async (req, res) => {
       variables,
       logos,
     } = req.body;
-    // el tipo del servicio puede ir null en casi de no ser un documentos que no este relacionado a un servicio
+
+    // Manejar caso donde fk_idTipoServicio puede ser null
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    console.log(req.body)
-    const archivo = req.file.originalname;
-    // primero  crea el documento
-    let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
-                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
+
+    // Registrar el documento en la base de datos
+    let sqlDocumento = `
+      INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
+      VALUES (?, CURDATE(), ?, ?, ?, ?, ?)
+    `;
     const [rows] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
@@ -86,17 +92,42 @@ export const registrarDocumentos = async (req, res) => {
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
-    //obtiene el id del documento que se acabo de crear con este creamos la version 
+
+    // Obtener el ID del documento recién creado
     const id_documentos = rows.insertId;
-    let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
-    // registramos la version el bd
-    const [respondeVersion] = await conexion.query(sql, [version, id_documentos, archivo]);
+
+    // Registrar la versión del documento en la base de datos
+    let sqlVersion = `
+      INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version)
+      VALUES (?, ?, ?, NOW())
+    `;
+    const archivoTemporal = req.file.filename;
+    const nombreTemporal = req.file.originalname;
+    const extension = path.extname(nombreTemporal);
+    const nombreTemporalSinExt = path.basename(nombreTemporal, extension);
+
+    const archivoConID = `${nombreTemporalSinExt}-${id_documentos}${extension}`;
+    const rutaArchivoOriginal = path.join('public', 'documentos', archivoTemporal);
+
+    // Insertar la versión en la base de datos
+    const [respondeVersion] = await conexion.query(sqlVersion, [version, id_documentos, archivoConID]);
+
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
-    //obtenemos el id del la version que en estos momentos ya esta relacionado a un documento
+
+
     const idVersion = respondeVersion.insertId;
-    // validamos que hallan logos 
+
+
+    const archivoConIDVersion = `${idVersion}-${nombreTemporalSinExt}${extension}`;
+    const rutaArchivoFinalConIDVersion = path.join('public', 'documentos', archivoConIDVersion);
+
+
+    fs.renameSync(rutaArchivoOriginal, rutaArchivoFinalConIDVersion);
+    let sqlNombre = `UPDATE versiones SET nombre_documento = ? WHERE idVersion = ?`
+    await conexion.query(sqlNombre, [archivoConIDVersion, idVersion]);
+
     if (!logos || logos.length === 0) {
       return res
         .status(400)
@@ -175,7 +206,10 @@ export const actalizardocumentosVersion = async (req, res) => {
     } = req.body;
     console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    const archivo = req.file.originalname;
+    const archivoTemporal = req.file.filename;
+    const nombreTemporal = req.file.originalname;
+    const extension = path.extname(nombreTemporal);
+    const nombreTemporalSinExt = path.basename(nombreTemporal, extension);
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
                         VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
@@ -196,12 +230,23 @@ export const actalizardocumentosVersion = async (req, res) => {
     const idDocumento = rows2.insertId
     let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
     // registramos la version el bd
-    const [respondeVersion] = await conexion.query(sql, [version, idDocumento, archivo]);
+    const [respondeVersion] = await conexion.query(sql, [version, idDocumento, archivoTemporal]);
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
 
     const idVersionDoc = respondeVersion.insertId;
+
+    const archivoConIDVersion = `${idVersionDoc}-${nombreTemporalSinExt}${extension}`;
+    const rutaArchivoOriginal = path.join('public', 'documentos', archivoTemporal);
+    const rutaArchivoFinalConIDVersion = path.join('public', 'documentos', archivoConIDVersion);
+
+     fs.renameSync(rutaArchivoOriginal, rutaArchivoFinalConIDVersion);
+
+  
+   
+    let sqlNombre = `UPDATE versiones SET nombre_documento = ? WHERE idVersion = ?`
+    await conexion.query(sqlNombre, [archivoConIDVersion, idVersionDoc]);
     // validamos que hallan logos 
     if (!logos || logos.length === 0) {
       return res
@@ -216,38 +261,38 @@ export const actalizardocumentosVersion = async (req, res) => {
     if (!responseEstado.affectedRows > 0) {
       return res.status(404).json({ message: "No se actualizó el estado de la versión." });
     }
-      /* 
+    /* 
 
 idVersion	
- */
-      
-        if(!fk_idTipoServicio){
-          let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
-        const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
-        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
-        if (response) {
-          return res
-            .status(200)
-            .json({ message: "Se Actualizo con éxito el documento y sus logos." });
-        }
-        };
-        let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
-        // mapea las variables por que viene en un array 
-        const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
-          const valuesVariable = [idVariables, idVersionDoc];
-          //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
-          const [response] = await conexion.query(sqlValorVariables, valuesVariable);
-          return response
-        });
-        let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
-        const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
-        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+*/
 
-         if (VariablesDocumento && response.affectedRows > 0) {
-          return res
-            .status(200)
-            .json({ message: "Se Actualizo con éxito el documento  sus logos. y sus variables" });
-        }
+    if (!fk_idTipoServicio) {
+      let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+      const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
+      const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+      if (response) {
+        return res
+          .status(200)
+          .json({ message: "Se Actualizo con éxito el documento y sus logos." });
+      }
+    };
+    let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
+    // mapea las variables por que viene en un array 
+    const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
+      const valuesVariable = [idVariables, idVersionDoc];
+      //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
+      const [response] = await conexion.query(sqlValorVariables, valuesVariable);
+      return response
+    });
+    let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+    const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
+    const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+
+    if (VariablesDocumento && response.affectedRows > 0) {
+      return res
+        .status(200)
+        .json({ message: "Se Actualizo con éxito el documento  sus logos. y sus variables" });
+    }
     return res.status(404).json({ message: "No se registró el documento." });
 
   } catch (e) {
