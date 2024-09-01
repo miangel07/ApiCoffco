@@ -12,3 +12,5 @@ export const conexion = createPool({
     database: process.env.DB_DATABASE
 })
 
+console.log(`Conexion establecida con DB: ${process.env.DB_DATABASE}`)
+
