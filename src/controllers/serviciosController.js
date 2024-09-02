@@ -96,78 +96,135 @@ export const eliminarServicios = async (req, res) => {
     }
 };
 
-export const obtenerServicioAlquiler = async (req, res) => {
+export const obtenerServiciosAlquiler = async (req, res) => {
     try {
-        const query = `
-        SELECT
-            s.id_servicios,
+        // Paso 1: Obtener el ID del tipo de servicio para "Alquiler de laboratorio"
+        const [tipoServicioResult] = await conexion.query(`SELECT idTipoServicio FROM tiposervicio WHERE nombreServicio = 'Alquiler de laboratorio'`);
+        
+        if (tipoServicioResult.length === 0) {
+            return res.status(404).json({ message: "Tipo de servicio no encontrado" });
+        }
+        
+        const idTipoServicio = tipoServicioResult[0].idTipoServicio;
+
+        // Paso 2: Consultar todos los servicios con el tipo de servicio "Alquiler de laboratorio"
+        const sql = `
+        SELECT 
+            s.id_servicios AS id_servicio,
             s.nombre AS servicio_nombre,
-            p.precio,
+            p.precio AS precio_servicio,
             CONCAT(u.nombre, ' ', u.apellidos) AS usuario_nombre_completo,
-            v.nombre AS variable_nombre,
-            v.tipo_dato AS variable_tipo_dato,
-            vl.valor AS variable_valor
-        FROM
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'variable_nombre', v.nombre, 
+                    'tipo_dato', v.tipo_dato, 
+                    'variable_valor', val.valor
+                )
+            ) AS variables
+        FROM 
             servicios s
-            INNER JOIN precio p ON s.fk_idPrecio = p.idPrecio
-            INNER JOIN usuarios u ON s.fk_idUsuarios = u.id_usuario
-            INNER JOIN valor vl ON s.id_servicios = vl.fk_id_servicio
-            INNER JOIN detalle d ON vl.fk_id_detalle = d.id_detalle
-            INNER JOIN variables v ON d.fk_idVariable = v.idVariable
-        WHERE
-            s.estado = 'activo'
-            AND p.estado_precio = 'activo';
+        JOIN 
+            usuarios u ON s.fk_idUsuarios = u.id_usuario
+        JOIN 
+            precio p ON s.fk_idPrecio = p.idPrecio
+        JOIN 
+            documentos doc ON s.fk_idTipoServicio = doc.fk_idTipoServicio
+        JOIN 
+            versiones ver ON doc.id_documentos = ver.fk_documentos
+        JOIN 
+            detalle det ON ver.idVersion = det.fk_id_version
+        JOIN 
+            variables v ON det.fk_idVariable = v.idVariable
+        JOIN 
+            valor val ON s.id_servicios = val.fk_id_servicio AND det.id_detalle = val.fk_id_detalle
+        WHERE 
+            s.fk_idTipoServicio = ?
+        GROUP BY 
+            s.id_servicios, s.nombre, p.precio, usuario_nombre_completo;
         `;
 
-        const [rows] = await conexion.query(query);
+        const [resultado] = await conexion.query(sql, [idTipoServicio]);
 
-        // Mapa para organizar los servicios
-        const servicios = {};
-
-        rows.forEach(row => {
-            const {
-                id_servicios,
-                servicio_nombre,
-                precio,
-                usuario_nombre_completo,
-                variable_nombre,
-                variable_tipo_dato,
-                variable_valor
-            } = row;
-
-            // Si el servicio no existe en el mapa, inicializarlo
-            if (!servicios[id_servicios]) {
-                servicios[id_servicios] = {
-                    id_servicios,
-                    servicio_nombre,
-                    precio,
-                    usuario_nombre_completo,
-                    start: null,
-                    end: null,
-                    title: null,
-                    client: usuario_nombre_completo // Suponiendo que client es el usuario
-                };
-            }
-
-            // Asignar las variables a las propiedades correspondientes
-            if (variable_nombre === 'fecha_inicio_alquiler') {
-                servicios[id_servicios].start = new Date(variable_valor);
-            } else if (variable_nombre === 'fecha_fin_alquiler') {
-                servicios[id_servicios].end = new Date(variable_valor);
-            } else if (variable_nombre === 'observaciones_laboratorio') {
-                servicios[id_servicios].title = variable_valor;
-            }
-        });
-
-        // Convertir el mapa a un array de servicios
-        const result = Object.values(servicios);
-
-        res.status(200).json(result);
+        if (resultado.length > 0) {
+            const servicios = resultado.map(row => ({
+                id_servicio: row.id_servicio,
+                servicio_nombre: row.servicio_nombre,
+                precio_servicio: row.precio_servicio,
+                usuario_nombre_completo: row.usuario_nombre_completo,
+                // Verificar si "variables" ya es un objeto, si no, intentar parsearlo
+                variables: typeof row.variables === 'string' ? JSON.parse(row.variables) : row.variables
+            }));
+            res.status(200).json(servicios);
+        } else {
+            res.status(404).json({ message: "Servicios no encontrados" });
+        }
     } catch (error) {
-        console.error("Error al obtener los servicios:", error);
-        res.status(500).json({ message: "Error al obtener los servicios" });
+        console.error("Error en el servidor:", error);
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
 };
+
+
+
+
+
+export const registrarServicioAlquiler = async (req, res) => {
+    try {
+        const { servicio_nombre, id_precio, id_ambiente, numero_documento, numero_documento_usuario, variables } = req.body;
+
+        // Paso 1: Obtener el ID del tipo de servicio para "Alquiler de laboratorio"
+        const [tipoServicioResult] = await conexion.query(`SELECT idTipoServicio FROM tiposervicio WHERE nombreServicio = ?`, [servicio_nombre]);
+        
+        if (tipoServicioResult.length === 0) {
+            return res.status(404).json({ message: "Tipo de servicio no encontrado" });
+        }
+        
+        const idTipoServicio = tipoServicioResult[0].idTipoServicio;
+
+        // Paso 2: Obtener el ID del usuario basado en el número de documento
+        const [usuarioResult] = await conexion.query(`SELECT id_usuario FROM usuarios WHERE numero_documento = ?`, [numero_documento_usuario]);
+
+        if (usuarioResult.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
+        }
+
+        const idUsuario = usuarioResult[0].id_usuario;
+
+        // Paso 3: Insertar el servicio en la tabla `servicios`
+        const [insertServicioResult] = await conexion.query(`
+            INSERT INTO servicios (nombre, fk_idPrecio, fk_idAmbiente, fk_idTipoServicio, fk_idUsuarios) 
+            VALUES (?, ?, ?, ?, ?)`,
+            [servicio_nombre, id_precio, id_ambiente, idTipoServicio, idUsuario]
+        );
+
+        const idServicio = insertServicioResult.insertId;
+
+        // Paso 4: Iterar sobre el array de variables y registrar cada una en la base de datos
+        for (let variable of variables) {
+            const { id_variable, variable_valor } = variable;
+
+            // Verifica que el id_variable y el id_servicio sean válidos antes de insertar
+            if (!id_variable || !idServicio) {
+                return res.status(400).json({ message: 'ID de variable o ID de servicio no válidos' });
+            }
+
+            // Insertar el valor de la variable en la tabla `valor`
+            await conexion.query(`
+                INSERT INTO valor (valor, fk_idVariable, fk_id_servicio) 
+                VALUES (?, ?, ?)`,
+                [variable_valor, id_variable, idServicio]
+            );
+        }
+
+        res.status(201).json({ message: "Servicio de alquiler registrado exitosamente" });
+    } catch (error) {
+        console.error("Error en el servidor:", error);
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+};
+
+
+
 
 
 
