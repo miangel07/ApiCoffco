@@ -21,6 +21,39 @@ export const listarUsuario = async (req, res) => {
   }
 };
 
+export const estadoUsuario = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    let selectSql = `
+      SELECT estado FROM usuarios WHERE id_usuario = ?
+    `;
+    
+    const [selectResult] = await conexion.query(selectSql, [id_usuario]);
+    
+    if (selectResult.length > 0) {
+      const usuario = selectResult[0];
+      const nuevoEstado = usuario.estado === 'activo' ? 'inactivo' : 'activo';
+
+      let updateSql = `
+        UPDATE usuarios SET estado = ? WHERE id_usuario = ?
+      `;
+
+      const [updateResult] = await conexion.query(updateSql, [nuevoEstado, id_usuario]);
+
+      if (updateResult.affectedRows > 0) {
+        res.status(200).json({ message: "Estado del usuario actualizado correctamente" });
+      } else {
+        res.status(404).json({ message: "Usuario no encontrado" });
+      }
+    } else {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
+
 export const listarUsuarioId = async (req, res) => {
   try {
     let id_usuario = req.params.id_usuario;
@@ -152,8 +185,6 @@ export const actualizarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error " + error.message });
   }
 };
-
-
 
 export const ConsultaUsers = async (req, res) => {
   try {
