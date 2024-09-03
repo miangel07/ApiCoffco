@@ -154,7 +154,6 @@ export const actualizarUsuario = async (req, res) => {
         telefono = ?,
         numero_documento = ?, 
         tipo_documento = ?, 
-        estado = ?, 
         fk_idRol = ?
     `;
     
@@ -165,9 +164,13 @@ export const actualizarUsuario = async (req, res) => {
       telefono,
       numero_documento,
       tipo_documento,
-      estado,
       fk_idRol,
     ];
+
+    if (estado) {
+      sql += `, estado = ?`;
+      values.push(estado);
+    }
 
     if (password) {
       const salt = await bcryptjs.genSalt(10);
