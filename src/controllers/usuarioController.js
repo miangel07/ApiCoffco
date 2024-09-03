@@ -4,15 +4,20 @@ import bcryptjs from "bcryptjs";
 
 export const listarUsuario = async (req, res) => {
   try {
-    let sql = ` select usuarios.*, rol.rol FROM usuarios JOIN rol ON rol.idRol = usuarios.fk_idRol`;
+    let sql = `
+      SELECT usuarios.*, rol.rol 
+      FROM usuarios 
+      LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol
+    `;
     const [resultado] = await conexion.query(sql);
+    
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
       res.status(404).json({ message: "No se encontraron usuarios" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor" + error.message });
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
 
@@ -89,8 +94,6 @@ export const actualizarUsuario = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const salt = await bcryptjs.genSalt(10);
-
     const { id } = req.params;
     const {
       nombre,
@@ -101,38 +104,42 @@ export const actualizarUsuario = async (req, res) => {
       numero_documento,
       tipo_documento,
       estado,
-      rol: fk_idRol
+      rol: fk_idRol,
     } = req.body;
 
-    const hashPassword = await bcryptjs.hash(password, salt);
-
-    const sql = `
-            UPDATE usuarios 
-            SET 
-                nombre = ?, 
-                apellidos = ?, 
-                correo_electronico = ?,
-                telefono = ?,
-                password = ?, 
-                numero_documento = ?, 
-                tipo_documento = ?, 
-                estado = ?, 
-                fk_idRol = ?
-            WHERE id_usuario = ?
-        `;
-
+    let sql = `
+      UPDATE usuarios 
+      SET 
+        nombre = ?, 
+        apellidos = ?, 
+        correo_electronico = ?,
+        telefono = ?,
+        numero_documento = ?, 
+        tipo_documento = ?, 
+        estado = ?, 
+        fk_idRol = ?
+    `;
+    
     const values = [
       nombre,
       apellidos,
       correo_electronico,
       telefono,
-      hashPassword,
       numero_documento,
       tipo_documento,
       estado,
       fk_idRol,
-      id,
     ];
+
+    if (password) {
+      const salt = await bcryptjs.genSalt(10);
+      const hashPassword = await bcryptjs.hash(password, salt);
+      sql += `, password = ?`;
+      values.push(hashPassword);
+    }
+
+    sql += ` WHERE id_usuario = ?`;
+    values.push(id);
 
     const [respuesta] = await conexion.query(sql, values);
 
@@ -145,6 +152,7 @@ export const actualizarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error " + error.message });
   }
 };
+
 
 
 export const ConsultaUsers = async (req, res) => {
