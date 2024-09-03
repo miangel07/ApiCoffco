@@ -8,6 +8,10 @@ export const listarUsuario = async (req, res) => {
       SELECT usuarios.*, rol.rol 
       FROM usuarios 
       LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol
+      ORDER BY CASE 
+        WHEN usuarios.estado = 'inactivo' THEN 1
+        ELSE 0
+      END
     `;
     const [resultado] = await conexion.query(sql);
     
@@ -20,6 +24,7 @@ export const listarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
+
 
 export const estadoUsuario = async (req, res) => {
   try {
