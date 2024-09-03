@@ -8,8 +8,8 @@ rutaUsuario.get('/listar', listarUsuario)
 rutaUsuario.get('/listarid/:id_usuario', listarUsuarioId)
 rutaUsuario.post('/registrar', registrarUsuario)
 rutaUsuario.delete('/eliminar/:id_usuario',  eliminarUsuario)
+rutaUsuario.put('/estado/:id_usuario',estadoUsuario)
 rutaUsuario.put('/actualizar/:id' ,actualizarUsuario)
 rutaUsuario.get('/consulta',ConsultaUsers)
-rutaUsuario.put('/estado/:id_usuario',estadoUsuario)
 
 export default rutaUsuario
