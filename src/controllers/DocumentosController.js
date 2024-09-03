@@ -10,27 +10,43 @@ export const listarDocumentos = async (req, res) => {
     d.descripcion,
     d.codigo_documentos,
     d.fecha_emision,
-    v.version,
+    v.version, 
+    v.idVersion AS idversion,
     v.estado AS estado_version,
     v.nombre_documento AS nombre_version,
-    v.fecha_version,
+    v.fecha_version, 
     t.nombreDocumento AS tipo_documento,
-    t.estado AS estado_tipo_documento
+    t.estado AS estado_tipo_documento,
+    v.nombre_documento AS nombre_documento_version,
+    -- Variables asociadas a la versión
+    GROUP_CONCAT(DISTINCT vrs.nombre SEPARATOR ', ') AS variables,
+    -- Logos asociados al documento
+    GROUP_CONCAT(DISTINCT lg.nombre SEPARATOR ', ') AS logos,
+    -- Tipo de servicio
+    ts.nombreServicio AS tipo_servicio
 FROM 
     documentos d
 JOIN 
     versiones v ON d.id_documentos = v.fk_documentos
 JOIN 
     tipodocumento t ON d.fk_idTipoDocumento = t.idTipoDocumento
+LEFT JOIN 
+    detalle dt ON v.idVersion = dt.fk_id_version
+LEFT JOIN 
+    variables vrs ON dt.fk_idVariable = vrs.idVariable
+LEFT JOIN 
+    tiposervicio ts ON d.fk_idTipoServicio = ts.idTipoServicio  
+LEFT JOIN 
+    logo_documento ld ON d.id_documentos = ld.documentos_iddocumentos
+LEFT JOIN 
+    logos lg ON ld.logo_idlogos = lg.idLogos
 WHERE 
-    v.estado = 'activo'`;
-    const [result] = await conexion.query(sql);
+    v.estado = 'activo'
+GROUP BY 
+    d.id_documentos, v.idVersion;
 
-    if (result.length === 0) {
-      return res.status(404).json({
-        message: "No se encontraron documentos en la base de datos",
-      });
-    }
+`;
+    const [result] = await conexion.query(sql);
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ message: "Error: " + err.message });
@@ -88,10 +104,12 @@ export const registrarDocumentos = async (req, res) => {
     }
     // si hay un un id de servicios osea si el docuemento tiene algo que ver con servicios entra al if
     if (fk_idTipoServicio) {
-      let sqlValorVariables = `INSERT INTO valor (fk_idServicios, fk_idVariable ,fk_id_Version) VALUES (?,?,?)`;
+      /* fk_idVariable	fk_id_version	
+ */
+      let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
       // mapea las variables por que viene en un array 
       const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
-        const valuesVariable = [fk_idTipoServicio, idVariables, idVersion];
+        const valuesVariable = [idVariables, idVersion];
         //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
         const [response] = await conexion.query(sqlValorVariables, valuesVariable);
         return response
@@ -150,23 +168,16 @@ export const actalizardocumentosVersion = async (req, res) => {
       fecha_emision,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
+      idversion,
       logos,
+      version,
+      variables
     } = req.body;
-
-    const id = req.params.id_documentos;
-    let sql = "SELECT * FROM documentos WHERE id_documentos = ?";
-    const [documentoRows] = await conexion.query(sql, id);
-    if (documentoRows.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No se encontró el documento solicitado." });
-    }
-    const fecha_carga = documentoRows[0].fecha_carga;
-    const date = new Date(fecha_carga).toISOString().split("T")[0];
-    console.log(date);
+    fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
+    const archivo = req.file.originalname;
 
     let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, fk_idTipoServicio, fk_idTipoDocumento)
-                        VALUES (?, '${date}', ?, ?, ?, ?, ?)`;
+                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
     const [rows2] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
@@ -181,18 +192,62 @@ export const actalizardocumentosVersion = async (req, res) => {
         .status(404)
         .json({ message: "No se actualizó el documentos." });
     }
-    let sqlLogos =
-      "INSERT INTO logo_documento (documentos_iddocumentos, 	logo_idlogos) VALUES ?";
-    const values = logos.map((id_logo) => [id, id_logo]);
-
-    const [response] = await conexion.query(sqlLogos, [values]);
-    if (response.affectedRows > 0) {
-      return res
-        .status(200)
-        .json({ message: "Se actualizo con éxito el documento" });
+    const idDocumento = rows2.insertId
+    let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
+    // registramos la version el bd
+    const [respondeVersion] = await conexion.query(sql, [version, idDocumento, archivo]);
+    if (!respondeVersion) {
+      return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
+
+    const idVersionDoc = respondeVersion.insertId;
+    // validamos que hallan logos 
+    if (!logos || logos.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "No se proporcionaron logos para el documento." });
+    }
+    if (!respondeVersion.affectedRows > 0) {
+      return res.status(404).json({ message: "No se actualizó la versión." });
+    }
+    let sqlcambio = `update versiones set estado='inactivo' where idVersion = ${idversion}`;
+    const [responseEstado] = await conexion.query(sqlcambio);
+    if (!responseEstado.affectedRows > 0) {
+      return res.status(404).json({ message: "No se actualizó el estado de la versión." });
+    }
+      
+      
+        if(!fk_idTipoServicio){
+          let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+        const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
+        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+        if (response) {
+          return res
+            .status(200)
+            .json({ message: "Se Actualizo con éxito el documento y sus logos." });
+        }
+        };
+        let sqlValorVariables = `INSERT INTO detalle ( fk_idVariable ,fk_id_Version) VALUES (?,?)`;
+        // mapea las variables por que viene en un array 
+        const VariablesDocumento = JSON.parse(variables).map(async (idVariables) => {
+          const valuesVariable = [idVariables, idVersionDoc];
+          //inserta uno por uno a la tabla valor el id  servicio el id de la variable y el id de la version
+          const [response] = await conexion.query(sqlValorVariables, valuesVariable);
+          return response
+        });
+        let sqlLogosVersiones = "INSERT INTO logo_documento (logo_idlogos,documentos_iddocumentos ) VALUES ?";
+        const valuesVersiones = JSON.parse(logos).map((id_logo) => [id_logo, idDocumento]);
+        const [response] = await conexion.query(sqlLogosVersiones, [valuesVersiones]);
+
+         if (VariablesDocumento && response.affectedRows > 0) {
+          return res
+            .status(200)
+            .json({ message: "Se Actualizo con éxito el documento  sus logos. y sus variables" });
+        }
+    return res.status(404).json({ message: "No se registró el documento." });
+
   } catch (e) {
-    return res.status(500).json({ message: "error " + e.message });
+    return res.status(500).json({ message: "error   " + e.message });
   }
 };
 
@@ -224,6 +279,7 @@ export const Actualizar = async (req, res) => {
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
     } = req.body;
+    console.log(req.body);
     const id = req.params.id_documentos;
     let sqlbuscar = "SELECT * FROM documentos WHERE id_documentos = ?";
     const [documentoRows] = await conexion.query(sqlbuscar, id);

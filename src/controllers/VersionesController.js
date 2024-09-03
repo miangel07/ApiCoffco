@@ -1,12 +1,13 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
+
 export const listarVersiones = async (req, res) => {
   try {
     let sql = "select * from versiones";
     const [result] = await conexion.query(sql);
     console.log(result);
-    
+
     console.log(result.length);
     if (result.length > 0) {
       res.status(200).json(result);
@@ -131,9 +132,11 @@ export const ListaridVersiones = async (req, res) => {
 export const desactivarEstado = async (req, res) => {
   try {
     let { estado } = req.body
+
+ 
     let idVersion = req.params.id_formato;
     console.log(req.body, idVersion)
-    let sql = `update versiones set estado='${estado}' where idVersion=${idVersion}`;
+    let sql = `update versiones set estado='${estado}' where fk_documentos=${idVersion}`;
     const [responde] = await conexion.query(sql);
     if (responde.affectedRows > 0) {
       res.status(200).json({ message: ` Se cambio  con éxito el estado a ${estado} ` });

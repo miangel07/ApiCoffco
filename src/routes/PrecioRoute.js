@@ -5,10 +5,10 @@ import { validatePrecio } from "../../validation/PrecioValidation.js";
 
 const rutaPrecio = Router()
 
-rutaPrecio.get('/listar',validarToken,listarPrecios)
-rutaPrecio.post('/registrar', validarToken,validatePrecio, registrarPrecio)
-rutaPrecio.delete('/eliminar/:idPrecio',validarToken, eliminarPrecio)
-rutaPrecio.put('/actualizar/:idPrecio',validarToken,validatePrecio, actualizarPrecio)
-rutaPrecio.get('/listarid/:idPrecio',validarToken, ListaridPrecio)
+rutaPrecio.get('/listar',listarPrecios)
+rutaPrecio.post('/registrar',validatePrecio, registrarPrecio)
+rutaPrecio.delete('/eliminar/:idPrecio', eliminarPrecio)
+rutaPrecio.put('/actualizar/:idPrecio',validatePrecio, actualizarPrecio)
+rutaPrecio.get('/listarid/:idPrecio', ListaridPrecio)
 
 export default rutaPrecio

@@ -8,7 +8,8 @@ export const ListarAmbientes = async (req, res) => {
     const [result] = await conexion.query(sql);
     if (result.length > 0) {
       res.status(200).json(result);
-    } else {
+    } 
+    else {
       res.status(404).json({ menssage: "No hay ambientes registrados" });
     }
   } catch (error) {
