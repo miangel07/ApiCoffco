@@ -8,6 +8,7 @@ export const listarUsuario = async (req, res) => {
       SELECT usuarios.*, rol.rol 
       FROM usuarios 
       LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol
+      WHERE usuarios.estado != 'inactivo'
       ORDER BY CASE 
         WHEN usuarios.estado = 'inactivo' THEN 1
         ELSE 0
@@ -24,7 +25,6 @@ export const listarUsuario = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
-
 
 export const estadoUsuario = async (req, res) => {
   try {
@@ -127,70 +127,30 @@ export const eliminarUsuario = async (req, res) => {
 
 export const actualizarUsuario = async (req, res) => {
   try {
+    // MANEJO DE ERRORES
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
     const { id } = req.params;
-    const {
-      nombre,
-      apellidos,
-      correo_electronico,
-      telefono,
-      password,
-      numero_documento,
-      tipo_documento,
-      estado,
-      rol: fk_idRol,
-    } = req.body;
+    const usuario = req.body;
 
-    let sql = `
-      UPDATE usuarios 
-      SET 
-        nombre = ?, 
-        apellidos = ?, 
-        correo_electronico = ?,
-        telefono = ?,
-        numero_documento = ?, 
-        tipo_documento = ?, 
-        fk_idRol = ?
-    `;
-    
-    const values = [
-      nombre,
-      apellidos,
-      correo_electronico,
-      telefono,
-      numero_documento,
-      tipo_documento,
-      fk_idRol,
-    ];
+    const [resultado] = await  conexion.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
 
-    if (estado) {
-      sql += `, estado = ?`;
-      values.push(estado);
+    if (resultado.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    if (password) {
-      const salt = await bcryptjs.genSalt(10);
-      const hashPassword = await bcryptjs.hash(password, salt);
-      sql += `, password = ?`;
-      values.push(hashPassword);
-    }
+    const datos = resultado[0];
 
-    sql += ` WHERE id_usuario = ?`;
-    values.push(id);
+    const actualizacion = {...datos, ...usuario };
 
-    const [respuesta] = await conexion.query(sql, values);
+    const [sql] = await conexion.query("UPDATE usuarios SET ? WHERE id_usuario = ?", [actualizacion, id]);
 
-    if (respuesta.affectedRows > 0) {
-      res.status(200).json({ message: "Usuario actualizado" });
-    } else {
-      res.status(404).json({ message: "Usuario no actualizado" });
-    }
+    res.json({ message: "Usuario actualizado", Usuario: sql });
   } catch (error) {
-    res.status(500).json({ message: "Error " + error.message });
+    res.status(500).send(error.message);
   }
 };
 
