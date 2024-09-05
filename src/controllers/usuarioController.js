@@ -4,15 +4,58 @@ import bcryptjs from "bcryptjs";
 
 export const listarUsuario = async (req, res) => {
   try {
-    let sql = ` select usuarios.*, rol.rol FROM usuarios JOIN rol ON rol.idRol = usuarios.fk_idRol`;
+    let sql = `
+      SELECT usuarios.*, rol.rol 
+      FROM usuarios 
+      LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol
+      WHERE usuarios.estado != 'inactivo'
+      ORDER BY CASE 
+        WHEN usuarios.estado = 'inactivo' THEN 1
+        ELSE 0
+      END
+    `;
     const [resultado] = await conexion.query(sql);
+    
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
       res.status(404).json({ message: "No se encontraron usuarios" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor" + error.message });
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
+
+export const estadoUsuario = async (req, res) => {
+  try {
+    const { id_usuario } = req.params;
+
+    let selectSql = `
+      SELECT estado FROM usuarios WHERE id_usuario = ?
+    `;
+    
+    const [selectResult] = await conexion.query(selectSql, [id_usuario]);
+    
+    if (selectResult.length > 0) {
+      const usuario = selectResult[0];
+      const nuevoEstado = usuario.estado === 'activo' ? 'inactivo' : 'activo';
+
+      let updateSql = `
+        UPDATE usuarios SET estado = ? WHERE id_usuario = ?
+      `;
+
+      const [updateResult] = await conexion.query(updateSql, [nuevoEstado, id_usuario]);
+
+      if (updateResult.affectedRows > 0) {
+        res.status(200).json({ message: "Estado del usuario actualizado correctamente" });
+      } else {
+        res.status(404).json({ message: "Usuario no encontrado" });
+      }
+    } else {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
 
@@ -84,68 +127,32 @@ export const eliminarUsuario = async (req, res) => {
 
 export const actualizarUsuario = async (req, res) => {
   try {
+    // MANEJO DE ERRORES
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const salt = await bcryptjs.genSalt(10);
-
     const { id } = req.params;
-    const {
-      nombre,
-      apellidos,
-      correo_electronico,
-      telefono,
-      password,
-      numero_documento,
-      tipo_documento,
-      estado,
-      rol: fk_idRol
-    } = req.body;
+    const usuario = req.body;
 
-    const hashPassword = await bcryptjs.hash(password, salt);
+    const [resultado] = await  conexion.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
 
-    const sql = `
-            UPDATE usuarios 
-            SET 
-                nombre = ?, 
-                apellidos = ?, 
-                correo_electronico = ?,
-                telefono = ?,
-                password = ?, 
-                numero_documento = ?, 
-                tipo_documento = ?, 
-                estado = ?, 
-                fk_idRol = ?
-            WHERE id_usuario = ?
-        `;
-
-    const values = [
-      nombre,
-      apellidos,
-      correo_electronico,
-      telefono,
-      hashPassword,
-      numero_documento,
-      tipo_documento,
-      estado,
-      fk_idRol,
-      id,
-    ];
-
-    const [respuesta] = await conexion.query(sql, values);
-
-    if (respuesta.affectedRows > 0) {
-      res.status(200).json({ message: "Usuario actualizado" });
-    } else {
-      res.status(404).json({ message: "Usuario no actualizado" });
+    if (resultado.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
     }
+
+    const datos = resultado[0];
+
+    const actualizacion = {...datos, ...usuario };
+
+    const [sql] = await conexion.query("UPDATE usuarios SET ? WHERE id_usuario = ?", [actualizacion, id]);
+
+    res.json({ message: "Usuario actualizado", Usuario: sql });
   } catch (error) {
-    res.status(500).json({ message: "Error " + error.message });
+    res.status(500).send(error.message);
   }
 };
-
 
 export const ConsultaUsers = async (req, res) => {
   try {
