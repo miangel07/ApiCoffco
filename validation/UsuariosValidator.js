@@ -26,6 +26,7 @@ export const validacionUser = [
   check("tipo_documento", "El tipo de documento es obligatorio")
     .optional()
     .isIn(['cc', 'ti', 'nit', 'pasaporte']),
+    
   check('rol', 'El rol es obligatorio')
     .not().isEmpty().withMessage('El número del rol no debe estar vacío')
     .isInt({ gt: 0 }).withMessage('El número de documento debe ser un número entero'),
