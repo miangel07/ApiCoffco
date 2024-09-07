@@ -7,11 +7,11 @@ import { precioValidationEstado } from "../../validation/precioValidationEstado.
 
 const rutaPrecio = Router()
 
-rutaPrecio.get('/listar',validarToken,listarPrecios)
+rutaPrecio.get('/listar',listarPrecios)
 rutaPrecio.post('/registrar', validarToken,validatePrecio, registrarPrecio)
 rutaPrecio.delete('/eliminar/:idPrecio',validarToken, eliminarPrecio)
 rutaPrecio.put('/actualizar/:idPrecio',validarToken,validatePrecio, actualizarPrecio)
 rutaPrecio.put('/actualizarestadoprecio/:idPrecio',precioValidationEstado,actualizarEstado)
-rutaPrecio.get('/listarid/:idPrecio',validarToken, ListaridPrecio)
+rutaPrecio.get('/listarid/:idPrecio', ListaridPrecio)
 
 export default rutaPrecio

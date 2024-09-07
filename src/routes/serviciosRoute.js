@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { actualizarServicios, eliminarServicios, listarServicios, listarServiciosId, registrarServicio } from "../controllers/serviciosController.js";
+import { obtenerVariablesPorVersion,actualizarServicios, eliminarServicios, listarServicios, 
+    listarServiciosId, registrarServicio, obtenerServiciosAlquiler, registrarServicioAlquiler } from "../controllers/serviciosController.js";
 import { validarToken } from "../controllers/AutentificacionLogin.js";
 import { validateServicios } from "../../validation/serviciosValidation.js";
 
@@ -10,5 +11,9 @@ rutaServicios.get('/listar/:id', validarToken, listarServiciosId);
 rutaServicios.post('/registrar', validarToken, validateServicios, registrarServicio);
 rutaServicios.put('/actualizar/:id', validarToken, validateServicios, actualizarServicios);
 rutaServicios.delete('/eliminar/:id', validarToken, eliminarServicios);
+rutaServicios.get('/listaAlquiler', obtenerServiciosAlquiler)
+rutaServicios.post('/variablesVersion',obtenerVariablesPorVersion)
+rutaServicios.post('/agregarAlquiler',registrarServicioAlquiler)
+
 
 export default rutaServicios;
