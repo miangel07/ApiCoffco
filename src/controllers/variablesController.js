@@ -31,7 +31,7 @@ tipo_dato*/
         console.log(nombre, tipo_dato)
 
         let sql = `insert into variables (nombre, tipo_dato) values (?,?)`;
-        const [respuesta] = await conexion.query(sql, [nombre,  tipo_dato])
+        const [respuesta] = await conexion.query(sql, [nombre, tipo_dato])
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ menssage: "Variable registrada exitosamente" })
         }
@@ -72,20 +72,20 @@ export const ActualizarVariables = async (req, res) => {
     nombre,	
     estado	,
     tipo_dato 	 */
-        let { nombre, estado, tipo_dato } = req.body;
+        let { nombre, tipo_dato } = req.body;
 
         let id = req.params.id;
 
-        let sql = `update variables set nombre=?, estado=?,tipo_dato=? where idVariable=?`;
-        const [respuesta] = await conexion.query(sql, [nombre, estado, tipo_dato, id]);
+        let sql = `update variables set nombre=?, tipo_dato=? where idVariable=?`;
+        const [respuesta] = await conexion.query(sql, [nombre, tipo_dato, id]);
         if (respuesta.affectedRows > 0) {
             return res
                 .status(200)
-                .json({ message: "se actualizo con exito la variable" });
+                .json({ menssage: "se actualizo con exito la variable" });
         } else {
             return res
                 .status(404)
-                .json({ message: "no se actualizo la variable" });
+                .json({ menssage: "no se actualizo la variable" });
         }
     } catch (error) {
         res.status(500).json({ message: 'Error en el servidor ' + error.mensage })
@@ -97,7 +97,7 @@ export const ELiminarVariables = async (req, res) => {
         let id = req.params.id
 
 
-        
+
 
         let sql = `delete from variables where idVariable=?`
         const [respuesta] = await conexion.query(sql, [id])
@@ -111,4 +111,25 @@ export const ELiminarVariables = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "error en el servidor " + error.message })
     }
+}
+export const UpdateEstado = async (req, res) => {
+    try {
+
+        let id = req.params.id
+        let { estado } = req.body;
+
+
+        let sql = `update variables set estado=? where idVariable=?`
+        const [respuesta] = await conexion.query(sql, [estado, id])
+        if (respuesta.affectedRows > 0) {
+           return res.status(200).json({ message: `Se cambio  con éxito el estado a ${estado} ` });
+        }
+        return res.status(500).json({ message: "dato no encontrado" });
+
+    } catch (error) {
+        res.status(500).json({ message: "Error en el servidor" + error.message });
+
+    }
+
+
 }
