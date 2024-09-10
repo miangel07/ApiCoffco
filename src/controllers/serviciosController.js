@@ -1,50 +1,180 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-export const registrarServicio = async (req, res) => {
+
+export const getDocumento= async(req,res)=>{
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    let { nombreServicio } = req.body;
+    console.log('nombreServicio en el body: ', nombreServicio);
 
-    let {
-      nombre,
-      fk_idTipoServicio,
-      fecha,
-      fk_idAmbiente,
-      fk_idMuestra,
-      fk_idPrecio,
-      fk_idUsuarios,
-    } = req.body;
+    let sql = `
+      SELECT doc.nombre
+    FROM documentos doc
+    JOIN versiones ver ON doc.id_documentos = ver.fk_documentos
+    JOIN tiposervicio ts ON doc.fk_idTipoServicio = ts.idTipoServicio
+    WHERE ts.nombreServicio = ?
+    AND ver.estado = 'activo';
+    `;
 
+    const [respuesta] = await conexion.query(sql, [nombreServicio]);
+    console.log(respuesta);
 
-    const sql = `INSERT INTO servicios (nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-      nombre,
-      fk_idTipoServicio,
-      fecha,
-      fk_idAmbiente,
-      fk_idMuestra,
-      fk_idPrecio,
-      fk_idUsuarios,
-    ];
-
-    const [respuesta] = await conexion.query(sql, values);
-
-    if (respuesta.affectedRows > 0) {
-      res.status(200).json({ message: "Dato registrado con éxito" });
+    if (respuesta.length > 0) {
+      return res.status(200).json(respuesta);
     } else {
-      res.status(404).json({ message: "Dato no registrado" });
+      return res.status(404).json({ message: 'No se encontró resultado de Documentos' });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
+    return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
   }
+
+}
+
+export const getVariables=async(req,res)=>{
+  try {
+    let {nombre}= req.body
+    console.log('nombre en el body: ',nombre)
+    let sql=`SELECT v.nombre AS variable_nombre, v.tipo_dato AS variable_tipo_dato
+FROM versiones ver
+JOIN documentos doc ON ver.fk_documentos = doc.id_documentos
+JOIN detalle det ON ver.idVersion = det.fk_id_version
+JOIN variables v ON det.fk_idVariable = v.idVariable
+WHERE doc.nombre = ?
+AND ver.estado = 'activo';
+`
+
+  const [respuesta]= await conexion.query(sql,[nombre])
+  console.log(respuesta)
+
+  if (respuesta.length>0) {
+    return res.status(200).json(respuesta)
+  } else {
+    return res.status(404).json({message:'No se encontro resultado de variables'})
+  }
+  } catch (error) {
+    return res.status(500).json({message:'Error en el servidor'+error.message})
+  }
+}
+
+
+
+export const registrarServicio = async (req, res) => {
+  // try {
+
+  //   const { idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables } = req.body;
+  //   console.log('variables en el body :',idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables)
+  //   // Paso 1: Seleccionar las variables asociadas a la versión activa del documento según el tipo de servicio
+  //   const [variables] = await conexion.query(`
+  //     SELECT v.idVariable, v.nombre
+  //     FROM documentos d
+  //     JOIN versiones vs ON d.id_documentos = vs.fk_documentos
+  //     JOIN variables v ON vs.idVersion = v.fk_idVersion
+  //     WHERE d.fk_idTipoServicio = ?
+  //     AND vs.estado = 'activo';
+  //   `, [idTipoServicio]);
+
+  //   if (variables.length === 0) {
+  //     return res.status(404).json({ error: 'No hay variables asociadas a una versión activa para este tipo de servicio' });
+  //   }
+
+  //   // Paso 2: Registrar el servicio en la tabla "servicios"
+  //   const [resultServicio] = await conexion.query(`
+  //     INSERT INTO servicios (fk_idTipoServicio, fk_idUsuarios, fk_idAmbiente, fk_idMuestra, estado)
+  //     VALUES (?, ?, ?, ?, 'activo');
+  //   `, [idTipoServicio, idUsuario, idAmbiente, idMuestra]);
+
+  //   const idServicio = resultServicio.insertId;
+
+  //   // Paso 3: Registrar los valores de las variables asociadas al servicio en la tabla "valor"
+  //   for (const variable of variables) {
+  //     const valorVariable = valoresVariables[variable.idVariable] || null; // Valor recibido desde el frontend
+
+  //     await db.query(`
+  //       INSERT INTO valor (fk_idVariable, fk_id_servicio, valor)
+  //       VALUES (?, ?, ?);
+  //     `, [variable.idVariable, idServicio, valorVariable]);
+  //   }
+
+  //   return res.status(201).json({ message: 'Servicio registrado exitosamente' });
+
+  // } catch (error) {
+  //   console.error('Error al registrar el servicio:', error);
+  //   return res.status(500).json({ error: 'Error al registrar el servicio' });
+  // }
+
+
+
+
+
 };
+
+// export const registrarServicio = async (req, res) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ errors: errors.array() });
+//     }
+
+//     let {
+//       nombre,
+//       fk_idTipoServicio,
+//       fecha,
+//       fk_idAmbiente,
+//       fk_idMuestra,
+//       fk_idPrecio,
+//       fk_idUsuarios,
+//     } = req.body;
+
+//     const sql = `INSERT INTO servicios (nombre, fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idPrecio, fk_idUsuarios) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+//     const values = [
+//       nombre,
+//       fk_idTipoServicio,
+//       fecha,
+//       fk_idAmbiente,
+//       fk_idMuestra,
+//       fk_idPrecio,
+//       fk_idUsuarios,
+//     ];
+
+//     const [respuesta] = await conexion.query(sql, values);
+
+//     if (respuesta.affectedRows > 0) {
+//       res.status(200).json({ message: "Dato registrado con éxito" });
+//     } else {
+//       res.status(404).json({ message: "Dato no registrado" });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: "Error en el servidor: " + error.message });
+//   }
+// };
 
 export const listarServicios = async (req, res) => {
   try {
-    let sql = `SELECT * FROM servicios`;
+    let sql = `SELECT 
+    s.id_servicios,
+    s.nombre,
+    ts.nombreServicio AS tipo_servicio,
+    DATE_FORMAT(s.fecha, '%Y-%m-%d') AS fecha,
+    a.nombre_ambiente,
+    m.codigo_muestra,
+    p.precio,
+    CONCAT(u.nombre, ' ', u.apellidos) AS nombre_completo_usuario,
+    r.rol AS rol_usuario,
+    s.estado
+FROM 
+    servicios s
+JOIN 
+    tiposervicio ts ON s.fk_idTipoServicio = ts.idTipoServicio
+JOIN 
+    ambiente a ON s.fk_idAmbiente = a.idAmbiente
+JOIN 
+    muestra m ON s.fk_idMuestra = m.id_muestra
+JOIN 
+    precio p ON s.fk_idPrecio = p.idPrecio
+JOIN 
+    usuarios u ON s.fk_idUsuarios = u.id_usuario
+JOIN 
+    rol r ON u.fk_idRol = r.idRol`;
     const [resultado] = await conexion.query(sql);
     if (resultado.length > 0) {
       res.status(200).json(resultado);
@@ -122,6 +252,31 @@ export const eliminarServicios = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor " + error.message });
   }
 };
+
+export const actualizarEstadoServicio = async(req,res)=>{
+  try {
+    let {estado}=req.body
+    let id_servicios = req.params.idPrecio;
+    let sql=`update servicios set estado=? where id_servicios=?`
+    const [respuesta] = await conexion.query(sql,[estado, id_servicios])
+    if(respuesta.affectedRows>0){
+      res.status(200).json({message:'Estado Actualizado correctamente'})
+    }else{
+      res.status(404).json({message:'Estado no actualizado'})
+    }
+  } catch (error) {
+    res.status(500).json({message: 'Error en la conexion'+error.message})
+  }
+}
+
+
+
+
+
+
+
+
+
 
 export const obtenerServiciosAlquiler = async (req, res) => {
   try {
@@ -287,37 +442,4 @@ export const registrarServicioAlquiler = async (req, res) => {
   }
 };
 
-export const obtenerVariablesPorVersion = async (req, res) => {
-  const { idTipoFormulario } = req.body;
-  try {
-    const query = `
-        SELECT
-            v.idVariable,
-            v.nombre AS variable_nombre,
-            v.tipo_dato AS variable_tipo_dato
-        FROM
-            versiones ver
-            INNER JOIN detalle d ON ver.idVersion = d.fk_id_version
-            INNER JOIN variables v ON d.fk_idVariable = v.idVariable
-        WHERE
-            ver.estado = 'activo'
-            AND ver.idVersion = ?
-            AND v.estado = 'activo';
-        `;
 
-    const [rows] = await conexion.query(query, [idTipoFormulario]);
-
-    const variables = rows.map((row) => ({
-      id: row.idVariable,
-      nombre: row.variable_nombre,
-      tipo_dato: row.variable_tipo_dato,
-    }));
-
-    res.status(200).json(variables);
-  } catch (error) {
-    console.error("Error al obtener las variables por versión:", error);
-    res
-      .status(500)
-      .json({ message: "Error al obtener las variables por versión" });
-  }
-};
