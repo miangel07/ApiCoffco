@@ -163,3 +163,31 @@ export const ListaridMuestra = async (req, res) => {
     res.status(500).json({ menssage: "error en la conexion" + error.menssage });
   }
 };
+
+
+
+
+export const ActualizarEstadoMuestra = async (req, res) => {
+  try {
+    let { estado } = req.body;
+    let id = req.params.id;
+
+    let sql = `
+      UPDATE muestra
+      SET estado = '${estado}'
+      WHERE id_muestra = ${id}
+    `;
+
+    const [respuesta] = await conexion.query(sql);
+
+    if (respuesta.affectedRows > 0) {
+      return res.status(200).json({ message: "Estado actualizado con éxito" });
+    } else {
+      return res.status(404).json({ message: "No se encontró la muestra" });
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error en la conexión: " + error.message });
+  }
+};
