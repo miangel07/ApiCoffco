@@ -5,7 +5,7 @@ import { validarToken} from "../controllers/AutentificacionLogin.js";
 const rutaUsuario= Router()
 
 rutaUsuario.get('/listar', listarUsuario)
-rutaUsuario.get('/listarid/:id_usuario', listarUsuarioId)
+rutaUsuario.get('/listarid/:id', listarUsuarioId)
 rutaUsuario.post('/registrar', registrarUsuario)
 rutaUsuario.delete('/eliminar/:id_usuario',  eliminarUsuario)
 rutaUsuario.put('/estado/:id_usuario',estadoUsuario)
