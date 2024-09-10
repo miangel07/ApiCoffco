@@ -32,32 +32,28 @@ export const validarUsuarios = async (req, res) => {
             return res.status(400).json(error)
         }
 
-        let { id: numero_documento,password: password } = req.body
-        // console.log(req.body)
-        
-        // Consulta para obtener el hash de la contraseña del usuario desde la base de datos
-        let sql =`SELECT nombre,estado ,fk_idRol,password  FROM usuarios WHERE numero_documento='${numero_documento}'`
+        let { id: numero_documento, password: password } = req.body
+
+        let sql =`SELECT id_usuario, nombre, estado, password FROM usuarios WHERE numero_documento='${numero_documento}'`
         const [resultado] = await conexion.query(sql);
-        // console.log(resultado)
       
-
         if (resultado.length > 0) {
-            const user = resultado[0];
-            const storedPasswordHash = user.password;
+            const usuario = resultado[0];
+            const storedPasswordHash = usuario.password;
 
-            // Comparación de la contraseña proporcionada con el hash almacenado en la base de datos
+            if (usuario.estado === 'inactivo') {
+                return res.status(403).json({ "message": "Acceso denegado" });
+            }
+
             const passwordMatch = await bcryptjs.compare(password, storedPasswordHash);
 
             if (passwordMatch) {
-                // Contraseña válida: se genera un token de autenticación
-                let token = jwt.sign({user:resultado},process.env.SECRET,{expiresIn:process.env.TIME})
-                return res.status(200).json({ user: { nombre: user.nombre, rol_usuario: user.fk_idRol,estado:user.estado }, token, message: 'Usuario autorizado' });
+                let token = jwt.sign({Usuario: resultado},process.env.SECRET,{expiresIn:process.env.TIME})
+                return res.status(200).json({ Usuario_Logeado: { id: usuario.id_usuario, nombre: usuario.nombre }, token, message: 'Usuario autorizado' });
             } else {
-                // Contraseña no válida
                 return res.status(401).json({ message: 'Contraseña incorrecta' });
             }
         } else {
-            // No se encontró un usuario con el correo proporcionado
             return res.status(404).json({ message: 'Contraseña o Numero de Indentificacion incorrectos' });
         }
     } catch (error) {
