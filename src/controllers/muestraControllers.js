@@ -1,25 +1,44 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 export const ListarMuestras = async (req, res) => {
-    try {
-      let sql = "SELECT * FROM muestra";
-      const [responde] = await conexion.query(sql);
-      
-      if (responde.length > 0) {
-        const formatearResponde = responde.map(muestra => ({
-          ...muestra,
-          fecha_muestra: new Date(muestra.fecha_muestra).toISOString().split('T')[0], // Formatear la fecha sin la hora
-        }));
+  try {
+    const sql = `
+      SELECT 
+        m.id_muestra, 
+        m.codigo_muestra, 
+        m.cantidadEntrada, 
+        m.fecha_muestra, 
+        m.estado, 
+        f.nombre_finca, 
+        CONCAT(u.nombre, ' ', u.apellidos) AS nombre
+      FROM muestra m
+      JOIN finca f ON m.fk_id_finca = f.id_finca
+      JOIN usuarios u ON m.fk_id_usuarios = u.id_usuario
+    `;
+    
+    const [responde] = await conexion.query(sql);
+    
+    if (responde.length > 0) {
+      const formatearResponde = responde.map(muestra => ({
+        id_muestra: muestra.id_muestra,
+        codigo_muestra: muestra.codigo_muestra,
+        cantidadEntrada: parseFloat(muestra.cantidadEntrada),
+        fecha_muestra: new Date(muestra.fecha_muestra).toISOString().split('T')[0], // Formatear la fecha sin la hora
+        estado: muestra.estado,
+        finca: muestra.nombre_finca, // Devolver el nombre de la finca como cadena
+        usuario: muestra.nombre // Devolver el nombre del usuario como cadena
+      }));
   
-        res.status(200).json(formatearResponde);
-      } else {
-        res.status(404).json({ menssage: "No se pudo listar correctamente" });
-      }
-    } catch (error) {
-      res.status(500).json({ menssage: "Error en la conexion: " + error.menssage });
+      res.status(200).json(formatearResponde);
+    } else {
+      res.status(404).json({ mensaje: "No se encontraron muestras" });
     }
-  };
-  
+  } catch (error) {
+    res.status(500).json({ mensaje: "Error en la conexión: " + error.message });
+  }
+};
+
+
 export const RegistrarMuestra = async (req, res) => {
   try {
     const error = validationResult(req);
