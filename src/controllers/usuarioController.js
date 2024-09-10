@@ -61,8 +61,11 @@ export const estadoUsuario = async (req, res) => {
 
 export const listarUsuarioId = async (req, res) => {
   try {
-    let id_usuario = req.params.id_usuario;
-    let sql = `select * from usuarios where id_usuario=${id_usuario}`;
+    let id = req.params.id;
+    let sql = `SELECT usuarios.*, rol.rol 
+      FROM usuarios 
+      LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol 
+      WHERE id_usuario=${id}`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.length == 1) {
       res.status(200).json(respuesta);
