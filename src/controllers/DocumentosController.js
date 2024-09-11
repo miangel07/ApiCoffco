@@ -42,8 +42,6 @@ LEFT JOIN
     logo_documento ld ON d.id_documentos = ld.documentos_iddocumentos
 LEFT JOIN 
     logos lg ON ld.logo_idlogos = lg.idLogos
-WHERE 
-    v.estado = 'activo'
 GROUP BY 
     d.id_documentos, v.idVersion;
 
