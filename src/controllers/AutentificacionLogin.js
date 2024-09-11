@@ -25,7 +25,6 @@ else{
 }
 
 export const validarUsuarios = async (req, res) => {
-
     try {
         const error= validationResult(req)
         if(!error.isEmpty()){
