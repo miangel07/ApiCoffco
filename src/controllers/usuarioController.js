@@ -61,8 +61,11 @@ export const estadoUsuario = async (req, res) => {
 
 export const listarUsuarioId = async (req, res) => {
   try {
-    let id_usuario = req.params.id_usuario;
-    let sql = `select * from usuarios where id_usuario=${id_usuario}`;
+    let id = req.params.id;
+    let sql = `SELECT usuarios.*, rol.rol 
+      FROM usuarios 
+      LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol 
+      WHERE id_usuario=${id}`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.length == 1) {
       res.status(200).json(respuesta);
@@ -127,32 +130,40 @@ export const eliminarUsuario = async (req, res) => {
 
 export const actualizarUsuario = async (req, res) => {
   try {
-    // MANEJO DE ERRORES
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+      // MANEJO DE ERRORES
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
 
-    const { id } = req.params;
-    const usuario = req.body;
+      const { id } = req.params;
+      const usuario = req.body;
 
-    const [resultado] = await  conexion.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
+      const salt = await bcryptjs.genSalt(10);
 
-    if (resultado.length === 0) {
-      return res.status(404).json({ message: "Usuario no encontrado" });
-    }
+      if (usuario.password) {
+        usuario.password = await bcryptjs.hash(usuario.password, salt);
+      }
 
-    const datos = resultado[0];
+      const [resultado] = await conexion.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
 
-    const actualizacion = {...datos, ...usuario };
+      if (resultado.length === 0) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
+      }
 
-    const [sql] = await conexion.query("UPDATE usuarios SET ? WHERE id_usuario = ?", [actualizacion, id]);
+      const datos = resultado[0];
 
-    res.json({ message: "Usuario actualizado", Usuario: sql });
-  } catch (error) {
+      const actualizacion = { ...datos, ...usuario };
+
+      const [sql] = await conexion.query("UPDATE usuarios SET ? WHERE id_usuario = ?", [actualizacion, id]);
+
+      res.json({ message: "Usuario actualizado", Usuario: sql });
+    } catch (error) {
     res.status(500).send(error.message);
   }
 };
+
+
 
 export const ConsultaUsers = async (req, res) => {
   try {
