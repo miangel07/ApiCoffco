@@ -42,8 +42,6 @@ LEFT JOIN
     logo_documento ld ON d.id_documentos = ld.documentos_iddocumentos
 LEFT JOIN 
     logos lg ON ld.logo_idlogos = lg.idLogos
-WHERE 
-    v.estado = 'activo'
 GROUP BY 
     d.id_documentos, v.idVersion;
 
@@ -241,10 +239,10 @@ export const actalizardocumentosVersion = async (req, res) => {
     const rutaArchivoOriginal = path.join('public', 'documentos', archivoTemporal);
     const rutaArchivoFinalConIDVersion = path.join('public', 'documentos', archivoConIDVersion);
 
-     fs.renameSync(rutaArchivoOriginal, rutaArchivoFinalConIDVersion);
+    fs.renameSync(rutaArchivoOriginal, rutaArchivoFinalConIDVersion);
 
-  
-   
+
+
     let sqlNombre = `UPDATE versiones SET nombre_documento = ? WHERE idVersion = ?`
     await conexion.query(sqlNombre, [archivoConIDVersion, idVersionDoc]);
     // validamos que hallan logos 
@@ -354,3 +352,32 @@ export const Actualizar = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+export const consultaGrafica = async (req, res) => {
+  try {
+
+    let sql = `
+SELECT 
+    td.nombreDocumento AS name, 
+    COUNT(d.id_documentos) AS value
+FROM 
+    documentos d
+JOIN 
+    tipodocumento td ON d.fk_idTipoDocumento = td.idTipoDocumento
+WHERE 
+    td.estado = 'activo'
+GROUP BY 
+    td.nombreDocumento;`
+    const [rows] = await conexion.query(sql);
+    if (rows.length > 0) {
+      return res.status(200).json({ data: rows });
+    }
+    return res
+      .status(404)
+      .json({ message: "No se ha podido actualizar el documento." });
+
+
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+}
