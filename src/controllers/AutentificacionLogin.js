@@ -33,7 +33,13 @@ export const validarUsuarios = async (req, res) => {
 
         let { id: numero_documento, password: password } = req.body
 
-        let sql =`SELECT id_usuario, nombre, estado, password FROM usuarios WHERE numero_documento='${numero_documento}'`
+        let sql = `
+            SELECT u.id_usuario, u.nombre, u.apellidos, r.rol AS rol, u.estado, u.correo_electronico, u.telefono, u.tipo_documento, u.password 
+            FROM usuarios u
+            JOIN rol r ON u.fk_idRol = r.idRol
+            WHERE u.numero_documento = '${numero_documento}'
+        `;
+
         const [resultado] = await conexion.query(sql);
       
         if (resultado.length > 0) {
@@ -47,7 +53,9 @@ export const validarUsuarios = async (req, res) => {
             const passwordMatch = await bcryptjs.compare(password, storedPasswordHash);
 
             if (passwordMatch) {
-                let token = jwt.sign({Usuario: resultado},process.env.SECRET,{expiresIn:process.env.TIME})
+                const { password, ...DatosSesion } = usuario;
+
+                let token = jwt.sign({Usuario: DatosSesion},process.env.SECRET,{expiresIn:process.env.TIME})
                 return res.status(200).json({ Usuario_Logeado: { id: usuario.id_usuario, nombre: usuario.nombre }, token, message: 'Usuario autorizado' });
             } else {
                 return res.status(401).json({ message: 'Contraseña incorrecta' });

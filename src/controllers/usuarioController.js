@@ -163,8 +163,6 @@ export const actualizarUsuario = async (req, res) => {
   }
 };
 
-
-
 export const ConsultaUsers = async (req, res) => {
   try {
     let sql = `SELECT COUNT(rol_usuario) AS rol
@@ -181,4 +179,39 @@ export const ConsultaUsers = async (req, res) => {
       res.status(404).json({ message: "No se encontraron usuarios" });
     }
   } catch (error) { }
+};
+
+export const verificarContraseña = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { id } = req.params;
+    const { contraActual, contraNueva } = req.body; 
+
+    const [resultado] = await conexion.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
+
+    const usuario = resultado[0];
+
+    const contraseñaCoincide = await bcryptjs.compare(contraActual, usuario.password);
+    if (!contraseñaCoincide) {
+      return res.status(401).json({ message: "Contraseña actual incorrecta" });
+    }
+
+    let actualizacion = { ...usuario }; 
+
+    if (contraNueva) {
+      const salt = await bcryptjs.genSalt(10);
+      const passwordHash = await bcryptjs.hash(contraNueva, salt);
+      actualizacion.password = passwordHash;
+    }
+
+    const [sql] = await conexion.query("UPDATE usuarios SET ? WHERE id_usuario = ?", [actualizacion, id]);
+
+    res.json({ message: "Contraseña actualizada correctamente", Usuario: sql });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 };
