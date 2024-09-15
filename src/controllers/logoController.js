@@ -1,12 +1,11 @@
 import { conexion } from "../database/conexion.js";
 
-
 export const listarLogos = async (req, res) => {
     try {
         let sql = "SELECT * FROM logos";
         const [response] = await conexion.query(sql)
         if (response.length > 0) {
-            return res.status(200).json(response);
+            return res.status(200).json({ message: "logos listados correctamente", data: response });
         }
         return res.status(401).json({ message: "no se listaron correctamente" });
 
