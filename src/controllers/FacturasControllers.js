@@ -9,7 +9,7 @@ export const generarFacturas = async (req, res) => {
     m.codigo_muestra,
     m.cantidadEntrada,  
     GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre ASC SEPARATOR ', ') AS servicios,
-    GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', FORMAT(p.precio, 0)) ORDER BY s.nombre ASC SEPARATOR ', ') AS precios,
+    GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', p.precio) ORDER BY s.nombre ASC SEPARATOR ', ') AS precios,
     GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', FORMAT(s.cantidad_salida, 2)) ORDER BY s.nombre ASC SEPARATOR ', ') AS cantidad_salida_servicios,
     FORMAT(SUM(s.cantidad_salida * p.precio), 2) AS total_calculado,  
     f.nombre_finca,
@@ -46,6 +46,7 @@ GROUP BY
     u.nombre, 
     u.apellidos, 
     u.correo_electronico;
+
 
 `
 
