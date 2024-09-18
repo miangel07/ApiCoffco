@@ -343,9 +343,9 @@ export const Actualizar = async (req, res) => {
     console.log(id_documentos, req.body);
   
     fk_idTipoServicio = fk_idTipoServicio ?? null;
-    entrada_salida = entrada_salida ?? null; // Manejar null
-    variables = variables ?? '[]'; // Manejar valores predeterminados
-    logos = logos ?? '[]'; // Manejar valores predeterminados
+    entrada_salida = entrada_salida ?? null; 
+    variables = variables ?? '[]'; 
+    logos = logos ?? '[]'; 
   
     let nuevoNombreArchivo = nombre_documento_version;
   
@@ -404,7 +404,7 @@ export const Actualizar = async (req, res) => {
       return res.status(404).json({ message: "No se actualizó el documento." });
     }
   
-    // Actualizar la tabla `versiones`
+    // Actualizar la tabla versiones
     let sqlVersion = `
       UPDATE versiones
       SET version = ?, 
@@ -419,14 +419,14 @@ export const Actualizar = async (req, res) => {
       return res.status(500).json({ message: "No se pudo actualizar la versión." });
     }
   
-    // Eliminar las asociaciones existentes en la tabla `detalle`
+    // Eliminar las asociaciones existentes en la tabla detalle
     let sqlEliminarDetalle = `
       DELETE FROM detalle
       WHERE fk_id_version = ?;
     `;
     await conexion.query(sqlEliminarDetalle, [idVersion]);
   
-    // Insertar las nuevas asociaciones en la tabla `detalle`
+    // Insertar las nuevas asociaciones en la tabla detalle
     let sqlDetalle = `
       INSERT INTO detalle (fk_idVariable, fk_id_version)
       VALUES (?, ?);
@@ -436,14 +436,14 @@ export const Actualizar = async (req, res) => {
       await conexion.query(sqlDetalle, [idVariable, idVersion]);
     }
   
-    // Eliminar las asociaciones existentes en la tabla `logo_documento`
+    // Eliminar las asociaciones existentes en la tabla logo_documento
     let sqlEliminarLogos = `
       DELETE FROM logo_documento
       WHERE documentos_iddocumentos = ?;
     `;
     await conexion.query(sqlEliminarLogos, [id_documentos]);
   
-    // Insertar las nuevas asociaciones en la tabla `logo_documento`
+    // Insertar las nuevas asociaciones en la tabla logo_documento
     let sqlLogos = `
       INSERT INTO logo_documento (logo_idlogos, documentos_iddocumentos)
       VALUES (?, ?);
