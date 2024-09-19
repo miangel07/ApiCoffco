@@ -1,11 +1,10 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-
 export const generarFacturas = async (req, res) => {
-    try {
-        const { codigo } = req.body;
-        let sql = `SELECT 
+  try {
+    const { codigo } = req.body;
+    let sql = `SELECT 
     m.codigo_muestra,
     m.cantidadEntrada,  
     GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre ASC SEPARATOR ', ') AS servicios,
@@ -45,21 +44,18 @@ GROUP BY
     mun.nombre_municipio, 
     u.nombre, 
     u.apellidos, 
-    u.correo_electronico;
+    u.correo_electronico
 
 
-`
+`;
 
-
-        const [result] = await conexion.query(sql);
-        if (result.length > 0) {
-            res.status(200).json(result);
-        } else {
-            res.status(404).json({ message: 'No se encontraron resultados' });
-        }
-
-    } catch (error) {
-        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
-
+    const [result] = await conexion.query(sql);
+    if (result.length > 0) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: "No se encontraron resultados" });
     }
-}
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
