@@ -20,11 +20,10 @@
 
 
 import { Router } from "express";
-import {actualizarEstadoServicio, eliminarServicios, getDocumento, getVariables, listarServicios, registrarServicio} from '../controllers/serviciosController.js'
+import {actualizarEstadoServicio, eliminarServicios, getVariables, listarServicios, registrarServicio} from '../controllers/serviciosController.js'
 
 const rutaServicios = Router();
 rutaServicios.get('/listar',listarServicios)
-rutaServicios.post('/getdocumento',getDocumento)
 rutaServicios.post('/getvariables',getVariables)
 rutaServicios.post('/registrarser',registrarServicio)
 rutaServicios.put('/actualizarestadoservicio/:id',actualizarEstadoServicio)
