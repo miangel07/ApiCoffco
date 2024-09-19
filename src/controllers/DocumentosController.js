@@ -197,7 +197,6 @@ export const actalizardocumentosVersion = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       idVersion,
@@ -221,7 +220,6 @@ export const actalizardocumentosVersion = async (req, res) => {
       descripcion,
       codigo_documentos,
       fecha_emision,
-      ,
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
