@@ -12,7 +12,6 @@ export const listarDocumentos = async (req, res) => {
     d.descripcion,
     d.codigo_documentos,
     d.fecha_emision,
-    d.entrada_salida, 
     v.version, 
     v.idVersion AS idversion,
     v.estado AS estado_version,
@@ -21,11 +20,8 @@ export const listarDocumentos = async (req, res) => {
     t.nombreDocumento AS tipo_documento,
     t.estado AS estado_tipo_documento,
     v.nombre_documento AS nombre_documento_version,
-    -- Variables asociadas a la versión
     GROUP_CONCAT(DISTINCT vrs.nombre SEPARATOR ', ') AS variables,
-    -- Logos asociados al documento
     GROUP_CONCAT(DISTINCT lg.nombre SEPARATOR ', ') AS logos,
-    -- Tipo de servicio
     ts.nombreServicio AS tipo_servicio
 FROM 
     documentos d
@@ -68,7 +64,7 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       version,
@@ -79,20 +75,20 @@ export const registrarDocumentos = async (req, res) => {
     console.log(req.body)
     // Manejar caso donde fk_idTipoServicio puede ser null
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    entrada_salida = entrada_salida ? entrada_salida : null;
+  
     // Registrar el documento en la base de datos
-    /* id_documentos	nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision	entrada_salida	fk_idTipoServicio	fk_idTipoDocumento	
+    /* id_documentos	nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision		fk_idTipoServicio	fk_idTipoDocumento	
  */
     let sqlDocumento = `
-      INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, entrada_salida,fk_idTipoServicio, fk_idTipoDocumento)
-      VALUES (?, CURDATE(), ?, ?, ?, ?, ?,?)
+      INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision,   fk_idTipoServicio, fk_idTipoDocumento)
+      VALUES (?, CURDATE(), ?, ?, ?, ?, ?)
     `;
     const [rows] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
@@ -201,7 +197,7 @@ export const actalizardocumentosVersion = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       idVersion,
@@ -211,21 +207,21 @@ export const actalizardocumentosVersion = async (req, res) => {
     } = req.body;
     console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    entrada_salida = entrada_salida ? entrada_salida : null;
+    
 
     const archivoTemporal = req.file.filename;
     const nombreTemporal = req.file.originalname;
     const extension = path.extname(nombreTemporal);
     const nombreTemporalSinExt = path.basename(nombreTemporal, extension);
 
-    let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, entrada_salida, fk_idTipoServicio, fk_idTipoDocumento)
-                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?,?)`;
+    let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision,fk_idTipoServicio, fk_idTipoDocumento)
+                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
     const [rows2] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      ,
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
@@ -329,7 +325,7 @@ export const Actualizar = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       nombre_documento_version,
@@ -343,9 +339,9 @@ export const Actualizar = async (req, res) => {
     console.log(id_documentos, req.body);
   
     fk_idTipoServicio = fk_idTipoServicio ?? null;
-    entrada_salida = entrada_salida ?? null; // Manejar null
-    variables = variables ?? '[]'; // Manejar valores predeterminados
-    logos = logos ?? '[]'; // Manejar valores predeterminados
+   
+    variables = variables ?? '[]'; 
+    logos = logos ?? '[]'; 
   
     let nuevoNombreArchivo = nombre_documento_version;
   
@@ -384,7 +380,7 @@ export const Actualizar = async (req, res) => {
           descripcion = ?, 
           codigo_documentos = ?, 
           fecha_emision = ?, 
-          entrada_salida = ?, 
+           = ?, 
           fk_idTipoServicio = ?, 
           fk_idTipoDocumento = ?
       WHERE id_documentos = ?;
@@ -394,7 +390,7 @@ export const Actualizar = async (req, res) => {
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      ,
       fk_idTipoServicio,
       fk_idTipoDocumento,
       id_documentos
@@ -404,7 +400,7 @@ export const Actualizar = async (req, res) => {
       return res.status(404).json({ message: "No se actualizó el documento." });
     }
   
-    // Actualizar la tabla `versiones`
+    // Actualizar la tabla versiones
     let sqlVersion = `
       UPDATE versiones
       SET version = ?, 
@@ -419,14 +415,14 @@ export const Actualizar = async (req, res) => {
       return res.status(500).json({ message: "No se pudo actualizar la versión." });
     }
   
-    // Eliminar las asociaciones existentes en la tabla `detalle`
+    // Eliminar las asociaciones existentes en la tabla detalle
     let sqlEliminarDetalle = `
       DELETE FROM detalle
       WHERE fk_id_version = ?;
     `;
     await conexion.query(sqlEliminarDetalle, [idVersion]);
   
-    // Insertar las nuevas asociaciones en la tabla `detalle`
+    // Insertar las nuevas asociaciones en la tabla detalle
     let sqlDetalle = `
       INSERT INTO detalle (fk_idVariable, fk_id_version)
       VALUES (?, ?);
@@ -436,14 +432,14 @@ export const Actualizar = async (req, res) => {
       await conexion.query(sqlDetalle, [idVariable, idVersion]);
     }
   
-    // Eliminar las asociaciones existentes en la tabla `logo_documento`
+    // Eliminar las asociaciones existentes en la tabla logo_documento
     let sqlEliminarLogos = `
       DELETE FROM logo_documento
       WHERE documentos_iddocumentos = ?;
     `;
     await conexion.query(sqlEliminarLogos, [id_documentos]);
   
-    // Insertar las nuevas asociaciones en la tabla `logo_documento`
+    // Insertar las nuevas asociaciones en la tabla logo_documento
     let sqlLogos = `
       INSERT INTO logo_documento (logo_idlogos, documentos_iddocumentos)
       VALUES (?, ?);

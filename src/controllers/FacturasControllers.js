@@ -10,7 +10,7 @@ export const generarFacturas = async (req, res) => {
     GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre ASC SEPARATOR ', ') AS servicios,
     GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', p.precio) ORDER BY s.nombre ASC SEPARATOR ', ') AS precios,
     GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', FORMAT(s.cantidad_salida, 2)) ORDER BY s.nombre ASC SEPARATOR ', ') AS cantidad_salida_servicios,
-    FORMAT(SUM(s.cantidad_salida * p.precio), 2) AS total_calculado,  
+    FORMAT(SUM(s.cantidad_salida * p.precio), 3) AS total_calculado,  
     f.nombre_finca,
     mun.nombre_municipio,
     u.nombre AS nombre_usuario,
@@ -36,7 +36,7 @@ WHERE
 AND 
     p.estado_precio = 'activo'
 AND 
-    s.estado = 'activo'
+    s.estado = 'terminado'
 GROUP BY 
     m.codigo_muestra, 
     m.cantidadEntrada,  
@@ -45,17 +45,18 @@ GROUP BY
     u.nombre, 
     u.apellidos, 
     u.correo_electronico
+`
 
 
-`;
+        const [result] = await conexion.query(sql);
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'No se encontraron resultados' });
+        }
 
-    const [result] = await conexion.query(sql);
-    if (result.length > 0) {
-      res.status(200).json(result);
-    } else {
-      res.status(404).json({ message: "No se encontraron resultados" });
-    }
-  } catch (error) {
+    } catch (error) {
+ 
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
