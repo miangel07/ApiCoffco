@@ -14,57 +14,48 @@ export const listarLogos = async (req, res) => {
     }
 }
 
-//REGISTRAR LOGO ORGINAL
-// export const registrarLogo = async (req, res) => {
-//     try {
-//         let { nombre } = req.body;
-//         const ruta = req.file.originalname;
-//         let sql = "INSERT INTO logos (ruta,nombre) VALUES (?,?)";
-//         const [response] = await conexion.query(sql, [ruta, nombre]);
-//         if (response.affectedRows > 0) {
-//             return res.status(200).json({ message: "Logo registrado correctamente" });
-
-//         }
-//         return res.status(200).json({ message: "No se registrado correctamente" });
-
-//     } catch (error) {
-//         return res.status(500).json({ message: "Error", error: error.message });
-//     }
-// }
-
 export const registrarLogo = async (req, res) => {
     try {
-        let { nombre, ruta} = req.body;
-        // const ruta = req.file.originalname;
+        let { nombre } = req.body;
+        const ruta = req.file.originalname;
         let sql = "INSERT INTO logos (ruta,nombre) VALUES (?,?)";
         const [response] = await conexion.query(sql, [ruta, nombre]);
         if (response.affectedRows > 0) {
             return res.status(200).json({ message: "Logo registrado correctamente" });
-
         }
         return res.status(200).json({ message: "No se registrado correctamente" });
-
     } catch (error) {
+        console.log(error)
         return res.status(500).json({ message: "Error", error: error.message });
     }
 }
 
 export const actualizarLogo = async (req, res) => {
     try {
-
         const id = req.params.id;
-        let { nombre, ruta } = req.body;
-        let sql = "UPDATE logos SET nombre=?, ruta=? WHERE idLogos=?";
+        const { nombre } = req.body; 
+        let ruta;
+        if (req.file) {
+            ruta = req.file.originalname; 
+        } else {
+            const logoActual = await conexion.query("SELECT ruta FROM logos WHERE idLogos = ?", [id]);
+            if (logoActual.length > 0) {
+                ruta = logoActual[0].ruta; 
+            } else {
+                return res.status(404).json({ message: "Logo no encontrado" });
+            }
+        }
+
+        const sql = "UPDATE logos SET nombre = ?, ruta = ? WHERE idLogos = ?";
         const [response] = await conexion.query(sql, [nombre, ruta, id]);
         if (response.affectedRows > 0) {
             return res.status(200).json({ message: "Logo actualizado correctamente" });
         }
-        return res.status(401).json({ message: "no se actualizado correctamente" });
-
+        return res.status(400).json({ message: "El logo no se actualizó correctamente" });
     } catch (error) {
-        return res.status(500).json({ message: "error", error: error.message });
+        return res.status(500).json({ message: "Error", error: error.message });
     }
-}
+};
 
 export const estadoLogo = async (req, res) => {
     try {

@@ -1,8 +1,13 @@
 import express from "express"; 
 import bodyParser from "body-parser";
+import path from 'path';
 import cors from "cors"; 
-
+import { fileURLToPath } from 'url';
 import router from "./src/routes/index.js";
+
+//OBTENER EL NOMBRE DE LA CARPETA 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const servidor = express(); 
 servidor.use(cors({
@@ -15,7 +20,8 @@ servidor.use(bodyParser.json({ limit: '50mb' }));
 servidor.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 servidor.set('view engine', 'ejs');
 servidor.set('views', './views');
-servidor.use(express.static('./public')); 
+//HACER PUBLICA LA CARPETA PUBLIC PARA PODER ACCEDER A ELLA EN EL FRONTEND
+servidor.use('/public', express.static(path.join(__dirname, 'public')));
 
 servidor.use('/documents', (req, res) => {
     res.render('documentacion.ejs');
