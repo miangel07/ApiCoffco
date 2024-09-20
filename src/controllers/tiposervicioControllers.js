@@ -135,4 +135,27 @@ export const actualizarestadoservicio = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
 };
-
+export const ValidarServiciodeDocumento = async (req, res) => {
+    try {
+        const { idTipoServicio } = req.body;
+        let sql = `
+            SELECT COUNT(*) AS documentos_activos
+            FROM versiones v
+            INNER JOIN documentos d ON v.fk_documentos = d.id_documentos
+            WHERE v.estado = 'activo'
+            AND d.fk_idTipoServicio = ${idTipoServicio};
+        `;
+        
+        const [rows] = await conexion.query(sql);
+        
+        if (rows.length > 0 && rows[0].documentos_activos > 0) {
+            return res.status(200).json({ message: 'Ya existe un documento activo asociado a este tipo de servicio' });
+        }
+    
+        return res.status(200).json({ message: true });
+        
+    } catch (error) {
+        return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+    
+}
