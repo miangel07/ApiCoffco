@@ -7,10 +7,12 @@ import jwt from"jsonwebtoken"
 
 
 export const validarToken=async(req,res,next)=>{
+
 let token_user=req.headers['token']
 if(!token_user){
     res.status(402).json({"mensaje":"se requiere un token"})
 }
+
 else{
     const decode =jwt.verify(token_user,process.env.SECRET,(Error,decode)=>{
         if(Error){

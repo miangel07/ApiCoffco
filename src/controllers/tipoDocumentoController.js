@@ -83,3 +83,27 @@ export const listarIdTipoDocumento = async (req, res) => {
         res.status(500).json({ "message": "Error en la conexión en la base de datos: " + error.message });
     }
 };
+
+
+
+export const actualizarEstadoTipoDocumento = async (req, res) => {
+    try {
+        let { estado } = req.body; 
+        let id = req.params.id;   
+
+        if (!estado || (estado !== 'activo' && estado !== 'inactivo')) {
+            return res.status(400).json({ "message": "Estado no válido" });
+        }
+
+        let sql = `UPDATE tipodocumento SET estado = ? WHERE idTipoDocumento = ?`;
+        const [respuesta] = await conexion.query(sql, [estado, id]);
+
+        if (respuesta.affectedRows > 0) {
+            return res.status(200).json({ "message": "Estado del tipo de documento actualizado con éxito" });
+        } else {
+            return res.status(404).json({ "message": "Tipo de documento no encontrado o no se actualizó" });
+        }
+    } catch (error) {
+        return res.status(500).json({ "message": "Error en el servidor: " + error.message });
+    }
+};
