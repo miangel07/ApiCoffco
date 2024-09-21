@@ -1,11 +1,10 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-
 export const generarFacturas = async (req, res) => {
-    try {
-        const { codigo } = req.body;
-        let sql = `SELECT 
+  try {
+    const { codigo } = req.body;
+    let sql = `SELECT 
     m.codigo_muestra,
     m.cantidadEntrada,  
     GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre ASC SEPARATOR ', ') AS servicios,
@@ -57,7 +56,7 @@ GROUP BY
         }
 
     } catch (error) {
-        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
-
-    }
-}
+ 
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
