@@ -2,27 +2,28 @@ import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
 export const generarFacturas = async (req, res) => {
-  try {
-    const { codigo } = req.body;
-    let sql = `SELECT 
+    try {
+        const { codigo } = req.body;
+        let sql = `SELECT 
     m.codigo_muestra,
-    m.cantidadEntrada,  
-    GROUP_CONCAT(DISTINCT s.nombre ORDER BY s.nombre ASC SEPARATOR ', ') AS servicios,
-    GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', p.precio) ORDER BY s.nombre ASC SEPARATOR ', ') AS precios,
-    GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', FORMAT(s.cantidad_salida, 2)) ORDER BY s.nombre ASC SEPARATOR ', ') AS cantidad_salida_servicios,
-    FORMAT(SUM(s.cantidad_salida * p.precio), 3) AS total_calculado,  
+    m.cantidadEntrada,
+    GROUP_CONCAT(DISTINCT s.cantidad_salida ORDER BY s.cantidad_salida ASC SEPARATOR ', ') AS cantidad_salida_servicios,
+    FORMAT(SUM(s.cantidad_salida * p.precio), 3) AS total_calculado,  -- Cálculo total
     f.nombre_finca,
     mun.nombre_municipio,
     u.nombre AS nombre_usuario,
     u.apellidos AS apellido_usuario,
-    u.correo_electronico AS correo_usuario,  
-    GROUP_CONCAT(DISTINCT CONCAT(s.nombre, ': ', us.nombre, ' ', us.apellidos) ORDER BY s.nombre ASC SEPARATOR ', ') AS usuarios_servicio
+    u.correo_electronico AS correo_usuario,
+    GROUP_CONCAT(DISTINCT CONCAT(us.nombre, ' ', us.apellidos) ORDER BY us.nombre ASC SEPARATOR ', ') AS usuarios_servicio,
+    ts.nombreServicio AS tipo_servicio 
 FROM 
     muestra m
 JOIN 
     servicios s ON s.fk_idMuestra = m.id_muestra
 JOIN 
-    precio p ON s.fk_idPrecio = p.idPrecio
+    tiposervicio ts ON m.fk_idTipoServicio = ts.idTipoServicio  -- Relación de muestra con tiposervicio
+JOIN 
+    precio p ON ts.idTipoServicio = p.fk_idTipoServicio  -- Relación de tiposervicio con precio
 JOIN 
     finca f ON m.fk_id_finca = f.id_finca
 JOIN 
@@ -44,7 +45,12 @@ GROUP BY
     mun.nombre_municipio, 
     u.nombre, 
     u.apellidos, 
-    u.correo_electronico
+    u.correo_electronico,
+    ts.nombreServicio;  
+
+
+
+
 `
 
 
@@ -56,7 +62,7 @@ GROUP BY
         }
 
     } catch (error) {
- 
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
-  }
+
+        res.status(500).json({ message: "Error en el servidor: " + error.message });
+    }
 };
