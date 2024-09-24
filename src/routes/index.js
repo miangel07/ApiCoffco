@@ -18,6 +18,7 @@ import servicioDetalle from "./tipoServicioRoute.js"
 import routerConsultas from "./consultasRouter.js";
 import logoRouter from "./logoRoutes.js";
 import rolRouter from "./rolRouter.js";
+import FacturasRouter from "./FacturasRouter.js"
 
 
 const router = express.Router();
@@ -41,6 +42,7 @@ router.use("/logo", logoRouter);
 router.use("/consultas", routerConsultas);
 router.use("/password", rutaRecuperarContraseña);
 router.use("/rol", rolRouter)
+router.use("/facturas", FacturasRouter)
 
 
 export default router;

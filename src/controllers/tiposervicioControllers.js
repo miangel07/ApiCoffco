@@ -103,3 +103,36 @@ export const eliminartiposervicio = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
 }
+
+
+// Actualizar Estado de Servicio Detalle
+export const actualizarestadoservicio = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        const id = req.params.id;
+
+        // Validar que el estado proporcionado sea válido
+        const estadosValidos = ['activo', 'inactivo'];
+        if (!estadosValidos.includes(estado)) {
+            return res.status(400).json({ message: 'Estado no válido. Debe ser "activo" o "inactivo".' });
+        }
+
+        console.log(`Actualizando estado de tipo de servicio con ID: ${id} a: ${estado}`);
+
+        // Consulta SQL para actualizar el estado del tipo de servicio
+        const sql = `UPDATE tiposervicio SET estado = ? WHERE idTipoServicio = ?`;
+
+        // Ejecutar la consulta
+        const [result] = await conexion.query(sql, [estado, id]);
+
+        // Verificar el resultado de la consulta
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Estado actualizado con éxito' });
+        } else {
+            res.status(404).json({ message: 'Datos no actualizados. Verifica si el ID existe.' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+};
+
