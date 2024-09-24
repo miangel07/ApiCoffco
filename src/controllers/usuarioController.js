@@ -8,11 +8,6 @@ export const listarUsuario = async (req, res) => {
       SELECT usuarios.*, rol.rol 
       FROM usuarios 
       LEFT JOIN rol ON rol.idRol = usuarios.fk_idRol
-      WHERE usuarios.estado != 'inactivo'
-      ORDER BY CASE 
-        WHEN usuarios.estado = 'inactivo' THEN 1
-        ELSE 0
-      END
     `;
     const [resultado] = await conexion.query(sql);
     
