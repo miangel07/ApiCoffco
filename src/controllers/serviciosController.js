@@ -4,20 +4,18 @@ import { validationResult } from "express-validator";
 export const getVariables = async (req, res) => {
   try {
     const { idTipoServicio } = req.body;
-    console.log('idTipoServicio en el body: ', idTipoServicio);
+    console.log("idTipoServicio en el body: ", idTipoServicio);
 
     // Consulta combinada para obtener el documento y sus variables
     const sql = `
-      SELECT doc.id_documentos, doc.nombre AS documento_nombre, v.nombre AS variable_nombre, v.tipo_dato AS variable_tipo_dato
+      SELECT doc.id_documentos, doc.nombre AS documento_nombre, v.idVariable, v.nombre AS variable_nombre, v.tipo_dato AS variable_tipo_dato
       FROM documentos doc
       JOIN versiones ver ON doc.id_documentos = ver.fk_documentos
       JOIN tiposervicio ts ON doc.fk_idTipoServicio = ts.idTipoServicio
       JOIN detalle det ON ver.idVersion = det.fk_id_version
       JOIN variables v ON det.fk_idVariable = v.idVariable
       WHERE ts.idTipoServicio = ?
-      AND doc.entrada_salida = 'entrada'
-      AND ver.estado = 'activo';
-    `;
+      AND ver.estado = 'activo'`;
 
     // Ejecuta la consulta
     const [respuesta] = await conexion.query(sql, [idTipoServicio]);
@@ -28,129 +26,124 @@ export const getVariables = async (req, res) => {
       return res.status(200).json(respuesta);
     } else {
       // Si no hay resultados, envía un error 404
-      return res.status(404).json({ message: 'No se encontró resultado de Documentos o Variables' });
+      return res
+        .status(404)
+        .json({
+          message: "No se encontró resultado de Documentos o Variables",
+        });
     }
   } catch (error) {
     // Manejo de errores
-    return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    return res
+      .status(500)
+      .json({ message: "Error en el servidor: " + error.message });
   }
 };
 
-
-
-
 export const registrarServicio = async (req, res) => {
-  // try {
-
-  //   const { idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables } = req.body;
-  //   console.log('variables en el body :',idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables)
-  //   // Paso 1: Seleccionar las variables asociadas a la versión activa del documento según el tipo de servicio
-  //   const [variables] = await conexion.query(`
-  //     SELECT v.idVariable, v.nombre
-  //     FROM documentos d
-  //     JOIN versiones vs ON d.id_documentos = vs.fk_documentos
-  //     JOIN variables v ON vs.idVersion = v.fk_idVersion
-  //     WHERE d.fk_idTipoServicio = ?
-  //     AND vs.estado = 'activo';
-  //   `, [idTipoServicio]);
-
-  //   if (variables.length === 0) {
-  //     return res.status(404).json({ error: 'No hay variables asociadas a una versión activa para este tipo de servicio' });
-  //   }
-
-  //   // Paso 2: Registrar el servicio en la tabla "servicios"
-  //   const [resultServicio] = await conexion.query(`
-  //     INSERT INTO servicios (fk_idTipoServicio, fk_idUsuarios, fk_idAmbiente, fk_idMuestra, estado)
-  //     VALUES (?, ?, ?, ?, 'activo');
-  //   `, [idTipoServicio, idUsuario, idAmbiente, idMuestra]);
-
-  //   const idServicio = resultServicio.insertId;
-
-  //   // Paso 3: Registrar los valores de las variables asociadas al servicio en la tabla "valor"
-  //   for (const variable of variables) {
-  //     const valorVariable = valoresVariables[variable.idVariable] || null; // Valor recibido desde el frontend
-
-  //     await db.query(`
-  //       INSERT INTO valor (fk_idVariable, fk_id_servicio, valor)
-  //       VALUES (?, ?, ?);
-  //     `, [variable.idVariable, idServicio, valorVariable]);
-  //   }
-
-  //   return res.status(201).json({ message: 'Servicio registrado exitosamente' });
-
-  // } catch (error) {
-  //   console.error('Error al registrar el servicio:', error);
-  //   return res.status(500).json({ error: 'Error al registrar el servicio' });
-  // }
-
-
   try {
-    // Obtén los datos del cuerpo de la solicitud (request body)
     const {
-      nombre,
       fk_idTipoServicio,
       fecha,
       fk_idAmbiente,
       fk_idMuestra,
-      fk_idPrecio,
       fk_idUsuarios,
-      cantidad_salida,
-      estado
+      valoresVariables,
     } = req.body;
 
-    // Verifica que todos los campos obligatorios estén presentes
-    if (!nombre || !fk_idTipoServicio || !fk_idAmbiente || !fk_idMuestra || !fk_idPrecio || !fk_idUsuarios) {
-      return res.status(400).json({ message: 'Faltan campos obligatorios' });
-    }
-
-    // Construye la consulta SQL para insertar el nuevo servicio
-    let sql = `
-      INSERT INTO servicios (
-        nombre, 
-        fk_idTipoServicio, 
-        fecha, 
-        fk_idAmbiente, 
-        fk_idMuestra, 
-        fk_idPrecio, 
-        fk_idUsuarios, 
-        cantidad_salida, 
-        estado
-      ) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    // Ejecuta la consulta
-    const [resultado] = await conexion.query(sql, [
-      nombre,
+    console.log("Datos recibidos en el controlador:", {
       fk_idTipoServicio,
-      fecha || new Date(), // Si no se proporciona una fecha, se usa la fecha actual
       fk_idAmbiente,
       fk_idMuestra,
-      fk_idPrecio,
       fk_idUsuarios,
-      cantidad_salida || 0, // Si no se proporciona cantidad_salida, se usa 0 por defecto
-      estado || 'activo' // Si no se proporciona un estado, se establece 'activo' por defecto
-    ]);
-
-    // Devuelve una respuesta exitosa
-    res.status(201).json({
-      message: 'Servicio insertado correctamente',
-      servicioId: resultado.insertId // El ID del nuevo servicio insertado
+      valoresVariables,
     });
+
+    // Verificación de campos obligatorios
+    if (
+      !fk_idTipoServicio ||
+      !fk_idAmbiente ||
+      !fk_idMuestra ||
+      !fk_idUsuarios
+    ) {
+      console.log("Campos obligatorios faltantes");
+      return res.status(400).json({ message: "Faltan campos obligatorios" });
+    }
+
+    // registro del servicio
+    const [resultServicio] = await conexion.query(
+      `
+      INSERT INTO servicios (fk_idTipoServicio, fecha, fk_idAmbiente, fk_idMuestra, fk_idUsuarios) VALUES (?, ?, ?, ?, ?)
+    `,
+      [
+        fk_idTipoServicio,
+        fecha || new Date(),
+        fk_idAmbiente,
+        fk_idMuestra,
+        fk_idUsuarios,
+      ]
+    );
+
+    console.log("Resultado de la inserción del servicio:", resultServicio);
+
+    const idServicio = resultServicio.insertId;
+    console.log("ID del servicio recién insertado:", idServicio);
+
+    // Inserción de los valores de las variables
+    for (const [idVariable, valor] of Object.entries(valoresVariables)) {
+      console.log("Buscando detalle para la variable ID:", idVariable);
+
+      // Buscar el detalle correspondiente para cada variable
+      const [resultDetalle] = await conexion.query(
+        `
+        SELECT id_detalle FROM detalle WHERE fk_idVariable = ?
+      `,
+        [idVariable]
+      );
+
+      console.log("Resultado de la búsqueda de detalle:", resultDetalle);
+
+      if (resultDetalle.length === 0) {
+        console.log(
+          "No se encontró el detalle para la variable con ID:",
+          idVariable
+        );
+        return res
+          .status(400)
+          .json({
+            message: `No se encontró el detalle para la variable con ID ${idVariable}`,
+          });
+      }
+
+      const idDetalle = resultDetalle[0].id_detalle;
+      console.log("ID del detalle correspondiente:", idDetalle);
+
+      await conexion.query(
+        `
+        INSERT INTO valor (fk_id_servicio, fk_id_detalle, valor)
+        VALUES (?, ?, ?)
+      `,
+        [idServicio, idDetalle, valor]
+      );
+
+      console.log('Valor insertado en la tabla "valor":', {
+        fk_id_servicio: idServicio,
+        fk_id_detalle: idDetalle,
+        valor,
+      });
+    }
+
+    res.status(201).json({ message: "Servicio registrado exitosamente" });
   } catch (error) {
-    // Manejo de errores
-    console.error('Error al insertar el servicio: ', error);
-    res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    console.error("Error al registrar el servicio:", error);
+    res.status(500).json({ error: "Error al registrar el servicio" });
   }
 };
-
-
 
 export const listarServicios = async (req, res) => {
   try {
     let sql = `SELECT 
     s.id_servicios,
-    s.nombre,
     ts.nombreServicio AS tipo_servicio,
     DATE_FORMAT(s.fecha, '%Y-%m-%d') AS fecha,
     a.nombre_ambiente,
@@ -168,11 +161,13 @@ JOIN
 JOIN 
     muestra m ON s.fk_idMuestra = m.id_muestra
 JOIN 
-    precio p ON s.fk_idPrecio = p.idPrecio
-JOIN 
     usuarios u ON s.fk_idUsuarios = u.id_usuario
 JOIN 
-    rol r ON u.fk_idRol = r.idRol`;
+    rol r ON u.fk_idRol = r.idRol
+JOIN 
+    precio p ON p.fk_idTipoServicio = ts.idTipoServicio
+`;
+
     const [resultado] = await conexion.query(sql);
     if (resultado.length > 0) {
       res.status(200).json(resultado);
@@ -251,35 +246,27 @@ export const eliminarServicios = async (req, res) => {
   }
 };
 
-export const actualizarEstadoServicio = async(req,res)=>{
+export const actualizarEstadoServicio = async (req, res) => {
   try {
-    let {estado}=req.body
+    let { estado } = req.body;
 
     let id_servicios = req.params.id;
 
-    let sql=`update servicios set estado=? where id_servicios=?`
-    const [respuesta] = await conexion.query(sql,[estado, id_servicios])
-    if(respuesta.affectedRows>0){
-      res.status(200).json({message:'Estado Actualizado correctamente'})
-    }else{
-      res.status(404).json({message:'Estado no actualizado'})
+    let sql = `update servicios set estado=? where id_servicios=?`;
+    const [respuesta] = await conexion.query(sql, [estado, id_servicios]);
+    if (respuesta.affectedRows > 0) {
+      res.status(200).json({ message: "Estado Actualizado correctamente" });
+    } else {
+      res.status(404).json({ message: "Estado no actualizado" });
     }
   } catch (error) {
-    res.status(500).json({message: 'Error en la conexion'+error.message})
+    res.status(500).json({ message: "Error en la conexion" + error.message });
   }
-}
-
-
-
-
-
-
-
-
-
+};
 
 export const procesarServicioCompleto = async (req, res) => {
-  const { idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables } = req.body;
+  const { idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables } =
+    req.body;
 
   try {
     // Paso 1: Obtener el documento según el tipo de servicio
@@ -292,10 +279,17 @@ export const procesarServicioCompleto = async (req, res) => {
       AND ver.estado = 'activo';
     `;
 
-    const [documentoRespuesta] = await conexion.query(sqlDocumento, [idTipoServicio]);
+    const [documentoRespuesta] = await conexion.query(sqlDocumento, [
+      idTipoServicio,
+    ]);
 
     if (documentoRespuesta.length === 0) {
-      return res.status(404).json({ message: 'No se encontró el documento para el tipo de servicio proporcionado.' });
+      return res
+        .status(404)
+        .json({
+          message:
+            "No se encontró el documento para el tipo de servicio proporcionado.",
+        });
     }
 
     const id_documentos = documentoRespuesta[0].id_documentos;
@@ -311,10 +305,16 @@ export const procesarServicioCompleto = async (req, res) => {
       AND ver.estado = 'activo';
     `;
 
-    const [variablesRespuesta] = await conexion.query(sqlVariables, [id_documentos]);
+    const [variablesRespuesta] = await conexion.query(sqlVariables, [
+      id_documentos,
+    ]);
 
     if (variablesRespuesta.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron variables asociadas al documento.' });
+      return res
+        .status(404)
+        .json({
+          message: "No se encontraron variables asociadas al documento.",
+        });
     }
 
     // Paso 3: Registrar el servicio
@@ -323,7 +323,12 @@ export const procesarServicioCompleto = async (req, res) => {
       VALUES (?, ?, ?, ?, 'activo');
     `;
 
-    const [resultadoServicio] = await conexion.query(sqlServicio, [idTipoServicio, idUsuario, idAmbiente, idMuestra]);
+    const [resultadoServicio] = await conexion.query(sqlServicio, [
+      idTipoServicio,
+      idUsuario,
+      idAmbiente,
+      idMuestra,
+    ]);
     const idServicio = resultadoServicio.insertId;
 
     // Paso 4: Registrar los valores de las variables en la tabla "valor"
@@ -334,17 +339,22 @@ export const procesarServicioCompleto = async (req, res) => {
         INSERT INTO valor (fk_idVariable, fk_id_servicio, valor)
         VALUES (?, ?, ?);
       `;
-      
-      await conexion.query(sqlInsertValor, [variable.idVariable, idServicio, valorVariable]);
+
+      await conexion.query(sqlInsertValor, [
+        variable.idVariable,
+        idServicio,
+        valorVariable,
+      ]);
     }
 
     return res.status(201).json({
-      message: 'Servicio registrado exitosamente',
+      message: "Servicio registrado exitosamente",
       servicioId: idServicio,
     });
-
   } catch (error) {
-    console.error('Error en el proceso de registro:', error);
-    return res.status(500).json({ error: 'Error en el servidor: ' + error.message });
+    console.error("Error en el proceso de registro:", error);
+    return res
+      .status(500)
+      .json({ error: "Error en el servidor: " + error.message });
   }
 };
