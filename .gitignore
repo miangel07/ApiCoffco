@@ -2,4 +2,3 @@ node_modules
 /public/documentos/*
 /public/logos/*
 .env
-env
