@@ -12,6 +12,7 @@ export const listarDocumentos = async (req, res) => {
     d.descripcion,
     d.codigo_documentos,
     d.fecha_emision,
+    d.fk_idTipoServicio,
     v.version, 
     v.idVersion AS idversion,
     v.estado AS estado_version,
