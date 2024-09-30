@@ -19,18 +19,16 @@ export const getVariables = async (req, res) => {
 
     // Ejecuta la consulta
     const [respuesta] = await conexion.query(sql, [idTipoServicio]);
-    console.log(respuesta);
+    console.log("respuetas de la obtencion de variables: ", respuesta);
 
     if (respuesta.length > 0) {
       // Si hay resultados, los envía en la respuesta
       return res.status(200).json(respuesta);
     } else {
       // Si no hay resultados, envía un error 404
-      return res
-        .status(404)
-        .json({
-          message: "No se encontró resultado de Documentos o Variables",
-        });
+      return res.status(404).json({
+        message: "No se encontró resultado de Documentos o Variables",
+      });
     }
   } catch (error) {
     // Manejo de errores
@@ -39,6 +37,36 @@ export const getVariables = async (req, res) => {
       .json({ message: "Error en el servidor: " + error.message });
   }
 };
+
+export const getVariablesUpdate = async (req, res) => {
+  try {
+    const { idTipoServicio } = req.body;
+    console.log("idTipoServicio en el body: ", idTipoServicio);
+
+    // Consulta SQL con la relación de detalle y variables
+    const sql = `SELECT v.valor, v.fk_id_detalle, v.id_valor,var.idVariable , var.nombre AS nombre_variable, var.tipo_dato, var.UnidadMedida
+                 FROM valor v
+                 JOIN servicios s ON v.fk_id_servicio = s.id_servicios
+                 JOIN detalle d ON v.fk_id_detalle = d.id_detalle
+                 JOIN variables var ON d.fk_idVariable = var.idVariable
+                 WHERE s.id_servicios = ?`;
+
+    // Ejecuta la consulta
+    const [respuesta] = await conexion.query(sql, [idTipoServicio]);
+    console.log("Respuesta de la obtención de variables: ", respuesta);
+
+    if (respuesta.length > 0) {
+      return res.status(200).json(respuesta);
+    } else {
+      return res.status(404).json({
+        message: "No se encontró resultado de Documentos o Variables",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
+
 
 export const registrarServicio = async (req, res) => {
   try {
@@ -108,11 +136,9 @@ export const registrarServicio = async (req, res) => {
           "No se encontró el detalle para la variable con ID:",
           idVariable
         );
-        return res
-          .status(400)
-          .json({
-            message: `No se encontró el detalle para la variable con ID ${idVariable}`,
-          });
+        return res.status(400).json({
+          message: `No se encontró el detalle para la variable con ID ${idVariable}`,
+        });
       }
 
       const idDetalle = resultDetalle[0].id_detalle;
@@ -264,97 +290,4 @@ export const actualizarEstadoServicio = async (req, res) => {
   }
 };
 
-export const procesarServicioCompleto = async (req, res) => {
-  const { idTipoServicio, idUsuario, idAmbiente, idMuestra, valoresVariables } =
-    req.body;
-
-  try {
-    // Paso 1: Obtener el documento según el tipo de servicio
-    let sqlDocumento = `
-      SELECT doc.id_documentos, doc.nombre 
-      FROM documentos doc
-      JOIN versiones ver ON doc.id_documentos = ver.fk_documentos
-      JOIN tiposervicio ts ON doc.fk_idTipoServicio = ts.idTipoServicio
-      WHERE ts.idTipoServicio = ?
-      AND ver.estado = 'activo';
-    `;
-
-    const [documentoRespuesta] = await conexion.query(sqlDocumento, [
-      idTipoServicio,
-    ]);
-
-    if (documentoRespuesta.length === 0) {
-      return res
-        .status(404)
-        .json({
-          message:
-            "No se encontró el documento para el tipo de servicio proporcionado.",
-        });
-    }
-
-    const id_documentos = documentoRespuesta[0].id_documentos;
-
-    // Paso 2: Obtener las variables asociadas al documento seleccionado
-    let sqlVariables = `
-      SELECT v.idVariable, v.nombre AS variable_nombre, v.tipo_dato AS variable_tipo_dato
-      FROM versiones ver
-      JOIN documentos doc ON ver.fk_documentos = doc.id_documentos
-      JOIN detalle det ON ver.idVersion = det.fk_id_version
-      JOIN variables v ON det.fk_idVariable = v.idVariable
-      WHERE doc.id_documentos = ?
-      AND ver.estado = 'activo';
-    `;
-
-    const [variablesRespuesta] = await conexion.query(sqlVariables, [
-      id_documentos,
-    ]);
-
-    if (variablesRespuesta.length === 0) {
-      return res
-        .status(404)
-        .json({
-          message: "No se encontraron variables asociadas al documento.",
-        });
-    }
-
-    // Paso 3: Registrar el servicio
-    let sqlServicio = `
-      INSERT INTO servicios (fk_idTipoServicio, fk_idUsuarios, fk_idAmbiente, fk_idMuestra, estado)
-      VALUES (?, ?, ?, ?, 'activo');
-    `;
-
-    const [resultadoServicio] = await conexion.query(sqlServicio, [
-      idTipoServicio,
-      idUsuario,
-      idAmbiente,
-      idMuestra,
-    ]);
-    const idServicio = resultadoServicio.insertId;
-
-    // Paso 4: Registrar los valores de las variables en la tabla "valor"
-    for (const variable of variablesRespuesta) {
-      const valorVariable = valoresVariables[variable.idVariable] || null;
-
-      let sqlInsertValor = `
-        INSERT INTO valor (fk_idVariable, fk_id_servicio, valor)
-        VALUES (?, ?, ?);
-      `;
-
-      await conexion.query(sqlInsertValor, [
-        variable.idVariable,
-        idServicio,
-        valorVariable,
-      ]);
-    }
-
-    return res.status(201).json({
-      message: "Servicio registrado exitosamente",
-      servicioId: idServicio,
-    });
-  } catch (error) {
-    console.error("Error en el proceso de registro:", error);
-    return res
-      .status(500)
-      .json({ error: "Error en el servidor: " + error.message });
-  }
-};
+;
