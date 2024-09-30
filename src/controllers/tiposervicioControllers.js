@@ -33,7 +33,7 @@ export const registrartiposervicio = async (req, res) => {
 // Listar Todos los Servicios Detalle
 export const listartiposervicio = async (req, res) => {
     try {
-        const sql = `SELECT * FROM tiposervicio`;
+        const sql = `SELECT * FROM tiposervicio `;
         const [result] = await conexion.query(sql);
 
         if (result.length > 0) {
@@ -168,3 +168,18 @@ AND
     }
 
 }
+export const listartiposervcioActivo = async (req, res) => {
+    try {
+        const sql = `SELECT * FROM tiposervicio where estado = 'activo' `;
+        const [result] = await conexion.query(sql);
+
+        if (result.length > 0) {
+            res.status(200).json(result);
+        } else {
+            res.status(404).json({ message: 'Datos no encontrados' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+}
+
