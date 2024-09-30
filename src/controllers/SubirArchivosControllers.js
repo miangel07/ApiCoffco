@@ -22,12 +22,12 @@ const fileFilter = (req, file, cb) => {
   const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
   // Verificar el tipo MIME
   const mimetype = fileTypes.test(file.mimetype);
-  if (mimetype && extname) {
+  if (mimetype && extname) { 
     cb(null, true);
   } else {
     return cb(
       JSON.stringify({
-        message: "archivo no valido",
+        message: "Archivo no valido",
       })
     );
   }

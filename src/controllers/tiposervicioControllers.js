@@ -139,23 +139,32 @@ export const ValidarServiciodeDocumento = async (req, res) => {
     try {
         const { idTipoServicio } = req.body;
         let sql = `
-            SELECT COUNT(*) AS documentos_activos
-            FROM versiones v
-            INNER JOIN documentos d ON v.fk_documentos = d.id_documentos
-            WHERE v.estado = 'activo'
-            AND d.fk_idTipoServicio = ${idTipoServicio};
+           SELECT 
+    COUNT(*) AS documentos_activos,
+    ts.nombreServicio
+FROM 
+    versiones v
+INNER JOIN 
+    documentos d ON v.fk_documentos = d.id_documentos
+INNER JOIN 
+    tiposervicio ts ON d.fk_idTipoServicio = ts.idTipoServicio
+WHERE 
+    v.estado = 'activo'
+AND 
+    d.fk_idTipoServicio = ${idTipoServicio}
         `;
-        
+
         const [rows] = await conexion.query(sql);
-        
+        console.log(rows);
+
         if (rows.length > 0 && rows[0].documentos_activos > 0) {
-            return res.status(200).json({ message: 'Ya existe un documento activo asociado a este tipo de servicio' });
+            return res.status(200).json({ message: `Ya existe un documento activo asociado a este ${rows[0].nombreServicio}` });
         }
-    
+
         return res.status(200).json({ message: true });
-        
+
     } catch (error) {
         return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
-    
+
 }
