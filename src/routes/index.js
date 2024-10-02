@@ -19,6 +19,7 @@ import routerConsultas from "./consultasRouter.js";
 import logoRouter from "./logoRoutes.js";
 import rolRouter from "./rolRouter.js";
 import FacturasRouter from "./FacturasRouter.js"
+import ReportesRouter from "./ReportesRouter.js"
 
 
 const router = express.Router();
@@ -43,6 +44,7 @@ router.use("/consultas", routerConsultas);
 router.use("/password", rutaRecuperarContraseña);
 router.use("/rol", rolRouter)
 router.use("/facturas", FacturasRouter)
+router.use("/reportes", ReportesRouter)
 
 
 export default router;
