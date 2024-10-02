@@ -12,7 +12,7 @@ export const listarDocumentos = async (req, res) => {
     d.descripcion,
     d.codigo_documentos,
     d.fecha_emision,
-    d.entrada_salida, 
+    d.fk_idTipoServicio,
     v.version, 
     v.idVersion AS idversion,
     v.estado AS estado_version,
@@ -21,11 +21,8 @@ export const listarDocumentos = async (req, res) => {
     t.nombreDocumento AS tipo_documento,
     t.estado AS estado_tipo_documento,
     v.nombre_documento AS nombre_documento_version,
-    -- Variables asociadas a la versión
     GROUP_CONCAT(DISTINCT vrs.nombre SEPARATOR ', ') AS variables,
-    -- Logos asociados al documento
     GROUP_CONCAT(DISTINCT lg.nombre SEPARATOR ', ') AS logos,
-    -- Tipo de servicio
     ts.nombreServicio AS tipo_servicio
 FROM 
     documentos d
@@ -68,7 +65,7 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       version,
@@ -79,20 +76,20 @@ export const registrarDocumentos = async (req, res) => {
     console.log(req.body)
     // Manejar caso donde fk_idTipoServicio puede ser null
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    entrada_salida = entrada_salida ? entrada_salida : null;
+  
     // Registrar el documento en la base de datos
-    /* id_documentos	nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision	entrada_salida	fk_idTipoServicio	fk_idTipoDocumento	
+    /* id_documentos	nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision		fk_idTipoServicio	fk_idTipoDocumento	
  */
     let sqlDocumento = `
-      INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, entrada_salida,fk_idTipoServicio, fk_idTipoDocumento)
-      VALUES (?, CURDATE(), ?, ?, ?, ?, ?,?)
+      INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision,   fk_idTipoServicio, fk_idTipoDocumento)
+      VALUES (?, CURDATE(), ?, ?, ?, ?, ?)
     `;
     const [rows] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
@@ -201,7 +198,6 @@ export const actalizardocumentosVersion = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       idVersion,
@@ -211,21 +207,20 @@ export const actalizardocumentosVersion = async (req, res) => {
     } = req.body;
     console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    entrada_salida = entrada_salida ? entrada_salida : null;
+    
 
     const archivoTemporal = req.file.filename;
     const nombreTemporal = req.file.originalname;
     const extension = path.extname(nombreTemporal);
     const nombreTemporalSinExt = path.basename(nombreTemporal, extension);
 
-    let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision, entrada_salida, fk_idTipoServicio, fk_idTipoDocumento)
-                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?,?)`;
+    let sqlDocumento = `INSERT INTO documentos (nombre, fecha_carga, descripcion, codigo_documentos, fecha_emision,fk_idTipoServicio, fk_idTipoDocumento)
+                        VALUES (?, CURDATE(), ?, ?, ?, ?, ?)`;
     const [rows2] = await conexion.query(sqlDocumento, [
       nombre,
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
@@ -329,7 +324,7 @@ export const Actualizar = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       nombre_documento_version,
@@ -343,7 +338,7 @@ export const Actualizar = async (req, res) => {
     console.log(id_documentos, req.body);
   
     fk_idTipoServicio = fk_idTipoServicio ?? null;
-    entrada_salida = entrada_salida ?? null; 
+   
     variables = variables ?? '[]'; 
     logos = logos ?? '[]'; 
   
@@ -384,7 +379,7 @@ export const Actualizar = async (req, res) => {
           descripcion = ?, 
           codigo_documentos = ?, 
           fecha_emision = ?, 
-          entrada_salida = ?, 
+           = ?, 
           fk_idTipoServicio = ?, 
           fk_idTipoDocumento = ?
       WHERE id_documentos = ?;
@@ -394,7 +389,7 @@ export const Actualizar = async (req, res) => {
       descripcion,
       codigo_documentos,
       fecha_emision,
-      entrada_salida,
+      ,
       fk_idTipoServicio,
       fk_idTipoDocumento,
       id_documentos
