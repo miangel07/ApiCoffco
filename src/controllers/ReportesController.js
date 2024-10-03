@@ -9,12 +9,16 @@ export const Reportes = async (req, res) => {
     d.nombre AS nombre_documento,
     d.codigo_documentos,
     v.version,
-     DATE_FORMAT(v.fecha_version, '%Y-%m-%d') AS fecha_version,
+    DATE_FORMAT(v.fecha_version, '%Y-%m-%d') AS fecha_version,
     m.codigo_muestra,
     CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario,
     mun.nombre_municipio AS municipio,
     f.nombre_finca AS nombre_finca,
     m.codigoExterno AS codigo_externo,
+    m.altura AS altura,  -- Agregamos altura
+    m.variedad AS variedad,  -- Agregamos variedad
+    m.observaciones AS observaciones, 
+    DATE_FORMAT(s.fecha, '%Y-%m-%d')as fecha_servicio,
     GROUP_CONCAT(DISTINCT l.ruta SEPARATOR ', ') AS logo_ruta,  -- Uso de DISTINCT aquí
     GROUP_CONCAT(DISTINCT CONCAT(var.nombre, ': ', val.valor) SEPARATOR ', ') AS variables  -- Uso de DISTINCT aquí también
 FROM 
@@ -38,7 +42,8 @@ WHERE
 GROUP BY 
     s.id_servicios, ts.nombreServicio, d.nombre, d.codigo_documentos, 
     v.version, v.fecha_version, m.codigo_muestra, u.nombre, u.apellidos, 
-    mun.nombre_municipio, f.nombre_finca, m.codigoExterno;`
+    mun.nombre_municipio, f.nombre_finca, m.codigoExterno, m.altura, 
+     m.variedad, m.observaciones, s.fecha; `
 
         const [rows] = await conexion.query(sql);
         
