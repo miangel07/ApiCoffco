@@ -4,5 +4,6 @@ import { validarToken } from "../controllers/AutentificacionLogin.js";
 import Router  from "express";
 const EstadisticaRouter=Router()
 
-EstadisticaRouter.get('/estadistica',validarToken, Estadistica)
+EstadisticaRouter.get('/estadistica', Estadistica)
+
 export default EstadisticaRouter
