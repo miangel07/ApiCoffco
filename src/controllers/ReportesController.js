@@ -18,7 +18,8 @@ export const Reportes = async (req, res) => {
     m.altura AS altura,  -- Agregamos altura
     m.variedad AS variedad,  -- Agregamos variedad
     m.observaciones AS observaciones, 
-    DATE_FORMAT(s.fecha, '%Y-%m-%d')as fecha_servicio,
+    DATE_FORMAT(s.fecha, '%Y-%m-%d') AS fecha_servicio,
+    s.cantidad_salida,  -- Agregamos la cantidad de salida
     GROUP_CONCAT(DISTINCT l.ruta SEPARATOR ', ') AS logo_ruta,  -- Uso de DISTINCT aquí
     GROUP_CONCAT(DISTINCT CONCAT(var.nombre, ': ', val.valor) SEPARATOR ', ') AS variables  -- Uso de DISTINCT aquí también
 FROM 
@@ -43,7 +44,7 @@ GROUP BY
     s.id_servicios, ts.nombreServicio, d.nombre, d.codigo_documentos, 
     v.version, v.fecha_version, m.codigo_muestra, u.nombre, u.apellidos, 
     mun.nombre_municipio, f.nombre_finca, m.codigoExterno, m.altura, 
-     m.variedad, m.observaciones, s.fecha; `
+    m.variedad, m.observaciones, s.fecha, s.cantidad_salida; `
 
         const [rows] = await conexion.query(sql);
         
