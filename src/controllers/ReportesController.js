@@ -2,7 +2,7 @@ import { conexion } from "../database/conexion.js";
 
 
 export const Reportes = async (req, res) => {
-    const {id_muestra, TipoServicio}= req.body;
+    const {muestra, TipoServicio}= req.body;
     try {
         let sql = `SELECT 
     ts.nombreServicio,
@@ -37,9 +37,9 @@ FROM
     LEFT JOIN detalle det ON val.fk_id_detalle = det.id_detalle
     LEFT JOIN variables var ON det.fk_idVariable = var.idVariable
 WHERE 
-    m.id_muestra = 26 
+    m.codigo_muestra = "${muestra}" 
     AND v.estado = 'activo'
-    AND ts.idTipoServicio = 1 
+    AND ts.idTipoServicio = ${TipoServicio} 
 GROUP BY 
     s.id_servicios, ts.nombreServicio, d.nombre, d.codigo_documentos, 
     v.version, v.fecha_version, m.codigo_muestra, u.nombre, u.apellidos, 
