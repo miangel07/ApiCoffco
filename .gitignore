@@ -1,4 +1,5 @@
 node_modules
 /public/documentos/*
 /public/logos/*
+/public/muestras/*
 .env

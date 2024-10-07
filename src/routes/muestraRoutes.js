@@ -5,7 +5,7 @@ import { validateMuestra } from "../../validation/muestraValidation.js";
 const ruta=Router()
 
 ruta.get("/listar",ListarMuestras)
-ruta.post("/registrar",validateMuestra,RegistrarMuestra)
+ruta.post("/registrar",RegistrarMuestra)
 ruta.put("/actualizar/:id",validateMuestra,ActualizarMuestra)
 ruta.put("/estado/:id",ActualizarEstadoMuestra)
 ruta.delete("/eliminar/:id_muestra",eliminarMuestra)
