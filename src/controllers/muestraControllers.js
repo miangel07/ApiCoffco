@@ -15,9 +15,10 @@ export const ListarMuestras = async (req, res) => {
         m.variedad, 
         m.observaciones, 
         m.codigoExterno, 
-        f.nombre_finca AS finca,  -- Renombrado para claridad
-        CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario,  -- Solo una vez
-        ts.nombreServicio AS fk_idTipoServicio  -- Renombrado para claridad
+        m.UnidadMedida,  -- Añadir UnidadMedida
+        f.nombre_finca AS finca,  
+        CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario,  
+        ts.nombreServicio AS fk_idTipoServicio  
       FROM muestra m
       JOIN finca f ON m.fk_id_finca = f.id_finca
       JOIN usuarios u ON m.fk_id_usuarios = u.id_usuario
@@ -40,6 +41,7 @@ export const ListarMuestras = async (req, res) => {
         observaciones: muestra.observaciones,
         codigoExterno: muestra.codigoExterno,
         fk_idTipoServicio: muestra.fk_idTipoServicio,
+        UnidadMedida: muestra.UnidadMedida,  // Añadir UnidadMedida
       }));
 
       return res.status(200).json(formatearResponde);
@@ -62,41 +64,65 @@ export const RegistrarMuestra = async (req, res) => {
 
     const {
       cantidadEntrada,
-      fk_id_finca, // ID de la finca
+      fk_id_finca,
       fecha_muestra,
-      codigo_muestra,
-      fk_id_usuarios, // ID del usuario
-      estado = "pendiente", // Valor predeterminado
+      fk_id_usuarios,
+      estado = "pendiente",
       altura,
       variedad,
       observaciones,
       codigoExterno,
-      fk_idTipoServicio // ID del tipo de servicio
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     } = req.body;
 
-    const sql = `
-      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, codigo_muestra, fk_id_usuarios, estado, altura, variedad, observaciones, codigoExterno, fk_idTipoServicio)
+    const insertSql = `
+      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, fk_id_usuarios, estado, altura, variedad, observaciones, codigoExterno, fk_idTipoServicio, UnidadMedida)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
-    const [respuesta] = await conexion.query(sql, [
+    
+    const [insertRespuesta] = await conexion.query(insertSql, [
       cantidadEntrada,
       fk_id_finca,
       fecha_muestra,
-      codigo_muestra,
       fk_id_usuarios,
       estado,
       altura,
       variedad,
       observaciones,
       codigoExterno,
-      fk_idTipoServicio
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     ]);
+  
 
-    if (respuesta.affectedRows > 0) {
-      return res.status(201).json({ message: "Se registró correctamente" });
-    } else {
+    if (insertRespuesta.affectedRows === 0) {
       return res.status(404).json({ message: "No se registró correctamente" });
+    }
+
+    const idMuestra = insertRespuesta.insertId;
+
+    const tipoServicioSql = `
+      SELECT codigoTipoServicio FROM tipoServicio WHERE idTipoServicio = ?
+    `;
+    const [servicioRespuesta] = await conexion.query(tipoServicioSql, [fk_idTipoServicio]);
+
+    if (servicioRespuesta.length === 0) {
+      return res.status(404).json({ message: "Tipo de servicio no encontrado" });
+    }
+
+    const codigoTipoServicio = servicioRespuesta[0].codigoTipoServicio;
+    const codigoMuestraFinal = `${codigoTipoServicio}-${idMuestra}`;
+
+    const updateSql = `
+      UPDATE muestra SET codigo_muestra = ? WHERE id_muestra = ?
+    `;
+    const [updateRespuesta] = await conexion.query(updateSql, [codigoMuestraFinal, idMuestra]);
+
+    if (updateRespuesta.affectedRows > 0) {
+      return res.status(201).json({ message: "Se registró correctamente", codigo_muestra: codigoMuestraFinal });
+    } else {
+      return res.status(404).json({ message: "No se pudo actualizar el código de la muestra" });
     }
   } catch (error) {
     return res.status(500).json({
@@ -104,6 +130,7 @@ export const RegistrarMuestra = async (req, res) => {
     });
   }
 };
+
 
 // Actualizar muestra
 export const ActualizarMuestra = async (req, res) => {
@@ -115,16 +142,17 @@ export const ActualizarMuestra = async (req, res) => {
 
     const {
       cantidadEntrada,
-      fk_id_finca, // ID de la finca
+      fk_id_finca,
       fecha_muestra,
       codigo_muestra,
-      fk_id_usuarios, // ID del usuario
+      fk_id_usuarios,
       estado,
       altura,
       variedad,
       observaciones,
       codigoExterno,
-      fk_idTipoServicio // ID del tipo de servicio
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     } = req.body;
 
     const id = req.params.id;
@@ -142,7 +170,8 @@ export const ActualizarMuestra = async (req, res) => {
         variedad = ?, 
         observaciones = ?, 
         codigoExterno = ?, 
-        fk_idTipoServicio = ?
+        fk_idTipoServicio = ?,
+        UnidadMedida = ?  -- Añadir UnidadMedida
       WHERE id_muestra = ?
     `;
 
@@ -158,6 +187,7 @@ export const ActualizarMuestra = async (req, res) => {
       observaciones,
       codigoExterno,
       fk_idTipoServicio,
+      UnidadMedida,  // Añadir UnidadMedida
       id,
     ]);
 
