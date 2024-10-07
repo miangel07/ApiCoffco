@@ -11,13 +11,13 @@ export const registrartiposervicio = async (req, res) => {
         }
 
         // Obtener el nombre del servicio del cuerpo de la solicitud
-        const { nombreServicio } = req.body;
+        const { nombreServicio, codigoTipoServicio } = req.body;
 
         // Definir la consulta SQL para insertar el nuevo servicio
-        const sql = `INSERT INTO tiposervicio (nombreServicio) VALUES (?)`;
+        const sql = `INSERT INTO tiposervicio (nombreServicio, codigoTipoServicio) VALUES (?, ?)`;
 
         // Ejecutar la consulta
-        const [result] = await conexion.query(sql, [nombreServicio]);
+        const [result] = await conexion.query(sql, [nombreServicio, codigoTipoServicio]);
 
         // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
@@ -66,16 +66,16 @@ export const listartiposervicioId = async (req, res) => {
 // Actualizar Servicio Detalle
 export const actualizartiposervicio = async (req, res) => {
     try {
-        const { nombreServicio } = req.body;
+        const { nombreServicio, codigoTipoServicio } = req.body;
         const id = req.params.id;
 
-        console.log(`Actualizando tipo de servicio con ID: ${id} y nombre: ${nombreServicio}`);
+        console.log(`Actualizando tipo de servicio con ID: ${id}, nombre: ${nombreServicio} y código: ${codigoTipoServicio}`);
 
         // Consulta SQL para actualizar el tipo de servicio
-        const sql = `UPDATE tiposervicio SET nombreServicio = ? WHERE idTipoServicio = ?`;
+        const sql = `UPDATE tipoServicio SET nombreServicio = ?, codigoTipoServicio = ? WHERE idTipoServicio = ?`;
 
         // Ejecutar la consulta
-        const [result] = await conexion.query(sql, [nombreServicio, id]);
+        const [result] = await conexion.query(sql, [nombreServicio, codigoTipoServicio, id]);
 
         // Verificar el resultado de la consulta
         if (result.affectedRows > 0) {
@@ -87,6 +87,7 @@ export const actualizartiposervicio = async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor: ' + error.message });
     }
 };
+
 // Eliminar Servicio Detalle
 export const eliminartiposervicio = async (req, res) => {
     try {
