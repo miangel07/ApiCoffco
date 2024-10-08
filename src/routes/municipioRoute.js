@@ -5,10 +5,10 @@ import { validarToken } from "../controllers/AutentificacionLogin.js";
 
 const rutaMunicipio = Router();
 
-rutaMunicipio.get("/listar", validarToken, listarMunicipio);
-rutaMunicipio.post("/registrar", validarToken, validateMunicipio, registrarMunicipio);
-rutaMunicipio.put("/actualizar/:id", validarToken, validateMunicipio, actualizarMunicipio);
-rutaMunicipio.delete("/eliminar/:id", validarToken, eliminarMunicipio);
-rutaMunicipio.get("/listarid/:id", validarToken, listarIdMunicipio);
+rutaMunicipio.get("/listar", listarMunicipio);
+rutaMunicipio.post("/registrar", validateMunicipio, registrarMunicipio);
+rutaMunicipio.put("/actualizar/:id", validateMunicipio, actualizarMunicipio);
+rutaMunicipio.delete("/eliminar/:id", eliminarMunicipio);
+rutaMunicipio.get("/listarid/:id", listarIdMunicipio);
 
 export default rutaMunicipio;

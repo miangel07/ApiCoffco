@@ -26,7 +26,7 @@ tipo_dato*/
       return res.status(400).json(error);
     }
     let { nombre, tipo_dato, UnidadMedida } = req.body;
-    console.log(nombre, tipo_dato);
+    console.log(nombre, tipo_dato,UnidadMedida);
 
     let sql = `insert into variables (nombre, tipo_dato,UnidadMedida) values (?,?,?)`;
     const [respuesta] = await conexion.query(sql, [
