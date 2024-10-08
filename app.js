@@ -21,7 +21,7 @@ servidor.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 servidor.set('view engine', 'ejs');
 servidor.set('views', './views');
 servidor.use("/docs", swaggerUi.serve, swaggerSetup)
-//HACER PUBLICA LA CARPETA PUBLIC PARA PODER ACCEDER A ELLA EN EL FRONTEND
+//HACER PUBLICA LA CARPETA PUBLIC PARA PODER ACCEDER A ELLA EN EL FRONTENDs
 servidor.use('/public', express.static(path.join(__dirname, 'public')));
 
 servidor.use('/documents', (req, res) => {
