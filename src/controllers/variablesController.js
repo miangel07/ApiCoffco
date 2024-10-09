@@ -16,31 +16,35 @@ export const ListarVariables = async (req, res) => {
   }
 };
 export const RegistrarVariables = async (req, res) => {
-  /* idVariable	
-nombre,	
-estado	,
-tipo_dato*/
   try {
     const error = validationResult(req);
     if (!error.isEmpty()) {
       return res.status(400).json(error);
     }
     let { nombre, tipo_dato, UnidadMedida } = req.body;
-    console.log(nombre, tipo_dato,UnidadMedida);
+    console.log(nombre, tipo_dato, UnidadMedida);
 
     let sql = `insert into variables (nombre, tipo_dato,UnidadMedida) values (?,?,?)`;
+    const NombreMinusculas = nombre.toLowerCase()
+    let sqlCheck = 'SELECT * FROM variables WHERE nombre = ?';
+    const [existingVariables] = await conexion.query(sqlCheck, [nombre]);
     const [respuesta] = await conexion.query(sql, [
-      nombre,
+      nombre.toLowerCase(),
       tipo_dato,
       UnidadMedida,
     ]);
-    if (respuesta.affectedRows > 0) {
+    if (NombreMinusculas === "variedad" || NombreMinusculas === "codigoExterno" || NombreMinusculas === "altura") {
+      return res
+        .status(400)
+        .json({ message: "El nombre de la Variable no puede ser 'variedad', 'codigoExterno' o 'altura'" });
+    }
+    if (respuesta.affectedRows > 0 && existingVariables.length === 0) {
       return res
         .status(200)
         .json({ menssage: "Variable registrada exitosamente" });
-    } else {
-      return res.status(404).json({ mensagge: "Variable no registrada" });
     }
+    return res.status(404).json({ mensagge: " El nombre de la Variable ya existe." });
+
   } catch (error) {
     return res
       .status(500)
