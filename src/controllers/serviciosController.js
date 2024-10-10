@@ -69,6 +69,31 @@ export const getVariablesUpdate = async (req, res) => {
   }
 };
 
+export const getMuestrasParaServicios = async (req, res) => {
+  try {
+
+    let sql = `
+      select id_muestra, cantidadEntrada, fk_id_finca, fecha_muestra, codigo_muestra, fk_id_usuarios,
+      estado, altura, variedad, observaciones, fk_idTipoServicio
+      from muestra
+      where estado = 'pendiente'
+      and id_muestra not in (select fk_idMuestra from servicios where fk_idMuestra is not null)
+    `;
+    const [respuesta] = await conexion.query(sql);
+
+    if (respuesta.length > 0) {
+      return res.status(200).json(respuesta);
+    } else {
+      return res.status(404).json({
+        message: 'No se encontraron muestras disponibles'
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+  }
+};
+
+
 export const getPreciosSegunTipoServicio = async (req, res) => {
   try {
     const { idTipoServicio } = req.body;

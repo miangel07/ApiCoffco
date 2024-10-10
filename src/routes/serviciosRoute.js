@@ -1,10 +1,11 @@
 import { Router } from "express";
-import {actualizarEstadoServicio, eliminarServicios, getPreciosSegunTipoServicio, getVariables, getVariablesUpdate, listarServicios, registrarServicio, registroServicioTerminado} from '../controllers/serviciosController.js'
+import {actualizarEstadoServicio, eliminarServicios, getMuestrasParaServicios, getPreciosSegunTipoServicio, getVariables, getVariablesUpdate, listarServicios, registrarServicio, registroServicioTerminado} from '../controllers/serviciosController.js'
 
 const rutaServicios = Router();
 rutaServicios.get('/listar',listarServicios)
 rutaServicios.post('/getvariables',getVariables)
 rutaServicios.post('/getvariablesupdate',getVariablesUpdate)
+rutaServicios.get('/getmuestrasser',getMuestrasParaServicios)
 rutaServicios.post('/getprecio',getPreciosSegunTipoServicio)
 rutaServicios.post('/registrarser',registrarServicio)
 rutaServicios.put('/servicioter/:id',registroServicioTerminado)
