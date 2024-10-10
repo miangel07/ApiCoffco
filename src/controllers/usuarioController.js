@@ -213,22 +213,30 @@ export const verificarContraseña = async (req, res) => {
 
 export const listarRoles = async (req, res) => {
   try {
-    
     let sqlRoles = `
       SELECT r.rol, COUNT(u.id_usuario) AS total_usuarios
-      FROM usuarios u
-      LEFT JOIN rol r ON u.fk_idRol = r.idRol
+      FROM rol r
+      LEFT JOIN usuarios u ON u.fk_idRol = r.idRol
+      WHERE r.rol IN ('administrador', 'encargado', 'cliente', 'operario')
       GROUP BY r.rol
     `;
 
     const [usuariosPorRol] = await conexion.query(sqlRoles);
+    const roles = ['administrador', 'encargado', 'cliente', 'operario'];
+    const usuariosPorRolFinal = roles.map((rol) => {
+      const rolEncontrado = usuariosPorRol.find((r) => r.rol === rol);
+      return {
+        rol,
+        total_usuarios: rolEncontrado ? rolEncontrado.total_usuarios : 0
+      };
+    });
 
     let sqlTotal = 'SELECT COUNT(*) AS total FROM usuarios';
     const [totalResults] = await conexion.query(sqlTotal);
     const totalUsuarios = totalResults[0].total;
 
     const resultadoFinal = {
-      usuariosPorRol: usuariosPorRol,
+      usuariosPorRol: usuariosPorRolFinal,
       total: totalUsuarios,
     };
 
@@ -238,3 +246,4 @@ export const listarRoles = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
+
