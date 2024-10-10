@@ -17,38 +17,50 @@ export const ListarVariables = async (req, res) => {
 };
 export const RegistrarVariables = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
-    }
-    let { nombre, tipo_dato, UnidadMedida } = req.body;
-    console.log(nombre, tipo_dato, UnidadMedida);
 
-    let sql = `insert into variables (nombre, tipo_dato,UnidadMedida) values (?,?,?)`;
-    const NombreMinusculas = nombre.toLowerCase()
-    let sqlCheck = 'SELECT * FROM variables WHERE nombre = ?';
-    const [existingVariables] = await conexion.query(sqlCheck, [nombre]);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    let { nombre, tipo_dato, UnidadMedida } = req.body;
+
+
+    const NombreMinusculas = nombre.toLowerCase();
+
+    if (["variedad", "codigoExterno", "altura"].includes(NombreMinusculas)) {
+      return res.status(400).json({
+        message: "El nombre de la Variable no puede ser variedad, codigoExterno o altura",
+      });
+    }
+
+
+    const sqlCheck = 'SELECT * FROM variables WHERE nombre = ?';
+    const [existingVariables] = await conexion.query(sqlCheck, [NombreMinusculas]);
+
+    if (existingVariables.length > 0) {
+      return res.status(400).json({ message: "El nombre de la Variable ya existe." });
+    }
+
+
+    const sql = `INSERT INTO variables (nombre, tipo_dato, UnidadMedida) VALUES (?, ?, ?)`;
     const [respuesta] = await conexion.query(sql, [
-      nombre.toLowerCase(),
+      NombreMinusculas,
       tipo_dato,
       UnidadMedida,
     ]);
-    if (NombreMinusculas === "variedad" || NombreMinusculas === "codigoExterno" || NombreMinusculas === "altura") {
-      return res
-        .status(400)
-        .json({ message: "El nombre de la Variable no puede ser 'variedad', 'codigoExterno' o 'altura'" });
+
+
+    if (respuesta.affectedRows > 0) {
+      return res.status(200).json({ message: "Variable registrada exitosamente" });
     }
-    if (respuesta.affectedRows > 0 && existingVariables.length === 0) {
-      return res
-        .status(200)
-        .json({ menssage: "Variable registrada exitosamente" });
-    }
-    return res.status(404).json({ mensagge: " El nombre de la Variable ya existe." });
+
+
+    return res.status(500).json({ message: "Error al registrar la variable" });
 
   } catch (error) {
-    return res
-      .status(500)
-      .json({ menssage: "error en el servidor" + error.message });
+
+    return res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
 
@@ -70,36 +82,56 @@ export const ListarIdVariables = async (req, res) => {
 
 export const ActualizarVariables = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
+    // Validar los errores de entrada
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    /* idVariable	
-    nombre,	
-    estado	,
-    tipo_dato 	 */
-    let { nombre, tipo_dato, UnidadMedida } = req.body;
 
+    let { nombre, tipo_dato, UnidadMedida } = req.body;
     let id = req.params.id;
 
-    let sql = `update variables set nombre=?, tipo_dato=? , UnidadMedida = ? where idVariable=?`;
-    const [respuesta] = await conexion.query(sql, [
-      nombre,
+
+    const NombreMinusculas = nombre.toLowerCase();
+
+
+    if (["variedad", "codigoExterno", "altura"].includes(NombreMinusculas)) {
+      return res.status(400).json({
+        message: "El nombre de la Variable no puede ser variedad, codigoExterno o altura",
+      });
+    }
+
+
+    const sqlCheck = 'SELECT * FROM variables WHERE nombre = ? AND idVariable != ?';
+    const [existingVariables] = await conexion.query(sqlCheck, [NombreMinusculas, id]);
+
+    if (existingVariables.length > 0) {
+      return res.status(400).json({ message: "Ya existe una variable con ese nombre." });
+    }
+
+
+    const sqlUpdate = `UPDATE variables SET nombre = ?, tipo_dato = ?, UnidadMedida = ? WHERE idVariable = ?`;
+    const [respuesta] = await conexion.query(sqlUpdate, [
+      NombreMinusculas,
       tipo_dato,
       UnidadMedida,
       id,
     ]);
+
+
     if (respuesta.affectedRows > 0) {
-      return res
-        .status(200)
-        .json({ menssage: "se actualizo con exito la variable" });
-    } else {
-      return res.status(404).json({ menssage: "no se actualizo la variable" });
+      return res.status(200).json({ message: "La variable se actualizó con éxito" });
     }
+
+
+    return res.status(404).json({ message: "No se pudo actualizar la variable, verifique el ID" });
+
   } catch (error) {
-    res.status(500).json({ message: "Error en el servidor " + error.mensage });
+
+    return res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
+
 
 export const ELiminarVariables = async (req, res) => {
   try {
