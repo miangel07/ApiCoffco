@@ -210,3 +210,31 @@ export const verificarContraseña = async (req, res) => {
     res.status(500).send(error.message);
   }
 };
+
+export const listarRoles = async (req, res) => {
+  try {
+    
+    let sqlRoles = `
+      SELECT r.rol, COUNT(u.id_usuario) AS total_usuarios
+      FROM usuarios u
+      LEFT JOIN rol r ON u.fk_idRol = r.idRol
+      GROUP BY r.rol
+    `;
+
+    const [usuariosPorRol] = await conexion.query(sqlRoles);
+
+    let sqlTotal = 'SELECT COUNT(*) AS total FROM usuarios';
+    const [totalResults] = await conexion.query(sqlTotal);
+    const totalUsuarios = totalResults[0].total;
+
+    const resultadoFinal = {
+      usuariosPorRol: usuariosPorRol,
+      total: totalUsuarios,
+    };
+
+    res.status(200).json(resultadoFinal);
+    
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
