@@ -1,5 +1,7 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
+
+// Listar muestras
 export const ListarMuestras = async (req, res) => {
   try {
     const sql = `
@@ -12,11 +14,15 @@ export const ListarMuestras = async (req, res) => {
         m.altura, 
         m.variedad, 
         m.observaciones, 
-        f.nombre_finca, 
-        CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario
+        m.codigoExterno, 
+        m.UnidadMedida,  -- Añadir UnidadMedida
+        f.nombre_finca AS finca,  
+        CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario,  
+        ts.nombreServicio AS fk_idTipoServicio  
       FROM muestra m
       JOIN finca f ON m.fk_id_finca = f.id_finca
       JOIN usuarios u ON m.fk_id_usuarios = u.id_usuario
+      JOIN tiposervicio ts ON m.fk_idTipoServicio = ts.idTipoServicio
     `;
 
     const [responde] = await conexion.query(sql);
@@ -26,13 +32,16 @@ export const ListarMuestras = async (req, res) => {
         id_muestra: muestra.id_muestra,
         codigo_muestra: muestra.codigo_muestra,
         cantidadEntrada: parseFloat(muestra.cantidadEntrada),
-        fecha_muestra: muestra.fecha_muestra.toISOString().split('T')[0], // Formatear la fecha sin la hora
+        fecha_muestra: muestra.fecha_muestra.toISOString().split('T')[0],
         estado: muestra.estado,
-        finca: muestra.nombre_finca,
+        finca: muestra.finca,
         usuario: muestra.nombre_usuario,
-        altura: parseFloat(muestra.altura), // Mostrar la altura
-        variedad: muestra.variedad, // Mostrar la variedad
-        observaciones: muestra.observaciones // Mostrar las observaciones
+        altura: parseFloat(muestra.altura),
+        variedad: muestra.variedad,
+        observaciones: muestra.observaciones,
+        codigoExterno: muestra.codigoExterno,
+        fk_idTipoServicio: muestra.fk_idTipoServicio,
+        UnidadMedida: muestra.UnidadMedida,  // Añadir UnidadMedida
       }));
 
       return res.status(200).json(formatearResponde);
@@ -45,7 +54,7 @@ export const ListarMuestras = async (req, res) => {
 };
 
 
-
+// Registrar muestra
 export const RegistrarMuestra = async (req, res) => {
   try {
     const error = validationResult(req);
@@ -53,43 +62,67 @@ export const RegistrarMuestra = async (req, res) => {
       return res.status(400).json(error);
     }
 
-    let {
+    const {
       cantidadEntrada,
       fk_id_finca,
       fecha_muestra,
-      codigo_muestra,
       fk_id_usuarios,
-      estado,
+      estado = "pendiente",
       altura,
       variedad,
-      observaciones
+      observaciones,
+      codigoExterno,
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     } = req.body;
 
-    if (!estado) {
-      estado = "pendiente";
-    }
-
-    const sql = `
-      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, codigo_muestra, fk_id_usuarios, estado, altura, variedad, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    const insertSql = `
+      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, fk_id_usuarios, estado, altura, variedad, observaciones, codigoExterno, fk_idTipoServicio, UnidadMedida)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
-
-    const [respuesta] = await conexion.query(sql, [
+    
+    const [insertRespuesta] = await conexion.query(insertSql, [
       cantidadEntrada,
       fk_id_finca,
       fecha_muestra,
-      codigo_muestra,
       fk_id_usuarios,
       estado,
       altura,
       variedad,
-      observaciones
+      observaciones,
+      codigoExterno,
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     ]);
+  
 
-    if (respuesta.affectedRows > 0) {
-      return res.status(200).json({ message: "Se registró correctamente" });
-    } else {
+    if (insertRespuesta.affectedRows === 0) {
       return res.status(404).json({ message: "No se registró correctamente" });
+    }
+
+    const idMuestra = insertRespuesta.insertId;
+
+    const tipoServicioSql = `
+      SELECT codigoTipoServicio FROM tipoServicio WHERE idTipoServicio = ?
+    `;
+    const [servicioRespuesta] = await conexion.query(tipoServicioSql, [fk_idTipoServicio]);
+
+    if (servicioRespuesta.length === 0) {
+      return res.status(404).json({ message: "Tipo de servicio no encontrado" });
+    }
+
+    const codigoTipoServicio = servicioRespuesta[0].codigoTipoServicio;
+    const codigoMuestraFinal = `${codigoTipoServicio}-${idMuestra}`;
+
+    const updateSql = `
+      UPDATE muestra SET codigo_muestra = ? WHERE id_muestra = ?
+    `;
+    const [updateRespuesta] = await conexion.query(updateSql, [codigoMuestraFinal, idMuestra]);
+
+    if (updateRespuesta.affectedRows > 0) {
+      return res.status(201).json({ message: "Se registró correctamente", codigo_muestra: codigoMuestraFinal });
+    } else {
+      return res.status(404).json({ message: "No se pudo actualizar el código de la muestra" });
     }
   } catch (error) {
     return res.status(500).json({
@@ -98,8 +131,15 @@ export const RegistrarMuestra = async (req, res) => {
   }
 };
 
+
+// Actualizar muestra
 export const ActualizarMuestra = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     const {
       cantidadEntrada,
       fk_id_finca,
@@ -109,7 +149,10 @@ export const ActualizarMuestra = async (req, res) => {
       estado,
       altura,
       variedad,
-      observaciones
+      observaciones,
+      codigoExterno,
+      fk_idTipoServicio,
+      UnidadMedida  // Añadir UnidadMedida
     } = req.body;
 
     const id = req.params.id;
@@ -125,7 +168,10 @@ export const ActualizarMuestra = async (req, res) => {
         estado = ?, 
         altura = ?, 
         variedad = ?, 
-        observaciones = ?
+        observaciones = ?, 
+        codigoExterno = ?, 
+        fk_idTipoServicio = ?,
+        UnidadMedida = ?  -- Añadir UnidadMedida
       WHERE id_muestra = ?
     `;
 
@@ -139,6 +185,9 @@ export const ActualizarMuestra = async (req, res) => {
       altura,
       variedad,
       observaciones,
+      codigoExterno,
+      fk_idTipoServicio,
+      UnidadMedida,  // Añadir UnidadMedida
       id,
     ]);
 
@@ -153,6 +202,8 @@ export const ActualizarMuestra = async (req, res) => {
     });
   }
 };
+
+
 
 
 export const eliminarMuestra = async (req, res) => {
