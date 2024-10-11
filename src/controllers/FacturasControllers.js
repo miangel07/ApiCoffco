@@ -2,9 +2,9 @@ import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
 export const generarFacturas = async (req, res) => {
-  try {
-    const { codigo } = req.body;
-    let sql = `SELECT 
+    try {
+        const { codigo } = req.body;
+        let sql = `SELECT 
     m.codigo_muestra,
     m.cantidadEntrada,
     GROUP_CONCAT(DISTINCT ts.nombreServicio ORDER BY ts.nombreServicio ASC SEPARATOR ', ') AS servicios,
@@ -59,7 +59,55 @@ GROUP BY
         }
 
     } catch (error) {
- 
-    res.status(500).json({ message: "Error en el servidor: " + error.message });
-  }
+
+        res.status(500).json({ message: "Error en el servidor: " + error.message });
+    }
 };
+
+export const facturasAlquiler = async (req, res) => {
+    try {
+        const { Documento } = req.body;
+        let sql = `
+  SELECT 
+    u.id_usuario, 
+    u.nombre, 
+    u.apellidos, 
+    u.numero_documento AS cedula, 
+    u.tipo_documento, 
+    u.correo_electronico, 
+    DATE_FORMAT(s.fecha, '%Y-%m-%d') AS fecha,  -- Formato de fecha sin tiempo
+    DATE_FORMAT(s.fecha_fin, '%Y-%m-%d') AS fecha_fin,  -- Formato de fecha_fin sin tiempo
+    s.estado,
+    p.precio  -- Traer el precio asociado
+FROM 
+    servicios s
+JOIN 
+    usuarios u ON s.fk_idUsuarios = u.id_usuario
+JOIN 
+    tiposervicio ts ON s.fk_idTipoServicio = ts.idTipoServicio
+JOIN 
+    precio p ON p.fk_idTipoServicio = ts.idTipoServicio  -- Unir con la tabla de precios
+WHERE 
+    s.fk_idTipoServicio = 4  -- Tipo de servicio alquiler de laboratorio
+    AND u.numero_documento = ${Documento}  -- Número de cédula específico
+    AND s.estado = 'terminado'  -- Estado del servicio terminado
+    AND (s.fecha >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) OR s.fecha > CURDATE());  -- Incluye registros de los últimos 2 meses y también fechas futuras
+
+
+
+
+  
+
+`
+
+        const [result] = await conexion.query(sql);
+        if (result.length > 0) {
+            return res.status(200).json(result);
+        } else {
+            return res.status(404).json({ message: 'No se encontraron resultados para generar la factura' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'error' });
+    }
+
+}
