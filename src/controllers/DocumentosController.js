@@ -65,10 +65,8 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
-      version,
       variables,
       logos,
 
@@ -111,7 +109,7 @@ export const registrarDocumentos = async (req, res) => {
     const rutaArchivoOriginal = path.join('public', 'documentos', archivoTemporal);
 
     // Insertar la versión en la base de datos
-    const [respondeVersion] = await conexion.query(sqlVersion, [version, id_documentos, archivoConID]);
+    const [respondeVersion] = await conexion.query(sqlVersion, ['1', id_documentos, archivoConID]);
 
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
@@ -205,7 +203,6 @@ export const actalizardocumentosVersion = async (req, res) => {
       version,
       variables
     } = req.body;
-    console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
 
 
@@ -232,8 +229,13 @@ export const actalizardocumentosVersion = async (req, res) => {
     }
     const idDocumento = rows2.insertId
     let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
+    const sqlVersion = `select version FROM versiones WHERE idVersion = ${idVersion}`;
+    const [responseVersion] = await conexion.query(sqlVersion, [idVersion]);
+    const versionNumero = parseInt(responseVersion[0].version);
+    const VersionIncrement = versionNumero + 1;
+    console.log(versionNumero)
     // registramos la version el bd
-    const [respondeVersion] = await conexion.query(sql, [version, idDocumento, archivoTemporal]);
+    const [respondeVersion] = await conexion.query(sql, [VersionIncrement, idDocumento, archivoTemporal]);
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
