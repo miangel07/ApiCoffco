@@ -39,10 +39,10 @@ export const registrarTipoDocumento = async (req, res) => {
 export const actualizarTipoDocumento = async (req, res) => {
 
     try {
-        let { nombreDocumento, estado } = req.body;
+        let { nombreDocumento } = req.body;
         let id = req.params.id;
-        let sql = `UPDATE tipodocumento SET nombreDocumento = ? , estado=? WHERE idTipoDocumento = ?`;
-        const [respuesta] = await conexion.query(sql, [nombreDocumento, estado, id]);
+        let sql = `UPDATE tipodocumento SET nombreDocumento = ? WHERE idTipoDocumento = ?`;
+        const [respuesta] = await conexion.query(sql, [nombreDocumento, id]);
 
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "Se actualizó con éxito el tipo de documento" });
