@@ -35,8 +35,7 @@ export const usuariosParaAlquiler = async (req,res)=>{
   try {
     let sql = `SELECT 
     u.id_usuario,
-    u.nombre,
-    u.apellidos,
+    CONCAT(u.nombre,' ', u.apellidos) AS nombre_completo_usuario,
     u.correo_electronico,
     u.telefono,
     u.numero_documento,
