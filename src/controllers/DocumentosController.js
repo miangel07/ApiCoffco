@@ -190,6 +190,10 @@ export const eliminarDocumentos = async (req, res) => {
 };
 
 export const actalizardocumentosVersion = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error);
+  }
   try {
     let {
       nombre,
@@ -200,7 +204,6 @@ export const actalizardocumentosVersion = async (req, res) => {
       tipo_documento: fk_idTipoDocumento,
       idVersion,
       logos,
-      version,
       variables
     } = req.body;
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
@@ -320,6 +323,10 @@ export const buscarDocumentos = async (req, res) => {
 };
 
 export const Actualizar = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error);
+  }
   try {
     let {
       nombre,
