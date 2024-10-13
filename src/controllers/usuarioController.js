@@ -76,35 +76,51 @@ export const registrarUsuario = async (req, res) => {
   try {
     const error = validationResult(req);
     if (!error.isEmpty()) {
-      return res.status(400).json(error);
+      const mensajesError = error.array().map(err => err.msg);
+      return res.status(400).json({ errors: mensajesError });
     }
-    console.log(req.body);
-    let {
-      nombre,
-      apellidos,
-      correo_electronico,
-      telefono,
-      password,
-      numero_documento,
-      tipo_documento,
-      estado,
-      rol: fk_idRol
-    } = req.body;
+
+    let { numero_documento, correo_electronico, ...restoDatos } = req.body;
+
+    let sqlExiste = `SELECT COUNT(*) AS count FROM usuarios WHERE numero_documento = ?`;
+    const [result] = await conexion.query(sqlExiste, [numero_documento]);
+
+    if (result[0].count > 0) {
+      return res.status(400).json({ message: "El número de documento ya está en uso" });
+    }
+
+    let sqlCorreo = `SELECT COUNT(*) AS count FROM usuarios WHERE correo_electronico = ?`;
+    const [correoResult] = await conexion.query(sqlCorreo, [correo_electronico]);
+
+    if (correoResult[0].count > 0) {
+      return res.status(400).json({ message: "El correo electrónico ya está en uso" });
+    }
 
     const salt = await bcryptjs.genSalt(10);
-    let hashPassword = await bcryptjs.hash(password, salt);
+    let hashPassword = await bcryptjs.hash(req.body.password, salt);
 
-    let sql = `insert into usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,estado,
-      fk_idRol)
-        value('${nombre}','${apellidos}','${correo_electronico}','${telefono}','${hashPassword}','${numero_documento}','${tipo_documento}','${estado}','${fk_idRol}')`;
-    const [respuesta] = await conexion.query(sql);
+    let sqlInsert = `INSERT INTO usuarios (nombre,apellidos,correo_electronico,telefono,password,numero_documento,tipo_documento,estado,fk_idRol)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    const [respuesta] = await conexion.query(sqlInsert, [
+      req.body.nombre,
+      req.body.apellidos,
+      correo_electronico,
+      req.body.telefono,
+      hashPassword,
+      numero_documento,
+      req.body.tipo_documento,
+      req.body.estado,
+      req.body.rol
+    ]);
+
     if (respuesta.affectedRows > 0) {
-      res.status(200).json({ message: "Se registro el usuario con exito" });
+      res.status(200).json({ message: "Se registró el usuario con éxito" });
     } else {
       res.status(404).json({ message: "No se pudo registrar el usuario" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error" + error.message });
+    res.status(500).json({ message: "Error: " + error.message });
   }
 };
 
