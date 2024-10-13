@@ -65,10 +65,8 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
-      version,
       variables,
       logos,
 
@@ -76,7 +74,7 @@ export const registrarDocumentos = async (req, res) => {
     console.log(req.body)
     // Manejar caso donde fk_idTipoServicio puede ser null
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-  
+
     // Registrar el documento en la base de datos
     /* id_documentos	nombre	fecha_carga	descripcion	codigo_documentos	fecha_emision		fk_idTipoServicio	fk_idTipoDocumento	
  */
@@ -89,7 +87,7 @@ export const registrarDocumentos = async (req, res) => {
       descripcion,
       codigo_documentos,
       fecha_emision,
-      
+
       fk_idTipoServicio,
       fk_idTipoDocumento,
     ]);
@@ -111,7 +109,7 @@ export const registrarDocumentos = async (req, res) => {
     const rutaArchivoOriginal = path.join('public', 'documentos', archivoTemporal);
 
     // Insertar la versión en la base de datos
-    const [respondeVersion] = await conexion.query(sqlVersion, [version, id_documentos, archivoConID]);
+    const [respondeVersion] = await conexion.query(sqlVersion, ['1', id_documentos, archivoConID]);
 
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
@@ -192,6 +190,10 @@ export const eliminarDocumentos = async (req, res) => {
 };
 
 export const actalizardocumentosVersion = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error);
+  }
   try {
     let {
       nombre,
@@ -202,12 +204,10 @@ export const actalizardocumentosVersion = async (req, res) => {
       tipo_documento: fk_idTipoDocumento,
       idVersion,
       logos,
-      version,
       variables
     } = req.body;
-    console.log(req.body);
     fk_idTipoServicio = fk_idTipoServicio ? fk_idTipoServicio : null;
-    
+
 
     const archivoTemporal = req.file.filename;
     const nombreTemporal = req.file.originalname;
@@ -232,8 +232,13 @@ export const actalizardocumentosVersion = async (req, res) => {
     }
     const idDocumento = rows2.insertId
     let sql = `INSERT INTO versiones (version, fk_documentos, nombre_documento, fecha_version) VALUES (?,?,?,NOW())`;
+    const sqlVersion = `select version FROM versiones WHERE idVersion = ${idVersion}`;
+    const [responseVersion] = await conexion.query(sqlVersion, [idVersion]);
+    const versionNumero = parseInt(responseVersion[0].version);
+    const VersionIncrement = versionNumero + 1;
+    console.log(versionNumero)
     // registramos la version el bd
-    const [respondeVersion] = await conexion.query(sql, [version, idDocumento, archivoTemporal]);
+    const [respondeVersion] = await conexion.query(sql, [VersionIncrement, idDocumento, archivoTemporal]);
     if (!respondeVersion) {
       return res.status(500).json({ message: "No se pudo registrar la versión." });
     }
@@ -318,13 +323,16 @@ export const buscarDocumentos = async (req, res) => {
 };
 
 export const Actualizar = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json(error);
+  }
   try {
     let {
       nombre,
       descripcion,
       codigo: codigo_documentos,
       fecha_emision,
-      
       servicios: fk_idTipoServicio,
       tipo_documento: fk_idTipoDocumento,
       nombre_documento_version,
@@ -333,17 +341,19 @@ export const Actualizar = async (req, res) => {
       version,
       variables
     } = req.body;
-  
+
     const { id_documentos } = req.params;
     console.log(id_documentos, req.body);
-  
-    fk_idTipoServicio = fk_idTipoServicio ?? null;
-   
-    variables = variables ?? '[]'; 
-    logos = logos ?? '[]'; 
-  
+
+    // Si servicios viene vacío, asignar null
+    fk_idTipoServicio = fk_idTipoServicio || null;
+
+    // Asignar valores por defecto si son undefined
+    variables = variables === 'null' ? null : variables ?? '[]';
+    logos = logos ?? '[]';
+
     let nuevoNombreArchivo = nombre_documento_version;
-  
+
     // Procesar reemplazo de archivo si se ha subido uno nuevo
     if (req.file) {
       try {
@@ -351,26 +361,26 @@ export const Actualizar = async (req, res) => {
         const nombreOriginalNuevo = req.file.originalname;
         const extensionNuevo = path.extname(nombreOriginalNuevo);
         const nombreSinExtNuevo = path.basename(nombreOriginalNuevo, extensionNuevo);
-  
+
         const rutaArchivoAnterior = path.join('public', 'documentos', nombre_documento_version);
-  
+
         if (fs.existsSync(rutaArchivoAnterior)) {
           fs.unlinkSync(rutaArchivoAnterior);
           console.log(`Archivo anterior ${nombre_documento_version} eliminado correctamente.`);
         } else {
           console.log(`El archivo anterior ${nombre_documento_version} no existe.`);
         }
-  
+
         nuevoNombreArchivo = `${idVersion}-${nombreSinExtNuevo}${extensionNuevo}`;
         const rutaArchivoFinal = path.join('public', 'documentos', nuevoNombreArchivo);
-  
+
         fs.renameSync(path.join('public', 'documentos', archivoNuevo), rutaArchivoFinal);
       } catch (error) {
         console.error(`Error al procesar el archivo: ${error.message}`);
         return res.status(500).json({ message: 'Error al procesar el archivo.' });
       }
     }
-  
+
     // Actualizar la tabla `documentos`
     let sqlDocumento = `
       UPDATE documentos
@@ -379,7 +389,6 @@ export const Actualizar = async (req, res) => {
           descripcion = ?, 
           codigo_documentos = ?, 
           fecha_emision = ?, 
-           = ?, 
           fk_idTipoServicio = ?, 
           fk_idTipoDocumento = ?
       WHERE id_documentos = ?;
@@ -389,16 +398,15 @@ export const Actualizar = async (req, res) => {
       descripcion,
       codigo_documentos,
       fecha_emision,
-      ,
       fk_idTipoServicio,
       fk_idTipoDocumento,
       id_documentos
     ]);
-  
+
     if (rows2.affectedRows === 0) {
       return res.status(404).json({ message: "No se actualizó el documento." });
     }
-  
+
     // Actualizar la tabla versiones
     let sqlVersion = `
       UPDATE versiones
@@ -409,52 +417,84 @@ export const Actualizar = async (req, res) => {
       WHERE idVersion = ?;
     `;
     const [respondeVersion] = await conexion.query(sqlVersion, [version, id_documentos, nuevoNombreArchivo, idVersion]);
-  
+
     if (respondeVersion.affectedRows === 0) {
       return res.status(500).json({ message: "No se pudo actualizar la versión." });
     }
-  
-    // Eliminar las asociaciones existentes en la tabla detalle
-    let sqlEliminarDetalle = `
-      DELETE FROM detalle
-      WHERE fk_id_version = ?;
-    `;
-    await conexion.query(sqlEliminarDetalle, [idVersion]);
-  
-    // Insertar las nuevas asociaciones en la tabla detalle
-    let sqlDetalle = `
-      INSERT INTO detalle (fk_idVariable, fk_id_version)
-      VALUES (?, ?);
-    `;
-    const variablesArray = JSON.parse(variables);
-    for (const idVariable of variablesArray) {
-      await conexion.query(sqlDetalle, [idVariable, idVersion]);
+
+    // Solo procesar las variables si no es 'null'
+    if (variables) {
+      const variablesArray = JSON.parse(variables);
+
+      // Paso 1: Verificar los IDs existentes
+      const placeholders = variablesArray.map(() => '?').join(', ');
+      const sqlCheck = `SELECT fk_idVariable FROM detalle WHERE fk_idVariable IN (${placeholders}) AND fk_id_version = ?`;
+      const [existingVariables] = await conexion.query(sqlCheck, [...variablesArray, idVersion]);
+
+      // Crear un conjunto de IDs que ya existen
+      const existingIds = new Set(existingVariables.map(row => row.fk_idVariable));
+
+      // Paso 2: Filtrar solo los IDs que no están en la base de datos
+      const newVariables = variablesArray.filter(idVariable => !existingIds.has(idVariable));
+
+      // Si hay nuevos IDs para insertar, procedemos a hacerlo
+      if (newVariables.length > 0) {
+        const valuesPlaceholder = newVariables.map(() => `(?, ?)`).join(', '); // Ejemplo: `(?, ?), (?, ?), ...`
+        const sqlDetalle = `
+          INSERT INTO detalle (fk_idVariable, fk_id_version)
+          VALUES ${valuesPlaceholder}
+        `;
+
+        const detalleValues = [];
+        for (const idVariable of newVariables) {
+          detalleValues.push(idVariable, idVersion);
+        }
+
+        await conexion.query(sqlDetalle, detalleValues);
+      }
     }
-  
-    // Eliminar las asociaciones existentes en la tabla logo_documento
-    let sqlEliminarLogos = `
-      DELETE FROM logo_documento
-      WHERE documentos_iddocumentos = ?;
-    `;
-    await conexion.query(sqlEliminarLogos, [id_documentos]);
-  
-    // Insertar las nuevas asociaciones en la tabla logo_documento
-    let sqlLogos = `
-      INSERT INTO logo_documento (logo_idlogos, documentos_iddocumentos)
-      VALUES (?, ?);
-    `;
+
     const logosArray = JSON.parse(logos);
-    for (const idLogo of logosArray) {
-      await conexion.query(sqlLogos, [idLogo, id_documentos]);
+
+    // Paso 1: Verificar los IDs de logos existentes
+    const logosPlaceholders = logosArray.map(() => '?').join(', ');
+    const sqlCheckLogos = `
+      SELECT logo_idlogos FROM logo_documento 
+      WHERE logo_idlogos IN (${logosPlaceholders}) AND documentos_iddocumentos = ?
+    `;
+    const [existingLogos] = await conexion.query(sqlCheckLogos, [...logosArray, id_documentos]);
+
+    const existingLogoIds = new Set(existingLogos.map(row => row.logo_idlogos));
+
+    // Paso 2: Filtrar solo los IDs de logos que no están en la base de datos
+    const newLogos = logosArray.filter(idLogo => !existingLogoIds.has(idLogo));
+
+    // Si hay nuevos logos para insertar, procedemos a hacerlo
+    if (newLogos.length > 0) {
+      const logosValuesPlaceholder = newLogos.map(() => `(?, ?)`).join(', ');
+      const sqlLogosInsert = `
+        INSERT INTO logo_documento (logo_idlogos, documentos_iddocumentos)
+        VALUES ${logosValuesPlaceholder}
+      `;
+
+      // Aplanar el array para los valores
+      const logosValues = [];
+      for (const idLogo of newLogos) {
+        logosValues.push(idLogo, id_documentos);
+      }
+
+      // Ejecutar la consulta para insertar solo los nuevos logos
+      await conexion.query(sqlLogosInsert, logosValues);
     }
-  
+
     res.status(200).json({ message: 'Actualización exitosa.' });
-  
+
   } catch (error) {
     console.error(`Error en la operación: ${error.message}`);
     res.status(500).json({ message: 'Error en la operación.' });
   }
 };
+
 
 export const consultaGrafica = async (req, res) => {
   try {

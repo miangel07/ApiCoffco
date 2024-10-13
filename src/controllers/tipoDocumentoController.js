@@ -39,10 +39,10 @@ export const registrarTipoDocumento = async (req, res) => {
 export const actualizarTipoDocumento = async (req, res) => {
 
     try {
-        let { nombreDocumento, estado } = req.body;
+        let { nombreDocumento } = req.body;
         let id = req.params.id;
-        let sql = `UPDATE tipodocumento SET nombreDocumento = ? , estado=? WHERE idTipoDocumento = ?`;
-        const [respuesta] = await conexion.query(sql, [nombreDocumento, estado, id]);
+        let sql = `UPDATE tipodocumento SET nombreDocumento = ? WHERE idTipoDocumento = ?`;
+        const [respuesta] = await conexion.query(sql, [nombreDocumento, id]);
 
         if (respuesta.affectedRows > 0) {
             return res.status(200).json({ "message": "Se actualizó con éxito el tipo de documento" });
@@ -88,8 +88,8 @@ export const listarIdTipoDocumento = async (req, res) => {
 
 export const actualizarEstadoTipoDocumento = async (req, res) => {
     try {
-        let { estado } = req.body; 
-        let id = req.params.id;   
+        let { estado } = req.body;
+        let id = req.params.id;
 
         if (!estado || (estado !== 'activo' && estado !== 'inactivo')) {
             return res.status(400).json({ "message": "Estado no válido" });
@@ -107,3 +107,16 @@ export const actualizarEstadoTipoDocumento = async (req, res) => {
         return res.status(500).json({ "message": "Error en el servidor: " + error.message });
     }
 };
+export const listarActivo = async (req, res) => {
+
+    try {
+        let sql = `SELECT * FROM tipodocumento WHERE estado = 'activo'`;
+        const [respuesta] = await conexion.query(sql);
+        if (respuesta.length > 0) {
+            return res.status(200).json(respuesta);
+        }
+        return res.status(404).json({ "message": "No se pudo listar correctamente" })
+    } catch (error) {
+        return res.status(500).json({ "message": "Error en el servidor: " + error.message });
+    }
+}
