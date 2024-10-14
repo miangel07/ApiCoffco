@@ -90,13 +90,7 @@ JOIN
 WHERE 
     s.fk_idTipoServicio = 4  -- Tipo de servicio alquiler de laboratorio
     AND u.numero_documento = ${Documento}  -- Número de cédula específico
-    AND s.estado = 'terminado'  -- Estado del servicio terminado
     AND (s.fecha >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH) OR s.fecha > CURDATE());  -- Incluye registros de los últimos 2 meses y también fechas futuras
-
-
-
-
-  
 
 `
 

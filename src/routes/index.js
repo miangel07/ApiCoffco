@@ -21,6 +21,7 @@ import rolRouter from "./rolRouter.js";
 import FacturasRouter from "./FacturasRouter.js"
 import ReportesRouter from "./ReportesRouter.js"
 import IngresosRouter from "./IngresoExcelRoute.js";
+import rutaAlquiler from "./AlquilerRouter.js";
 
 
 const router = express.Router();
@@ -47,6 +48,6 @@ router.use("/rol", rolRouter)
 router.use("/facturas", FacturasRouter)
 router.use("/reportes", ReportesRouter)
 router.use("/ingresos", IngresosRouter)
-
+router.use('/alquiler',rutaAlquiler)
 
 export default router;
