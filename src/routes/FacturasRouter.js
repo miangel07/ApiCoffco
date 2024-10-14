@@ -6,7 +6,7 @@ const FacturasRouter = Router()
 
 
 FacturasRouter.post('/generar', validarToken, generarFacturas)
-FacturasRouter.post('/alquiler', validarToken, facturasAlquiler)
+FacturasRouter.post('/alquiler',  facturasAlquiler)
 
 
 export default FacturasRouter
