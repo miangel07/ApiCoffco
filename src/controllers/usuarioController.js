@@ -263,3 +263,34 @@ export const listarRoles = async (req, res) => {
   }
 };
 
+
+
+export const listarClientes = async (req, res) => {
+  try {
+    const sql = `
+      SELECT 
+        CONCAT(u.nombre, ' ', u.apellidos) AS nombre_completo,
+        u.numero_documento,
+        u.id_usuario
+      FROM usuarios u
+      JOIN rol r ON u.fk_idRol = r.idRol
+      WHERE r.idRol = 3
+    `;
+
+    const [clientes] = await conexion.query(sql);
+
+    if (clientes.length > 0) {
+      const clientesFormateados = clientes.map(cliente => ({
+        nombre_cliente: cliente.nombre_completo,
+        numero_documento: cliente.numero_documento,
+        id_usuario: cliente.id_usuario
+      }));
+      res.status(200).json(clientesFormateados);
+    } else {
+      res.status(404).json({ message: "No se encontraron usuarios con el rol especificado" });
+    }
+  } catch (error) {
+    console.error("Error al listar clientes:", error);
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};
