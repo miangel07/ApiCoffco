@@ -6,13 +6,13 @@ import { subirArchivos } from "../controllers/SubirArchivosControllers.js";
 
 const DocumentosRouter = Router()
 
-DocumentosRouter.get('/listar', listarDocumentos)
-DocumentosRouter.post('/registrar', subirArchivos, registrarDocumentos)
+DocumentosRouter.get('/listar', validarToken, listarDocumentos)
+DocumentosRouter.post('/registrar', validarToken,  subirArchivos, registrarDocumentos)
 DocumentosRouter.delete('/eliminar/:id_documentos', validarToken, eliminarDocumentos)
-DocumentosRouter.post('/actualizarversion', subirArchivos, documentoValidate, actalizardocumentosVersion)
-DocumentosRouter.put('/actualizar/:id_documentos', subirArchivos, documentoValidate, Actualizar)
-DocumentosRouter.get('/buscar/:id', buscarDocumentos)
-DocumentosRouter.get('/grafica', consultaGrafica)
+DocumentosRouter.post('/actualizarversion', subirArchivos,  actalizardocumentosVersion)
+DocumentosRouter.put('/actualizar/:id_documentos', validarToken, subirArchivos,  Actualizar)
+DocumentosRouter.get('/buscar/:id', validarToken, buscarDocumentos)
+DocumentosRouter.get('/grafica', validarToken, consultaGrafica)
 
 
 
