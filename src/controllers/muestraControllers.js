@@ -109,7 +109,7 @@ export const RegistrarMuestra = async (req, res) => {
     const idMuestra = insertRespuesta.insertId;
 
     const tipoServicioSql = `
-      SELECT codigoTipoServicio FROM tipoServicio WHERE idTipoServicio = ?
+      SELECT codigoTipoServicio FROM tiposervicio WHERE idTipoServicio = ?
     `;
     const [servicioRespuesta] = await conexion.query(tipoServicioSql, [fk_idTipoServicio]);
 
@@ -139,9 +139,12 @@ export const RegistrarMuestra = async (req, res) => {
 };
 
 
-
 export const ActualizarMuestra = async (req, res) => {
   try {
+    console.log("Iniciando ActualizarMuestra");
+    console.log("Contenido de req.file:", req.file);
+    console.log("Contenido de req.body:", req.body);
+
     // Validar si hay errores en los datos enviados
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -174,6 +177,7 @@ export const ActualizarMuestra = async (req, res) => {
     }
 
     const currentData = existingData[0];
+    console.log("Datos actuales de la muestra:", currentData);
 
     // Función para verificar si un valor de llave foránea es válido
     const isValidForeignKey = async (table, column, value) => {
@@ -195,8 +199,9 @@ export const ActualizarMuestra = async (req, res) => {
       ? fk_idTipoServicio 
       : currentData.fk_idTipoServicio;
 
-    // Manejar la actualización de la foto de la muestra, si se sube una nueva
-    const fotoMuestra = req.file?.filename || currentData.fotoMuestra;
+    // Manejar la actualización de la foto de la muestra
+    const updatedFotoMuestra = req.file ? req.file.originalname : currentData.fotoMuestra;
+    console.log("Foto de la muestra a utilizar:", updatedFotoMuestra);
 
     // Consulta SQL para actualizar la muestra
     const sql = `
@@ -216,8 +221,7 @@ export const ActualizarMuestra = async (req, res) => {
       WHERE id_muestra = ?
     `;
 
-    // Ejecutar la consulta de actualización con valores actualizados o actuales
-    const [respuesta] = await conexion.query(sql, [
+    const updatedValues = [
       cantidadEntrada !== undefined ? parseFloat(cantidadEntrada) : currentData.cantidadEntrada,
       updatedFkIdFinca,
       fecha_muestra || currentData.fecha_muestra,
@@ -228,9 +232,16 @@ export const ActualizarMuestra = async (req, res) => {
       codigoExterno || currentData.codigoExterno,
       updatedFkIdTipoServicio,
       UnidadMedida || currentData.UnidadMedida,
-      fotoMuestra,
+      updatedFotoMuestra,
       id
-    ]);
+    ];
+
+    console.log("Valores a actualizar:", updatedValues);
+
+    // Ejecutar la consulta de actualización
+    const [respuesta] = await conexion.query(sql, updatedValues);
+
+    console.log("Respuesta de la actualización:", respuesta);
 
     // Verificar si la actualización fue exitosa
     if (respuesta.affectedRows > 0) {
@@ -248,7 +259,7 @@ export const ActualizarMuestra = async (req, res) => {
           codigoExterno: codigoExterno || currentData.codigoExterno,
           fk_idTipoServicio: updatedFkIdTipoServicio,
           UnidadMedida: UnidadMedida || currentData.UnidadMedida,
-          fotoMuestra
+          fotoMuestra: updatedFotoMuestra
         }
       });
     } else {
@@ -261,7 +272,6 @@ export const ActualizarMuestra = async (req, res) => {
     });
   }
 };
-
 
 export const eliminarMuestra = async (req, res) => {
   try {
