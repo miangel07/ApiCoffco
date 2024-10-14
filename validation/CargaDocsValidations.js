@@ -37,3 +37,15 @@ export const documentoValidate = [
     .withMessage("El tipo de documento debe ser un número entero"),
 
 ];
+/*  DataForm.append('nombre', data.nombre);
+        DataForm.append('id_documentos', valor.id_documentos);
+        DataForm.append('descripcion', data.descripcion);
+        DataForm.append('codigo', data.codigo_documentos);
+        DataForm.append('fecha_emision', data.fecha_emision);
+        DataForm.append('servicios', servicio);
+        DataForm.append('tipo_documento', dataInput);
+        DataForm.append('nombre_documento_version', valor.nombre_documento_version);
+        DataForm.append('idVersion', valor.idversion);
+        DataForm.append('logos', JSON.stringify(logos));
+        DataForm.append('version', data.version);
+        DataForm.append('variables', JSON.stringify(ArryVariables)); */
