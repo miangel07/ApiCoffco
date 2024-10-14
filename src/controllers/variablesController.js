@@ -166,3 +166,16 @@ export const UpdateEstado = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor" + error.message });
   }
 };
+export const valiribaleActivas =async (req, res) => {
+  try {
+    let sql = `SELECT * FROM variables WHERE estado = 'activo'`;
+    const [respuesta] = await conexion.query(sql);
+    if (respuesta.length > 0) {
+      res.status(200).json(respuesta);
+    } else {
+      res.status(404).json({ message: "No hay variables activas" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "error en la conexion" + error });
+  }
+}
