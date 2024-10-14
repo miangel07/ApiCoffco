@@ -1,7 +1,7 @@
 import { conexion } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-// Listar muestras
+
 export const ListarMuestras = async (req, res) => {
   try {
     const sql = `
@@ -15,7 +15,8 @@ export const ListarMuestras = async (req, res) => {
         m.variedad, 
         m.observaciones, 
         m.codigoExterno, 
-        m.UnidadMedida,  -- Añadir UnidadMedida
+        m.UnidadMedida,
+        m.fotoMuestra,
         f.nombre_finca AS finca,  
         CONCAT(u.nombre, ' ', u.apellidos) AS nombre_usuario,  
         ts.nombreServicio AS fk_idTipoServicio  
@@ -41,7 +42,8 @@ export const ListarMuestras = async (req, res) => {
         observaciones: muestra.observaciones,
         codigoExterno: muestra.codigoExterno,
         fk_idTipoServicio: muestra.fk_idTipoServicio,
-        UnidadMedida: muestra.UnidadMedida,  // Añadir UnidadMedida
+        UnidadMedida: muestra.UnidadMedida,
+        fotoMuestra: muestra.fotoMuestra // Solo el nombre de la imagen
       }));
 
       return res.status(200).json(formatearResponde);
@@ -49,55 +51,59 @@ export const ListarMuestras = async (req, res) => {
       return res.status(404).json({ mensaje: "No se encontraron muestras" });
     }
   } catch (error) {
+    console.error("Error al listar muestras:", error);
     return res.status(500).json({ mensaje: "Error en la conexión: " + error.message });
   }
 };
 
-
-// Registrar muestra
 export const RegistrarMuestra = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
+
+    console.log('Datos recibidos:', req.body); // Para depuración
 
     const {
       cantidadEntrada,
       fk_id_finca,
       fecha_muestra,
       fk_id_usuarios,
-      estado = "pendiente",
       altura,
       variedad,
       observaciones,
       codigoExterno,
       fk_idTipoServicio,
-      UnidadMedida  // Añadir UnidadMedida
+      UnidadMedida
     } = req.body;
 
+    const estado = "pendiente";
+    // Usamos el nombre original del archivo
+    const fotoMuestra = req.file.originalname || null;
+
     const insertSql = `
-      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, fk_id_usuarios, estado, altura, variedad, observaciones, codigoExterno, fk_idTipoServicio, UnidadMedida)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO muestra (cantidadEntrada, fk_id_finca, fecha_muestra, fk_id_usuarios, estado, altura, variedad, observaciones, codigoExterno, fk_idTipoServicio, UnidadMedida, fotoMuestra)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const [insertRespuesta] = await conexion.query(insertSql, [
-      cantidadEntrada,
-      fk_id_finca,
+      parseFloat(cantidadEntrada),
+      parseInt(fk_id_finca),
       fecha_muestra,
-      fk_id_usuarios,
+      parseInt(fk_id_usuarios),
       estado,
-      altura,
+      parseFloat(altura),
       variedad,
       observaciones,
       codigoExterno,
-      fk_idTipoServicio,
-      UnidadMedida  // Añadir UnidadMedida
+      parseInt(fk_idTipoServicio),
+      UnidadMedida,
+      fotoMuestra
     ]);
 
-
     if (insertRespuesta.affectedRows === 0) {
-      return res.status(404).json({ message: "No se registró correctamente" });
+      return res.status(500).json({ message: "No se registró correctamente" });
     }
 
     const idMuestra = insertRespuesta.insertId;
@@ -122,88 +128,139 @@ export const RegistrarMuestra = async (req, res) => {
     if (updateRespuesta.affectedRows > 0) {
       return res.status(201).json({ message: "Se registró correctamente", codigo_muestra: codigoMuestraFinal });
     } else {
-      return res.status(404).json({ message: "No se pudo actualizar el código de la muestra" });
+      return res.status(500).json({ message: "No se pudo actualizar el código de la muestra" });
     }
   } catch (error) {
+    console.error("Error al registrar la muestra:", error);
     return res.status(500).json({
-      message: "Error al conectar la base de datos: " + error.message,
+      message: "Error al registrar la muestra: " + error.message,
     });
   }
 };
 
 
-// Actualizar muestra
+
 export const ActualizarMuestra = async (req, res) => {
   try {
-    const error = validationResult(req);
-    if (!error.isEmpty()) {
-      return res.status(400).json(error);
+    // Validar si hay errores en los datos enviados
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const {
       cantidadEntrada,
-      fk_id_finca,
       fecha_muestra,
-      codigo_muestra,
-      fk_id_usuarios,
-      estado,
       altura,
       variedad,
       observaciones,
       codigoExterno,
-      fk_idTipoServicio,
-      UnidadMedida  // Añadir UnidadMedida
+      UnidadMedida,
+      fk_id_finca,
+      fk_id_usuarios,
+      fk_idTipoServicio
     } = req.body;
 
     const id = req.params.id;
 
+    // Obtener los datos actuales de la muestra para comparaciones
+    const [existingData] = await conexion.query(
+      'SELECT * FROM muestra WHERE id_muestra = ?',
+      [id]
+    );
+
+    if (existingData.length === 0) {
+      return res.status(404).json({ message: "No se encontró la muestra para actualizar" });
+    }
+
+    const currentData = existingData[0];
+
+    // Función para verificar si un valor de llave foránea es válido
+    const isValidForeignKey = async (table, column, value) => {
+      if (value === undefined) return false;
+      const [result] = await conexion.query(`SELECT 1 FROM ${table} WHERE ${column} = ?`, [value]);
+      return result.length > 0;
+    };
+
+    // Validar llaves foráneas con datos actuales si es necesario
+    const updatedFkIdFinca = fk_id_finca && await isValidForeignKey('finca', 'id_finca', fk_id_finca) 
+      ? fk_id_finca 
+      : currentData.fk_id_finca;
+
+    const updatedFkIdUsuarios = fk_id_usuarios && await isValidForeignKey('usuarios', 'id_usuario', fk_id_usuarios) 
+      ? fk_id_usuarios 
+      : currentData.fk_id_usuarios;
+
+    const updatedFkIdTipoServicio = fk_idTipoServicio && await isValidForeignKey('tipoServicio', 'idTipoServicio', fk_idTipoServicio) 
+      ? fk_idTipoServicio 
+      : currentData.fk_idTipoServicio;
+
+    // Manejar la actualización de la foto de la muestra, si se sube una nueva
+    const fotoMuestra = req.file?.filename || currentData.fotoMuestra;
+
+    // Consulta SQL para actualizar la muestra
     const sql = `
       UPDATE muestra 
       SET 
         cantidadEntrada = ?, 
         fk_id_finca = ?, 
         fecha_muestra = ?, 
-        codigo_muestra = ?, 
         fk_id_usuarios = ?, 
-        estado = ?, 
         altura = ?, 
         variedad = ?, 
         observaciones = ?, 
         codigoExterno = ?, 
         fk_idTipoServicio = ?,
-        UnidadMedida = ?  -- Añadir UnidadMedida
+        UnidadMedida = ?,
+        fotoMuestra = ?
       WHERE id_muestra = ?
     `;
 
+    // Ejecutar la consulta de actualización con valores actualizados o actuales
     const [respuesta] = await conexion.query(sql, [
-      cantidadEntrada,
-      fk_id_finca,
-      fecha_muestra,
-      codigo_muestra,
-      fk_id_usuarios,
-      estado,
-      altura,
-      variedad,
-      observaciones,
-      codigoExterno,
-      fk_idTipoServicio,
-      UnidadMedida,  // Añadir UnidadMedida
-      id,
+      cantidadEntrada !== undefined ? parseFloat(cantidadEntrada) : currentData.cantidadEntrada,
+      updatedFkIdFinca,
+      fecha_muestra || currentData.fecha_muestra,
+      updatedFkIdUsuarios,
+      altura !== undefined ? parseFloat(altura) : currentData.altura,
+      variedad || currentData.variedad,
+      observaciones || currentData.observaciones,
+      codigoExterno || currentData.codigoExterno,
+      updatedFkIdTipoServicio,
+      UnidadMedida || currentData.UnidadMedida,
+      fotoMuestra,
+      id
     ]);
 
+    // Verificar si la actualización fue exitosa
     if (respuesta.affectedRows > 0) {
-      return res.status(200).json({ message: "Se actualizó con éxito" });
+      return res.status(200).json({ 
+        message: "Se actualizó con éxito",
+        updatedData: {
+          id_muestra: id,
+          cantidadEntrada: cantidadEntrada !== undefined ? parseFloat(cantidadEntrada) : currentData.cantidadEntrada,
+          fk_id_finca: updatedFkIdFinca,
+          fecha_muestra: fecha_muestra || currentData.fecha_muestra,
+          fk_id_usuarios: updatedFkIdUsuarios,
+          altura: altura !== undefined ? parseFloat(altura) : currentData.altura,
+          variedad: variedad || currentData.variedad,
+          observaciones: observaciones || currentData.observaciones,
+          codigoExterno: codigoExterno || currentData.codigoExterno,
+          fk_idTipoServicio: updatedFkIdTipoServicio,
+          UnidadMedida: UnidadMedida || currentData.UnidadMedida,
+          fotoMuestra
+        }
+      });
     } else {
-      return res.status(404).json({ message: "No se actualizó correctamente" });
+      return res.status(404).json({ message: "No se encontró la muestra para actualizar" });
     }
   } catch (error) {
+    console.error("Error al actualizar la muestra:", error);
     return res.status(500).json({
-      message: "Error en la conexión: " + error.message,
+      message: "Error al actualizar la muestra: " + error.message,
     });
   }
 };
-
-
 
 
 export const eliminarMuestra = async (req, res) => {

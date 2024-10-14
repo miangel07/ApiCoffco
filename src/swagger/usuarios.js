@@ -36,7 +36,7 @@
 
 /**
  * @swagger
- * /api/usuarios:
+ * /api/usuarios/listar:
  *   get:
  *     summary: Obtiene la lista de todos los usuarios
  *     tags:
@@ -54,7 +54,7 @@
 
 /**
  * @swagger
- * /api/usuarios/{id}:
+ * /api/usuarios/listarid/{id}:
  *   get:
  *     summary: Obtiene un usuario por su ID
  *     tags:
@@ -79,7 +79,7 @@
 
 /**
  * @swagger
- * /api/usuarios:
+ * /api/usuarios/registrar:
  *   post:
  *     summary: Crea un nuevo usuario
  *     tags:
@@ -103,7 +103,28 @@
 
 /**
  * @swagger
- * /api/usuarios/{id}:
+ * /api/usuarios/eliminar/{id_usuario}:
+ *   delete:
+ *     summary: Elimina un usuario por su ID
+ *     tags:
+ *       - Usuarios
+ *     parameters:
+ *       - in: path
+ *         name: id_usuario
+ *         required: true
+ *         description: "El ID del usuario a eliminar"
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Usuario eliminado con éxito
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
+/**
+ * @swagger
+ * /api/usuarios/actualizar/{id}:
  *   put:
  *     summary: Actualiza un usuario por su ID
  *     tags:
@@ -112,7 +133,7 @@
  *       - in: path
  *         name: id
  *         required: true
- *         description: "El ID del usuario"
+ *         description: "El ID del usuario a actualizar"
  *         schema:
  *           type: integer
  *     requestBody:
@@ -132,27 +153,6 @@
  *         description: Usuario no encontrado
  *       400:
  *         description: Error en los datos enviados
- */
-
-/**
- * @swagger
- * /api/usuarios/{id}:
- *   delete:
- *     summary: Elimina un usuario por su ID
- *     tags:
- *       - Usuarios
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: "El ID del usuario"
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Usuario eliminado con éxito
- *       404:
- *         description: Usuario no encontrado
  */
 
 export const usuariosDocs = {};
