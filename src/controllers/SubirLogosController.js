@@ -39,9 +39,6 @@ export const subirLogos = (req, res, next) => {
     } else if (err) {
       return res.status(400).json({ message: err.message });
     }
-    if (!req.file) {
-      return res.status(204).json({ message: 'No se subió ningún archivo.' });
-    }
     next();
   });
 };
