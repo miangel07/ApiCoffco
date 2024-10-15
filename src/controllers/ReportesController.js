@@ -3,6 +3,7 @@ import { conexion } from "../database/conexion.js";
 
 export const Reportes = async (req, res) => {
     const {muestra, TipoServicio}= req.body;
+    console.log(req.body)
     try {
         let sql = `SELECT 
     ts.nombreServicio,

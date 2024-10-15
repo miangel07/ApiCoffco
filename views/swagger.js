@@ -2,6 +2,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { usuariosDocs } from '../src/swagger/usuarios.js';
 import { reportesDocs } from '../src/swagger/reportes.js';
+import { muestrasDocs } from '../src/swagger/muestras.js';
 
 const options = {
   definition: {
@@ -19,6 +20,7 @@ const options = {
     paths: {
       ...reportesDocs,
       ...usuariosDocs,
+      ...muestrasDocs,
 
     },
   },
