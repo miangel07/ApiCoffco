@@ -35,10 +35,11 @@ export const actualizarLogo = async (req, res) => {
         const id = req.params.id;
         const { nombre } = req.body;
         let ruta;
+        
         if (req.file) {
             ruta = req.file.originalname;
         } else {
-            const logoActual = await conexion.query("SELECT ruta FROM logos WHERE idLogos = ?", [id]);
+            const [logoActual] = await conexion.query("SELECT ruta FROM logos WHERE idLogos = ?", [id]);
             if (logoActual.length > 0) {
                 ruta = logoActual[0].ruta;
             } else {
