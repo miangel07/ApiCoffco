@@ -27,7 +27,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: { fileSize: 50 * 1024 * 1024 }, 
-}).single('file');
+}).single('fotoMuestra');
 
 export const subirLogos = (req, res, next) => {
   upload(req, res, (err) => {
