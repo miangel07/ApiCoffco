@@ -27,7 +27,7 @@ const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: { fileSize: 50 * 1024 * 1024 }, 
-}).single('fotoMuestra');
+}).single('file');
 
 export const subirLogos = (req, res, next) => {
   upload(req, res, (err) => {
@@ -38,6 +38,9 @@ export const subirLogos = (req, res, next) => {
       return res.status(500).json({ message: `Error de subida: ${err.message}` });
     } else if (err) {
       return res.status(400).json({ message: err.message });
+    }
+    if (!req.file) {
+      return next();
     }
     next();
   });

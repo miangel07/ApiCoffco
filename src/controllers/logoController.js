@@ -46,7 +46,6 @@ export const actualizarLogo = async (req, res) => {
                 return res.status(404).json({ message: "Logo no encontrado" });
             }
         }
-
         const sql = "UPDATE logos SET nombre = ?, ruta = ? WHERE idLogos = ?";
         const [response] = await conexion.query(sql, [nombre, ruta, id]);
         if (response.affectedRows > 0) {
