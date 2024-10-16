@@ -69,61 +69,6 @@ if(respuesta.length>0){
 }
 
 
-
-// export const registrarAlquiler = async (req, res) => {
-//   try {
-//     const { fecha, fk_idAmbiente, fk_idUsuarios, fecha_fin } = req.body;
-
-//     // Obtener la fecha actual
-//     const fechaActual = new Date().toISOString().split('T')[0]; // Formato 'YYYY-MM-DD'
-
-//     // Verificar si la fecha de inicio o fin es anterior a la fecha actual
-//     if (fecha < fechaActual || fecha_fin < fechaActual) {
-//       return res.status(400).json({ message: "No se pueden reservar fechas anteriores a la actual" });
-//     }
-
-//     // Verificar si ya hay una reserva en ese ambiente para el rango de fechas
-//     let sqlVerificar = `
-//       SELECT * FROM servicios 
-//       WHERE fk_idAmbiente = ? 
-//       AND (fecha BETWEEN ? AND ? OR fecha_fin BETWEEN ? AND ?)
-//     `;
-    
-//     const [reservasExistentes] = await conexion.query(sqlVerificar, [
-//       fk_idAmbiente,
-//       fecha,
-//       fecha_fin,
-//       fecha,
-//       fecha_fin,
-//     ]);
-
-//     if (reservasExistentes.length > 0) {
-//       return res.status(400).json({ message: "Ya existe una reserva para las fechas seleccionadas" });
-//     }
-
-//     // Si todo está bien, proceder con la inserción
-//     let sqlInsertar = `
-//       INSERT INTO servicios (fk_idTipoServicio, fecha, fk_idAmbiente, fk_idUsuarios, fecha_fin) 
-//       VALUES (4, ?, ?, ?, ?)
-//     `;
-    
-//     const [resultado] = await conexion.query(sqlInsertar, [
-//       fecha,
-//       fk_idAmbiente,
-//       fk_idUsuarios,
-//       fecha_fin,
-//     ]);
-
-//     if (resultado.affectedRows > 0) {
-//       res.status(200).json({ message: "Reserva de laboratorio exitosa" });
-//     } else {
-//       res.status(404).json({ message: "No se pudo crear la reserva" });
-//     }
-//   } catch (error) {
-//     res.status(500).json({ message: "Error en el servidor: " + error.message });
-//   }
-// };
-
 export const registrarAlquiler = async (req, res) => {
   try {
     const { fecha, fk_idAmbiente, fk_idUsuarios, fecha_fin } = req.body;
@@ -200,8 +145,6 @@ export const registrarAlquiler = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor: " + error.message });
   }
 };
-
-
 
 export const actualizarAlquiler = async (req, res) => {
   try {

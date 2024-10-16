@@ -1,5 +1,7 @@
 import { Router } from "express";
-import { actualizarestadoservicio, actualizartiposervicio, eliminartiposervicio, listartiposervicio, listartiposervicioId,listartiposervcioActivo, registrartiposervicio, ValidarServiciodeDocumento } from "../controllers/tiposervicioControllers.js";
+import { actualizarestadoservicio, actualizartiposervicio, eliminartiposervicio,
+     listartiposervicio, listartiposervicioId,listartiposervcioActivo, registrartiposervicio, 
+     ValidarServiciodeDocumento, listarTiposServicioConDocumentoActivo } from "../controllers/tiposervicioControllers.js";
 import { validarToken } from "../controllers/AutentificacionLogin.js";
 import { validateTipoServicio } from "../../validation/tipoServicioValidation.js";
 
@@ -14,5 +16,8 @@ rutaidTipoServicio.post('/validarTiposervicio', ValidarServiciodeDocumento);
 rutaidTipoServicio.put('/actualizar/:id', validateTipoServicio, actualizartiposervicio);
 rutaidTipoServicio.put('/estado/:id', validateTipoServicio, actualizarestadoservicio);
 rutaidTipoServicio.delete('/eliminar/:id', eliminartiposervicio);
+rutaidTipoServicio.get('/listarTipoServActivos', listarTiposServicioConDocumentoActivo);
+
+
 
 export default rutaidTipoServicio;

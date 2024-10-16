@@ -8,10 +8,11 @@ export const generarFacturas = async (req, res) => {
     m.codigo_muestra,
     m.cantidadEntrada,
     GROUP_CONCAT(DISTINCT ts.nombreServicio ORDER BY ts.nombreServicio ASC SEPARATOR ', ') AS servicios,
-    GROUP_CONCAT(DISTINCT CONCAT(ts.nombreServicio, ': ', p.precio) ORDER BY ts.nombreServicio ASC SEPARATOR ', ') AS precios,
+    GROUP_CONCAT(DISTINCT CONCAT(ts.nombreServicio, ': ', p.precio, ' ', p.UnidadMedida) ORDER BY ts.nombreServicio ASC SEPARATOR ', ') AS precios,
     GROUP_CONCAT(DISTINCT CONCAT(ts.nombreServicio, ': ', FORMAT(s.cantidad_salida, 2)) ORDER BY ts.nombreServicio ASC SEPARATOR ', ') AS cantidad_salida_servicios,
     FORMAT(SUM(s.cantidad_salida * p.precio), 3) AS total_calculado,  
     f.nombre_finca,
+    p.UnidadMedida,
     mun.nombre_municipio,
     u.nombre AS nombre_usuario,
     u.apellidos AS apellido_usuario,
@@ -32,13 +33,17 @@ JOIN
 LEFT JOIN 
     usuarios us ON s.fk_idUsuarios = us.id_usuario
 LEFT JOIN 
-    (SELECT fk_idTipoServicio, MAX(precio) as precio FROM precio WHERE estado_precio = 'activo' GROUP BY fk_idTipoServicio) p ON ts.idTipoServicio = p.fk_idTipoServicio
+    (SELECT fk_idTipoServicio, MAX(precio) AS precio, UnidadMedida 
+     FROM precio 
+     WHERE estado_precio = 'activo' 
+     GROUP BY fk_idTipoServicio, UnidadMedida) p ON ts.idTipoServicio = p.fk_idTipoServicio
 WHERE 
     m.codigo_muestra = '${codigo}'
 AND 
     s.estado = 'terminado'
 GROUP BY 
-    m.codigo_muestra, 
+    m.codigo_muestra,
+    p.UnidadMedida, 
     m.cantidadEntrada,  
     f.nombre_finca, 
     mun.nombre_municipio, 
