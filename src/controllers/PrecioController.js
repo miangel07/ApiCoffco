@@ -8,6 +8,7 @@ export const listarPrecios = async (req, res) => {
       p.idPrecio,
       p.estado_precio,
       p.presentacion,
+      p.UnidadMedida,
       p.precio,
       t.nombreServicio
     FROM
@@ -40,17 +41,18 @@ export const registrarPrecio = async (req, res) => {
     }
 
     // Obtener los datos del cuerpo de la solicitud
-    const {  presentacion, precio, fk_idTipoServicio } = req.body;
+    const { presentacion, precio, fk_idTipoServicio, unidaMedida } = req.body;
 
     // Consulta SQL para insertar el nuevo precio
-    const sql = `INSERT INTO precio ( presentacion, precio, fk_idTipoServicio)
-                 VALUES (?, ?, ?)`;
+    const sql = `INSERT INTO precio ( presentacion, precio, fk_idTipoServicio,UnidadMedida)
+                 VALUES (?, ?, ?,?)`;
 
     // Ejecutar la consulta
     const [result] = await conexion.query(sql, [
       presentacion,
       precio,
       fk_idTipoServicio,
+      unidaMedida
     ]);
 
     // Verificar el resultado de la consulta
@@ -88,7 +90,7 @@ export const eliminarPrecio = async (req, res) => {
 export const actualizarPrecio = async (req, res) => {
   try {
     let idPrecio = req.params.idPrecio;
-    let {presentacion, precio, fk_idTipoServicio } = req.body;
+    let { presentacion, precio, fk_idTipoServicio } = req.body;
 
     let sql = `UPDATE precio SET presentacion = ?, precio = ?, fk_idTipoServicio = ? WHERE idPrecio = ?`;
     let values = [
@@ -112,19 +114,19 @@ export const actualizarPrecio = async (req, res) => {
   }
 };
 
-export const actualizarEstado = async(req,res)=>{
+export const actualizarEstado = async (req, res) => {
   try {
-    let {estado_precio}=req.body
+    let { estado_precio } = req.body
     let idPrecio = req.params.idPrecio;
-    let sql=`update precio set estado_precio=? where idPrecio=?`
-    const [respuesta] = await conexion.query(sql,[estado_precio,idPrecio])
-    if(respuesta.affectedRows>0){
-      res.status(200).json({message:'Estado Actualizado correctamente'})
-    }else{
-      res.status(404).json({message:'Estado no actualizado'})
+    let sql = `update precio set estado_precio=? where idPrecio=?`
+    const [respuesta] = await conexion.query(sql, [estado_precio, idPrecio])
+    if (respuesta.affectedRows > 0) {
+      res.status(200).json({ message: 'Estado Actualizado correctamente' })
+    } else {
+      res.status(404).json({ message: 'Estado no actualizado' })
     }
   } catch (error) {
-    res.status(500).json({message: 'Error en la conexion'+error.message})
+    res.status(500).json({ message: 'Error en la conexion' + error.message })
   }
 }
 
