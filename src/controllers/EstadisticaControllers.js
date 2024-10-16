@@ -40,17 +40,18 @@ ORDER BY
 export const EstadisticasAlquiler = async (req, res) => {
     try {
         let slq = `SELECT 
-                DATE_FORMAT(fecha, '%Y-%m') AS fecha, 
-                COUNT(*) AS cantidad_servicios
-            FROM 
-                servicios
-            WHERE 
-                fk_idTipoServicio = 4
-                AND fecha BETWEEN CURDATE() - INTERVAL 4 MONTH AND CURDATE() + INTERVAL 4 MONTH
-            GROUP BY 
-                fecha
-            ORDER BY 
-                fecha;
+    DATE_FORMAT(fecha, '%Y-%m') AS fecha, 
+    COUNT(*) AS cantidad_servicios
+FROM 
+    servicios
+WHERE 
+    fk_idTipoServicio = 4
+    AND fecha BETWEEN CURDATE() - INTERVAL 4 MONTH AND CURDATE() + INTERVAL 4 MONTH
+GROUP BY 
+    DATE_FORMAT(fecha, '%Y-%m')  
+ORDER BY 
+    fecha;
+
 
 
 `
