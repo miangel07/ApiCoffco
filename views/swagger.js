@@ -6,7 +6,6 @@ import { muestrasDocs } from '../src/swagger/muestras.js';
 import { alquilerDocs } from '../src/swagger/alquiler.js';
 import { ambienteDocs } from '../src/swagger/ambiente.js';
 import { authDocs } from '../src/swagger/Auth.js';
-import { consultasDocs } from '../src/swagger/consultas.js';
 import { documentosDocs } from '../src/swagger/documentos.js';
 import { estadisticaDocs } from '../src/swagger/estadistica.js';
 import { facturasDocs } from '../src/swagger/facturas.js';
@@ -44,7 +43,6 @@ const options = {
       ...alquilerDocs,
       ...ambienteDocs,
       ...authDocs,
-      ...consultasDocs,
       ...documentosDocs,
       ...estadisticaDocs,
       ...facturasDocs,
