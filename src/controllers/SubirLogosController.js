@@ -40,7 +40,7 @@ export const subirLogos = (req, res, next) => {
       return res.status(400).json({ message: err.message });
     }
     if (!req.file) {
-      return res.status(400).json({ message: 'No se subió ningún archivo.' });
+      return next();
     }
     next();
   });
