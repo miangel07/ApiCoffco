@@ -6,12 +6,12 @@ import { logoValidate } from "../../validation/logoValidation.js";
 
 const logoRouter = Router()
 
-logoRouter.get('/listar', listarLogos)
-logoRouter.get('/listaActivos', logosActivos)
-logoRouter.post('/registrar', subirLogos, logoValidate, registrarLogo)
+logoRouter.get('/listar', validarToken, listarLogos)
+logoRouter.get('/listaActivos', validarToken, logosActivos)
+logoRouter.post('/registrar', validarToken, subirLogos, logoValidate, registrarLogo)
 logoRouter.delete('/eliminar/:id', validarToken, eliminarLogo)
-logoRouter.put('/actualizar/:id', subirLogos, actualizarLogo)
-logoRouter.put('/estado/:id', estadoLogo)
+logoRouter.put('/actualizar/:id', validarToken, subirLogos, actualizarLogo)
+logoRouter.put('/estado/:id', validarToken, estadoLogo)
 logoRouter.get('/listarid/:id', validarToken, buscarLogo)
 
 export default logoRouter
