@@ -6,16 +6,17 @@ import { validacionUserActualizar } from "../../validation/UsuariosValidatorUpda
 import { validarToken} from "../controllers/AutentificacionLogin.js";
 const rutaUsuario= Router()
 
-rutaUsuario.get('/listar', listarUsuario)
-rutaUsuario.get('/listarroles', listarRoles)
-rutaUsuario.get('/listarid/:id', listarUsuarioId)
-rutaUsuario.post('/registrar', registrarUsuario)
-rutaUsuario.put('/contra/:id', verificarContraseña)
-rutaUsuario.delete('/eliminar/:id_usuario',  eliminarUsuario)
-rutaUsuario.put('/estado/:id_usuario',estadoUsuario)
-rutaUsuario.put('/actualizar/:id', validacionUserActualizar, actualizarUsuario)
-rutaUsuario.get('/consulta',ConsultaUsers)
-rutaUsuario.get('/clientes',listarClientes)
+rutaUsuario.get('/listar', validarToken, listarUsuario)
+rutaUsuario.get('/listarroles', validarToken, listarRoles)
+rutaUsuario.get('/listarid/:id', validarToken, listarUsuarioId)
+rutaUsuario.post('/registrar', validarToken, registrarUsuario)
+rutaUsuario.post('/registrarlogin', registrarUsuario)
+rutaUsuario.put('/contra/:id', validarToken, verificarContraseña)
+rutaUsuario.delete('/eliminar/:id_usuario', validarToken, eliminarUsuario)
+rutaUsuario.put('/estado/:id_usuario', validarToken, estadoUsuario)
+rutaUsuario.put('/actualizar/:id', validarToken, validacionUserActualizar, actualizarUsuario)
+rutaUsuario.get('/consulta', validarToken, ConsultaUsers)
+rutaUsuario.get('/clientes', validarToken, listarClientes)
 
 
 export default rutaUsuario
