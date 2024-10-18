@@ -36,7 +36,7 @@
 
 /**
  * @swagger
- * /api/usuarios/listar:
+ * /api/usuario/listar:
  *   get:
  *     summary: Obtiene la lista de todos los usuarios
  *     tags:
@@ -56,7 +56,7 @@
 
 /**
  * @swagger
- * /api/usuarios/listarroles:
+ * /api/usuario/listarroles:
  *   get:
  *     summary: Obtiene la lista de roles y su cantidad de usuarios
  *     tags:
@@ -87,7 +87,7 @@
 
 /**
  * @swagger
- * /api/usuarios/listarid/{id}:
+ * /api/usuario/listarid/{id}:
  *   get:
  *     summary: Obtiene un usuario por su ID
  *     tags:
@@ -112,7 +112,7 @@
 
 /**
  * @swagger
- * /api/usuarios/registrar:
+ * /api/usuario/registrar:
  *   post:
  *     summary: Crea un nuevo usuario
  *     tags:
@@ -136,7 +136,7 @@
 
 /**
  * @swagger
- * /api/usuarios/actualizar/{id}:
+ * /api/usuario/actualizar/{id}:
  *   put:
  *     summary: Actualiza un usuario por su ID
  *     tags:
@@ -169,7 +169,7 @@
 
 /**
  * @swagger
- * /api/usuarios/eliminar/{id_usuario}:
+ * /api/usuario/eliminar/{id_usuario}:
  *   delete:
  *     summary: Elimina un usuario por su ID
  *     tags:
@@ -190,7 +190,7 @@
 
 /**
  * @swagger
- * /api/usuarios/estado/{id_usuario}:
+ * /api/usuario/estado/{id_usuario}:
  *   put:
  *     summary: Cambia el estado de un usuario (activo/inactivo)
  *     tags:
@@ -213,7 +213,7 @@
 
 /**
  * @swagger
- * /api/usuarios/clientes:
+ * /api/usuario/clientes:
  *   get:
  *     summary: Obtiene la lista de todos los clientes
  *     tags:
@@ -243,7 +243,7 @@
 
 /**
  * @swagger
- * /api/usuarios/consulta:
+ * /api/usuario/consulta:
  *   get:
  *     summary: Consulta la cantidad de usuarios por rol
  *     tags:

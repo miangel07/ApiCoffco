@@ -4,6 +4,11 @@ import { validationResult } from "express-validator";
 
 export const ListarMuestras = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     const sql = `
       SELECT 
         m.id_muestra, 
@@ -58,9 +63,9 @@ export const ListarMuestras = async (req, res) => {
 
 export const RegistrarMuestra = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
     }
 
     console.log('Datos recibidos:', req.body); // Para depuración
@@ -146,10 +151,11 @@ export const ActualizarMuestra = async (req, res) => {
     console.log("Contenido de req.body:", req.body);
 
     // Validar si hay errores en los datos enviados
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
     }
+
 
     const {
       cantidadEntrada,
@@ -195,7 +201,7 @@ export const ActualizarMuestra = async (req, res) => {
       ? fk_id_usuarios 
       : currentData.fk_id_usuarios;
 
-    const updatedFkIdTipoServicio = fk_idTipoServicio && await isValidForeignKey('tipoServicio', 'idTipoServicio', fk_idTipoServicio) 
+    const updatedFkIdTipoServicio = fk_idTipoServicio && await isValidForeignKey('tiposervicio', 'idTipoServicio', fk_idTipoServicio) 
       ? fk_idTipoServicio 
       : currentData.fk_idTipoServicio;
 
@@ -275,6 +281,11 @@ export const ActualizarMuestra = async (req, res) => {
 
 export const eliminarMuestra = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     // Obtén el id desde los parámetros de la ruta
     const { id_muestra } = req.params;
 
@@ -305,6 +316,11 @@ export const eliminarMuestra = async (req, res) => {
 
 export const ListaridMuestra = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     let id = req.params.id;
     let sql = `select * from muestra where id_muestra=${id}`;
     const [responde] = await conexion.query(sql);
