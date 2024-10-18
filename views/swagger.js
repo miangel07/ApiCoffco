@@ -17,7 +17,7 @@ import { precioDocs } from '../src/swagger/precio.js';
 import { recuperarContraseñaDocs } from '../src/swagger/recuperarContraseña.js';
 import { rolDocs } from '../src/swagger/rol.js';
 import { tipoDocumentoDocs } from '../src/swagger/tipoDocumento.js';
-import { tiposervicioDocs } from '../src/swagger/tiposervicio.js';
+import { tiposervicioDocs } from '../src/swagger/tipoServicio.js';
 import { valorDocs } from '../src/swagger/valor.js';
 import { variablesDocs } from '../src/swagger/variables.js';
 import { versionesDocs } from '../src/swagger/versiones.js';
