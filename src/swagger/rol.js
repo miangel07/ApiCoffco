@@ -15,7 +15,7 @@
 
 /**
  * @swagger
- * /api/roles/listar:
+ * /api/rol/listar:
  *   get:
  *     summary: Listar todos los roles
  *     tags:
@@ -37,7 +37,7 @@
 
 /**
  * @swagger
- * /api/roles/registrar:
+ * /api/rol/registrar:
  *   post:
  *     summary: Registrar un nuevo rol
  *     tags:
@@ -59,7 +59,7 @@
 
 /**
  * @swagger
- * /api/roles/actualizar/{idRol}:
+ * /api/rol/actualizar/{idRol}:
  *   put:
  *     summary: Actualizar un rol existente
  *     tags:
@@ -88,7 +88,7 @@
 
 /**
  * @swagger
- * /api/roles/eliminar/{idRol}:
+ * /api/rol/eliminar/{idRol}:
  *   delete:
  *     summary: Eliminar un rol
  *     tags:
@@ -111,7 +111,7 @@
 
 /**
  * @swagger
- * /api/roles/listarid/{idRol}:
+ * /api/rol/listarid/{idRol}:
  *   get:
  *     summary: Buscar rol por ID
  *     tags:
