@@ -59,7 +59,6 @@ export const listaIngresoTrilla = async (req, res) => {
   }
 };
 
-
 export const obtenerInformacionServicio = async (req, res) => {
   try {
     // Obtener los parámetros del cuerpo de la solicitud
@@ -100,7 +99,7 @@ export const obtenerInformacionServicio = async (req, res) => {
       JOIN logos l ON ld.logo_idlogos = l.idLogos
       JOIN finca f ON m.fk_id_finca = f.id_finca -- Unir con finca
       JOIN municipio mun ON f.fk_id_municipio = mun.id_municipio -- Unir con municipio
-      JOIN tipoServicio ts ON s.fk_idTipoServicio = ts.idTipoServicio -- Cambiar a 'tipoServicio' (nombre correcto)
+      JOIN tiposervicio ts ON s.fk_idTiposervicio = ts.idTipoServicio -- Cambiado a 'tiposervicio' (nombre correcto)
       WHERE s.fk_idTiposervicio = ?
         AND v.estado = 'activo' -- Filtra solo documentos con versión activa
         AND (d.fecha_emision BETWEEN ? AND ? OR m.fecha_muestra BETWEEN ? AND ?)
@@ -141,4 +140,3 @@ export const obtenerInformacionServicio = async (req, res) => {
     });
   }
 };
-
