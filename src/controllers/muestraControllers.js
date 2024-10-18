@@ -201,7 +201,7 @@ export const ActualizarMuestra = async (req, res) => {
       ? fk_id_usuarios 
       : currentData.fk_id_usuarios;
 
-    const updatedFkIdTipoServicio = fk_idTipoServicio && await isValidForeignKey('tipoServicio', 'idTipoServicio', fk_idTipoServicio) 
+    const updatedFkIdTipoServicio = fk_idTipoServicio && await isValidForeignKey('tiposervicio', 'idTipoServicio', fk_idTipoServicio) 
       ? fk_idTipoServicio 
       : currentData.fk_idTipoServicio;
 
