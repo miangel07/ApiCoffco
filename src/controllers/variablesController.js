@@ -3,6 +3,11 @@ import { validationResult } from "express-validator";
 
 export const ListarVariables = async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     let sql = "select * from variables";
     const [respuesta] = await conexion.query(sql);
 
@@ -18,9 +23,9 @@ export const ListarVariables = async (req, res) => {
 export const RegistrarVariables = async (req, res) => {
   try {
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
     }
 
     let { nombre, tipo_dato, UnidadMedida } = req.body;
@@ -83,10 +88,11 @@ export const ListarIdVariables = async (req, res) => {
 export const ActualizarVariables = async (req, res) => {
   try {
     // Validar los errores de entrada
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
     }
+
 
     let { nombre, tipo_dato, UnidadMedida } = req.body;
     let id = req.params.id;
@@ -153,6 +159,10 @@ export const UpdateEstado = async (req, res) => {
   try {
     let id = req.params.id;
     let { estado } = req.body;
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
 
     let sql = `update variables set estado=? where idVariable=?`;
     const [respuesta] = await conexion.query(sql, [estado, id]);
@@ -168,6 +178,11 @@ export const UpdateEstado = async (req, res) => {
 };
 export const valiribaleActivas =async (req, res) => {
   try {
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json(error);
+    }
+
     let sql = `SELECT * FROM variables WHERE estado = 'activo'`;
     const [respuesta] = await conexion.query(sql);
     if (respuesta.length > 0) {
