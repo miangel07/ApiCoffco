@@ -59,31 +59,32 @@
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Muestra'
+ *       404:
+ *         description: No se encontraron muestras.
+ *       500:
+ *         description: Error en la conexión.
  */
 
 /**
  * @swagger
- * /api/muestras/listarid/{id}:
+ * /api/muestras/listarTerminadas:
  *   get:
- *     summary: Obtiene una muestra por su ID
+ *     summary: Obtiene una lista de muestras terminadas
  *     tags:
  *       - Muestras
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: "El ID de la muestra"
- *         schema:
- *           type: integer
  *     responses:
  *       200:
- *         description: Muestra obtenida con éxito
+ *         description: Lista de muestras terminadas obtenida con éxito
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Muestra'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Muestra'
  *       404:
- *         description: Muestra no encontrada
+ *         description: No se encontraron muestras terminadas.
+ *       500:
+ *         description: Error en la conexión.
  */
 
 /**
@@ -108,6 +109,10 @@
  *               $ref: '#/components/schemas/Muestra'
  *       400:
  *         description: Error en los datos enviados
+ *       404:
+ *         description: Tipo de servicio no encontrado.
+ *       500:
+ *         description: Error al registrar la muestra.
  */
 
 /**
@@ -141,6 +146,8 @@
  *         description: Muestra no encontrada
  *       400:
  *         description: Error en los datos enviados
+ *       500:
+ *         description: Error al actualizar la muestra.
  */
 
 /**
@@ -162,6 +169,67 @@
  *         description: Muestra eliminada con éxito
  *       404:
  *         description: Muestra no encontrada
+ *       500:
+ *         description: Error en la conexión.
+ */
+
+/**
+ * @swagger
+ * /api/muestras/listarid/{id}:
+ *   get:
+ *     summary: Obtiene una muestra por su ID
+ *     tags:
+ *       - Muestras
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: "El ID de la muestra"
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Muestra obtenida con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Muestra'
+ *       404:
+ *         description: Muestra no encontrada
+ *       500:
+ *         description: Error en la conexión.
+ */
+
+/**
+ * @swagger
+ * /api/muestras/estado/{id}:
+ *   put:
+ *     summary: Actualiza el estado de una muestra
+ *     tags:
+ *       - Muestras
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: "El ID de la muestra"
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               estado:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Estado actualizado con éxito.
+ *       404:
+ *         description: Muestra no encontrada
+ *       500:
+ *         description: Error en la conexión.
  */
 
 export const muestrasDocs = {};

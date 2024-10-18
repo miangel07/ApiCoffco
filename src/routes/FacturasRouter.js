@@ -5,8 +5,8 @@ import { generarFacturas, facturasAlquiler } from "../controllers/FacturasContro
 const FacturasRouter = Router()
 
 
-FacturasRouter.post('/generar',  generarFacturas)
-FacturasRouter.post('/alquiler',  facturasAlquiler)
+FacturasRouter.post('/generar', validarToken, generarFacturas)
+FacturasRouter.post('/alquiler',  validarToken, facturasAlquiler)
 
 
 export default FacturasRouter

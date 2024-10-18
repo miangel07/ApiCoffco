@@ -8,10 +8,10 @@ const rutaVariables = Router()
 rutaVariables.post("/registrar", validarToken, validateVariables, RegistrarVariables)
 rutaVariables.get("/listar", validarToken,ListarVariables)
 rutaVariables.get("/listaActivas",validarToken, valiribaleActivas)
-rutaVariables.get("/listarid/:id", ListarIdVariables)
+rutaVariables.get("/listarid/:id", validarToken ,ListarIdVariables)
 rutaVariables.put("/actualizar/:id", validarToken, validateVariables, ActualizarVariables)
-rutaVariables.put("/estado/:id", UpdateEstado)
-rutaVariables.delete("/eliminar/:id", ELiminarVariables)
+rutaVariables.put("/estado/:id", validarToken,UpdateEstado)
+rutaVariables.delete("/eliminar/:id",validarToken, ELiminarVariables)
 
 
 export default rutaVariables

@@ -6,13 +6,13 @@ import { subirMuestras } from "../controllers/SubirMuestrasController.js";
 
 const ruta = Router()
 
-ruta.get("/listar", ListarMuestras)
-ruta.get("/listarTerminadas", MuestrasTerminadas)
-ruta.post("/registrar", subirMuestras, RegistrarMuestra)
-ruta.put("/actualizar/:id", subirMuestras, ActualizarMuestra)
-ruta.put("/estado/:id", ActualizarEstadoMuestra)
-ruta.delete("/eliminar/:id_muestra", eliminarMuestra)
-ruta.get("/listarid/:id", ListaridMuestra)
+ruta.get("/listar", validarToken, ListarMuestras)
+ruta.get("/listarTerminadas", validarToken, MuestrasTerminadas)
+ruta.post("/registrar", validarToken, subirMuestras, RegistrarMuestra)
+ruta.put("/actualizar/:id",validarToken,  subirMuestras, ActualizarMuestra)
+ruta.put("/estado/:id",validarToken,  ActualizarEstadoMuestra)
+ruta.delete("/eliminar/:id_muestra", validarToken, eliminarMuestra)
+ruta.get("/listarid/:id", validarToken, ListaridMuestra)
 
 export default ruta
 

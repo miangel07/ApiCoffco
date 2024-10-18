@@ -59,7 +59,6 @@ export const estadoUsuario = async (req, res) => {
   }
 };
 
-
 export const listarUsuarioId = async (req, res) => {
   try {
     let id = req.params.id;
