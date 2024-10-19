@@ -9,9 +9,9 @@ const rutaVersion = Router()
 
 rutaVersion.get('/listar', validarToken, listarVersiones)
 rutaVersion.get('/listarid/:id_formato', validarToken, ListaridVersiones)
-rutaVersion.post('/registrar',  validateVersiones, registrarVersiones)
+rutaVersion.post('/registrar', validarToken,  validateVersiones, registrarVersiones)
 rutaVersion.put('/actualizarVersion/:id_formato', validarToken,  validateVersiones, actualizarVersiones)
-rutaVersion.put('/actualizarEstado/:id_formato',  desactivarEstado)
+rutaVersion.put('/actualizarEstado/:id_formato',validarToken,  desactivarEstado)
 rutaVersion.put('/actualizar/:id_formato', validarToken,  validateVersiones, actualizar)
 rutaVersion.delete('/eliminar/:id_formato', validarToken, eliminarVersiones)
 
