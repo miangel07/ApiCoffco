@@ -4,6 +4,10 @@ import { validationResult } from "express-validator";
 //obtiene variables para registro segun id_muestra
 export const getVariables = async (req, res) => {
   try {
+
+    
+
+
     const { id_muestra } = req.body;
 
     // Verifica si id_muestra está presente
@@ -50,7 +54,10 @@ export const getVariables = async (req, res) => {
     } else {
       return res
         .status(404)
-        .json({ message: "No se encontraron Documentos o Variables" });
+        .json({
+          message:
+            "No se encontraron documentos o variables para esta muestra.",
+        });
     }
   } catch (error) {
     return res
@@ -154,7 +161,9 @@ export const getPreciosSegunTipoServicio = async (req, res) => {
 
     // Consulta para obtener el fk_idTipoServicio relacionado con la muestra
     const sqlGetTipoServicio = `SELECT fk_idTipoServicio, UnidadMedida FROM muestra WHERE id_muestra = ?`;
-    const [getTipoServicio] = await conexion.query(sqlGetTipoServicio, [id_muestra]);
+    const [getTipoServicio] = await conexion.query(sqlGetTipoServicio, [
+      id_muestra,
+    ]);
 
     if (getTipoServicio.length === 0) {
       return res.status(404).json({ message: "Muestra no encontrada" });
@@ -166,7 +175,10 @@ export const getPreciosSegunTipoServicio = async (req, res) => {
     if (!fk_idTipoServicio || !UnidadMedida) {
       return res
         .status(404)
-        .json({ message: "Tipo de servicio o unidad de medida no encontrado para la muestra" });
+        .json({
+          message:
+            "Tipo de servicio o unidad de medida no encontrado para la muestra",
+        });
     }
 
     // Consulta para obtener los precios filtrados por fk_idTipoServicio y UnidadMedida
@@ -190,14 +202,20 @@ export const getPreciosSegunTipoServicio = async (req, res) => {
         p.estado_precio = 'activo'
     `;
 
-    const [respuesta] = await conexion.query(sqlVariables, [fk_idTipoServicio, UnidadMedida]);
+    const [respuesta] = await conexion.query(sqlVariables, [
+      fk_idTipoServicio,
+      UnidadMedida,
+    ]);
 
     if (respuesta.length > 0) {
       return res.status(200).json(respuesta);
     } else {
       return res
         .status(404)
-        .json({ message: "No se encontraron precios para el servicio y la unidad de medida" });
+        .json({
+          message:
+            "No se encontraron precios para el servicio y la unidad de medida",
+        });
     }
   } catch (error) {
     return res
@@ -206,10 +224,15 @@ export const getPreciosSegunTipoServicio = async (req, res) => {
   }
 };
 
-
 // registra un servicio
 export const registrarServicio = async (req, res) => {
   try {
+
+    const error = validationResult(req)
+    if(!error.isEmpty()){
+      return res.status(400).json(error);
+    }
+
     const {
       fk_idTipoServicio,
       fecha,
@@ -415,11 +438,6 @@ export const listarServiciosId = async (req, res) => {
 export const editarValoresPorServicio = async (req, res) => {
   try {
     const { id_servicios, valoresVariables } = req.body;
-
-    console.log("Datos recibidos para editar valores:", {
-      id_servicios,
-      valoresVariables,
-    });
 
     // Verificación de campos obligatorios
     if (!id_servicios || !valoresVariables) {
@@ -645,12 +663,9 @@ export const getValoresDeVariablesPorIDServicio = async (req, res) => {
     if (valores.length > 0) {
       return res.status(200).json(valores);
     } else {
-      return res
-        .status(404)
-        .json({
-          message:
-            "No se encontraron valores para el id_servicios proporcionado",
-        });
+      return res.status(404).json({
+        message: "No se encontraron valores para el id_servicios proporcionado",
+      });
     }
   } catch (error) {
     return res
@@ -658,7 +673,6 @@ export const getValoresDeVariablesPorIDServicio = async (req, res) => {
       .json({ message: `Error en el servidor: ${error.message}` });
   }
 };
-
 
 export const getCambios = async (req, res) => {
   try {
@@ -689,10 +703,34 @@ export const getCambios = async (req, res) => {
     if (respuesta.length > 0) {
       return res.status(200).json(respuesta);
     } else {
-      return res.status(404).json({ message: 'No se encontraron cambios' });
+      return res.status(404).json({ message: "No se encontraron cambios" });
     }
   } catch (error) {
-    return res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    return res
+      .status(500)
+      .json({ message: "Error en el servidor: " + error.message });
   }
 };
 
+export const obtenerDatosDeMuestraSegunServicio = async (req, res) => {
+  try {
+    let id = req.params.id;
+
+    let sql = `SELECT 
+    m.* 
+FROM 
+    servicios s
+JOIN 
+    muestra m ON s.fk_idMuestra = m.id_muestra
+WHERE 
+    s.id_servicios = ?`;
+    const [resultado] = await conexion.query(sql, [id]);
+    if (resultado.length > 0) {
+      res.status(200).json(resultado);
+    } else {
+      res.status(404).json({ message: "Muestra no encontrada" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor: " + error.message });
+  }
+};

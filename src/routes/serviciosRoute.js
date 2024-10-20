@@ -1,6 +1,7 @@
 import { Router } from "express";
-import {actualizarEstadoServicio, editarValoresPorServicio, eliminarServicios, getCambios, getMuestrasParaServicios, getPreciosSegunTipoServicio, getTipoServicioDeIDMuestra, getValoresDeVariablesPorIDServicio, getVariables, getVariablesUpdate, listarServicios, registrarCambio, registrarServicio, registroServicioTerminado} from '../controllers/serviciosController.js'
+import {actualizarEstadoServicio, editarValoresPorServicio, eliminarServicios, getCambios, getMuestrasParaServicios, getPreciosSegunTipoServicio, getTipoServicioDeIDMuestra, getValoresDeVariablesPorIDServicio, getVariables, getVariablesUpdate, listarServicios, obtenerDatosDeMuestraSegunServicio, registrarCambio, registrarServicio, registroServicioTerminado} from '../controllers/serviciosController.js'
 import { validarToken } from "../controllers/AutentificacionLogin.js";
+import { validateServicios } from "../../validation/serviciosValidation.js";
 
 
 const rutaServicios = Router();
@@ -12,7 +13,8 @@ rutaServicios.post('/getserviciosconvariablesvalor',validarToken,  getValoresDeV
 rutaServicios.get('/getmuestrasser',validarToken,  getMuestrasParaServicios)
 rutaServicios.post('/getprecio',validarToken,  getPreciosSegunTipoServicio)
 rutaServicios.get('/getcambios', validarToken, getCambios)
-rutaServicios.post('/registrarser', validarToken, registrarServicio)
+rutaServicios.get('/gedatosmuestra/:id',  obtenerDatosDeMuestraSegunServicio)
+rutaServicios.post('/registrarser',validarToken,validateServicios,registrarServicio)
 rutaServicios.post('/registrarcambio',validarToken,  registrarCambio)
 rutaServicios.post('/editarvaloresvariables', validarToken, editarValoresPorServicio)
 rutaServicios.put('/servicioter/:id',validarToken,  registroServicioTerminado)
@@ -21,5 +23,3 @@ rutaServicios.delete('/eliminar/:id', validarToken, eliminarServicios)
 
 
 export default rutaServicios;
-
-
