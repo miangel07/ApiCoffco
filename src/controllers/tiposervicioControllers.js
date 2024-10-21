@@ -184,3 +184,31 @@ export const listartiposervcioActivo = async (req, res) => {
     }
 }
 
+
+
+// Listar Tipos de Servicio con Documento Activo
+export const listarTiposServicioConDocumentoActivo = async (req, res) => {
+    try {
+        // Consulta SQL que selecciona los tipos de servicio con al menos un documento activo
+        const sql = `
+            SELECT DISTINCT ts.idTipoServicio,  ts.nombreServicio
+            FROM tiposervicio ts
+            JOIN documentos d ON ts.idTipoServicio = d.fk_idTipoServicio
+            JOIN versiones v ON d.id_documentos = v.fk_documentos
+            WHERE v.estado = 'activo'
+        `;
+
+        // Ejecutar la consulta
+        const [result] = await conexion.query(sql);
+
+        // Comprobar si se encontraron resultados
+        if (result.length > 0) {
+            res.status(200).json(result);  // Enviar los datos en formato JSON
+        } else {
+            res.status(404).json({ message: 'No se encontraron tipos de servicio con documentos activos' });
+        }
+    } catch (error) {
+        // Captura cualquier error y envía una respuesta con un mensaje
+        res.status(500).json({ message: 'Error en el servidor: ' + error.message });
+    }
+};
